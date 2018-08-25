@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import aodev.blue.rxsandbox.R
@@ -18,7 +19,6 @@ import kotlin.properties.Delegates
 
 // TODO Add RTL support
 // TODO Add inner horizontal padding
-// TODO Fix the text alignment
 // TODO Fix the arrow not being displayed
 class TimelineView : View {
 
@@ -53,7 +53,7 @@ class TimelineView : View {
     }
 
 
-    // Ressources
+    // Resources
     private val strokeWidth = context.resources.getDimension(R.dimen.timeline_stroke_width)
     private val padding = context.resources.getDimension(R.dimen.timeline_padding)
     private val eventSize = context.resources.getDimension(R.dimen.timeline_event_size)
@@ -91,13 +91,14 @@ class TimelineView : View {
         color = errorColor
     }
 
-    // Path
+    // Draw
     private val arrowPath = Path().apply {
         // Starting from the pointy end
         rMoveTo(-arrowWidth, arrowHeight / 2)
         rMoveTo(0f, arrowHeight)
         close()
     }
+    private val textBoundsRect = Rect()
 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -187,7 +188,13 @@ class TimelineView : View {
 
             canvas.drawCircle(position, centerHeight, eventSize / 2, eventFillPaint)
             canvas.drawCircle(position, centerHeight, eventSize / 2, strokePaint)
-            canvas.drawText(event.value.toString(), position, centerHeight, eventTextPaint)
+
+            val eventText = event.value.toString()
+            eventTextPaint.getTextBounds(eventText, 0, eventText.length, textBoundsRect)
+            val textX = position - textBoundsRect.width().toFloat() / 2 - textBoundsRect.left
+            val textY = centerHeight + textBoundsRect.height().toFloat() / 2 - textBoundsRect.bottom
+
+            canvas.drawText(event.value.toString(), textX, textY, eventTextPaint)
         }
     }
 
