@@ -4,11 +4,11 @@
     <!-- Timeline -->
     <dimen name="timeline_stroke_width">2dp</dimen>
     <dimen name="timeline_padding">16dp</dimen>
-    <dimen name="timeline_event_size">48dp</dimen>
+    <dimen name="timeline_event_size">36dp</dimen>
     <dimen name="timeline_event_text_size">16sp</dimen>
-    <dimen name="timeline_complete_height">36dp</dimen>
-    <dimen name="timeline_error_size">36dp</dimen>
-    <dimen name="timeline_arrow_width">16dp</dimen>
-    <dimen name="timeline_arrow_height">12dp</dimen>
+    <dimen name="timeline_complete_height">48dp</dimen>
+    <dimen name="timeline_error_size">40dp</dimen>
+    <dimen name="timeline_arrow_width">20dp</dimen>
+    <dimen name="timeline_arrow_height">20dp</dimen>
 
 </resources>

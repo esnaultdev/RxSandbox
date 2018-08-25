@@ -19,7 +19,6 @@ import kotlin.properties.Delegates
 
 // TODO Add RTL support
 // TODO Add inner horizontal padding
-// TODO Fix the arrow not being displayed
 class TimelineView : View {
 
     constructor(context: Context) : super(context)
@@ -76,7 +75,7 @@ class TimelineView : View {
     }
     private val arrowPaint = Paint().apply {
         color = strokeColor
-        style = Paint.Style.FILL
+        style = Paint.Style.FILL_AND_STROKE
     }
     private val eventFillPaint = Paint().apply {
         color = eventFillColor
@@ -92,12 +91,7 @@ class TimelineView : View {
     }
 
     // Draw
-    private val arrowPath = Path().apply {
-        // Starting from the pointy end
-        rMoveTo(-arrowWidth, arrowHeight / 2)
-        rMoveTo(0f, arrowHeight)
-        close()
-    }
+    private val arrowPath = Path()
     private val textBoundsRect = Rect()
 
 
@@ -127,6 +121,22 @@ class TimelineView : View {
         setMeasuredDimension(width, height)
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        computeArrowPath(w, h)
+    }
+
+    private fun computeArrowPath(width: Int, height: Int) {
+        arrowPath.run {
+            // Starting from the pointy end
+            moveTo(width - padding, height.toFloat() / 2)
+            rLineTo(-arrowWidth, -arrowHeight / 2)
+            rLineTo(0f, arrowHeight)
+            rLineTo(arrowWidth, -arrowHeight / 2)
+            close()
+        }
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -141,11 +151,7 @@ class TimelineView : View {
         val centerHeight = height.toFloat() / 2
 
         canvas.drawLine(padding, centerHeight, width - padding, centerHeight, strokePaint)
-
-        canvas.save()
-        canvas.translate(width - padding, centerHeight)
         canvas.drawPath(arrowPath, arrowPaint)
-        canvas.restore()
     }
 
     private fun drawTerminationEvent(canvas: Canvas, event: TerminationEvent) {
