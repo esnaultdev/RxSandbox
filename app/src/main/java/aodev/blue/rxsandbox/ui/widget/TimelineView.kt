@@ -18,7 +18,6 @@ import kotlin.properties.Delegates
 
 
 // TODO Add RTL support
-// TODO Add inner horizontal padding
 class TimelineView : View {
 
     constructor(context: Context) : super(context)
@@ -33,10 +32,12 @@ class TimelineView : View {
         if (isInEditMode) {
             timeline = Timeline(
                     listOf(
+                            Event(0f, 0),
                             Event(2f, 1),
                             Event(4f, 2),
                             Event(6f, 3),
-                            Event(8f, 4)
+                            Event(8f, 4),
+                            Event(10f, 5)
                     ),
                     TerminationEvent(Config.timelineDuration.toFloat(), Termination.Complete)
             )
@@ -55,6 +56,7 @@ class TimelineView : View {
     // Resources
     private val strokeWidth = context.resources.getDimension(R.dimen.timeline_stroke_width)
     private val padding = context.resources.getDimension(R.dimen.timeline_padding)
+    private val innerPadding = context.resources.getDimension(R.dimen.timeline_padding_inner)
     private val eventSize = context.resources.getDimension(R.dimen.timeline_event_size)
     private val eventTextSize = context.resources.getDimension(R.dimen.timeline_event_text_size)
     private val completeHeight = context.resources.getDimension(R.dimen.timeline_complete_height)
@@ -69,6 +71,7 @@ class TimelineView : View {
 
     // Paint
     private val strokePaint = Paint().apply {
+        flags = Paint.ANTI_ALIAS_FLAG
         color = strokeColor
         strokeWidth = this@TimelineView.strokeWidth
         style = Paint.Style.STROKE
@@ -88,6 +91,7 @@ class TimelineView : View {
     }
     private val errorPaint = Paint().apply {
         color = errorColor
+        style = Paint.Style.STROKE
     }
 
     // Draw
@@ -96,8 +100,8 @@ class TimelineView : View {
 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val desiredWidth = (2 * padding + 10 * eventSize).toInt()
-        val desiredHeight = (2 * padding + eventSize).toInt()
+        val desiredWidth = (2 * padding + 2 * innerPadding + 10 * eventSize).toInt()
+        val desiredHeight = (2 * padding + completeHeight).toInt()
 
         val widthMode = View.MeasureSpec.getMode(widthMeasureSpec)
         val widthSize = View.MeasureSpec.getSize(widthMeasureSpec)
@@ -205,6 +209,9 @@ class TimelineView : View {
     }
 
     private fun eventPosition(time: Float): Float {
-        return time / Config.timelineDuration * (width - 2 * padding) + padding
+        val timeFactor = time / Config.timelineDuration
+        val widthForEvents = width - 2 * padding - 2 * innerPadding
+        val leftPadding = padding + innerPadding
+        return timeFactor * widthForEvents + leftPadding
     }
 }

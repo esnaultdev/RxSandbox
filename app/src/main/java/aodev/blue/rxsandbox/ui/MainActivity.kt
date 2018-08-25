@@ -23,10 +23,12 @@ class MainActivity : AppCompatActivity() {
         val operator = MapOperator(MultiplyMapping())
         val timeline = Timeline(
                 listOf(
+                        Event(0f, 0),
                         Event(2f, 1),
                         Event(4f, 2),
                         Event(6f, 3),
-                        Event(8f, 4)
+                        Event(8f, 4),
+                        Event(10f, 5)
                 ),
                 TerminationEvent(Config.timelineDuration.toFloat(), Termination.Complete)
         )
