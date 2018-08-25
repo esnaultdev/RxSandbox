@@ -14,10 +14,10 @@ import aodev.blue.rxsandbox.model.Termination
 import aodev.blue.rxsandbox.model.TerminationEvent
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
+import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import kotlin.properties.Delegates
 
 
-// TODO Add RTL support
 class TimelineView : View {
 
     constructor(context: Context) : super(context)
@@ -133,11 +133,19 @@ class TimelineView : View {
     private fun computeArrowPath(width: Int, height: Int) {
         arrowPath.run {
             // Starting from the pointy end
-            moveTo(width - padding, height.toFloat() / 2)
-            rLineTo(-arrowWidth, -arrowHeight / 2)
-            rLineTo(0f, arrowHeight)
-            rLineTo(arrowWidth, -arrowHeight / 2)
-            close()
+            if (isLtr) {
+                moveTo(width - padding, height.toFloat() / 2)
+                rLineTo(-arrowWidth, -arrowHeight / 2)
+                rLineTo(0f, arrowHeight)
+                rLineTo(arrowWidth, -arrowHeight / 2)
+                close()
+            } else {
+                moveTo(padding, height.toFloat() / 2)
+                rLineTo(arrowWidth, -arrowHeight / 2)
+                rLineTo(0f, arrowHeight)
+                rLineTo(-arrowWidth, -arrowHeight / 2)
+                close()
+            }
         }
     }
 
@@ -211,7 +219,11 @@ class TimelineView : View {
     private fun eventPosition(time: Float): Float {
         val timeFactor = time / Config.timelineDuration
         val widthForEvents = width - 2 * padding - 2 * innerPadding
-        val leftPadding = padding + innerPadding
-        return timeFactor * widthForEvents + leftPadding
+        val startPadding = padding + innerPadding
+        return if (isLtr) {
+            timeFactor * widthForEvents + startPadding
+        } else {
+            (1 - timeFactor) * widthForEvents + startPadding
+        }
     }
 }
