@@ -11,28 +11,33 @@
         android:id="@+id/source_timeline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/operator"
+        app:layout_constraintBottom_toTopOf="@+id/operator_card"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"/>
 
-    <TextView
-        android:id="@+id/operator"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/operator_card"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/transparent"
-        android:gravity="center"
-        android:padding="16dp"
-        android:textColor="@color/operator_text_color"
-        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/result_timeline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/source_timeline"
-        tools:text="map { x -> x * 2 }"/>
+        app:layout_constraintTop_toBottomOf="@+id/source_timeline">
+
+        <TextView
+            android:id="@+id/operator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:gravity="center"
+            android:padding="16dp"
+            android:textColor="@color/operator_text_color"
+            android:textSize="18sp"
+            tools:text="map { x -> x * 2 }"/>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <aodev.blue.rxsandbox.ui.widget.TimelineView
         android:id="@+id/result_timeline"
@@ -41,6 +46,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/operator"/>
+        app:layout_constraintTop_toBottomOf="@+id/operator_card"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

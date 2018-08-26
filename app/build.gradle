@@ -32,6 +32,7 @@ dependencies {
     // AppCompat
     implementation 'androidx.appcompat:appcompat:1.0.0-rc01'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
+    implementation 'com.google.android.material:material:1.0.0-rc01'
 
     // Test
     testImplementation 'junit:junit:4.12'
