@@ -156,7 +156,7 @@ class TimelineView : View {
 
         drawLine(canvas)
         timeline?.let { timeline ->
-            drawTerminationEvent(canvas, timeline.termination)
+            timeline.termination?.let { drawTerminationEvent(canvas, it) }
             drawEvents(canvas, timeline.events)
         }
     }
