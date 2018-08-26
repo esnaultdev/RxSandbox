@@ -1,8 +1,8 @@
 package aodev.blue.rxsandbox.ui
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.Event
