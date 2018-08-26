@@ -61,6 +61,7 @@ class TimelineView : View {
     private val eventTextSize = context.resources.getDimension(R.dimen.timeline_event_text_size)
     private val completeHeight = context.resources.getDimension(R.dimen.timeline_complete_height)
     private val errorSize = context.resources.getDimension(R.dimen.timeline_error_size)
+    private val errorStrokeWitdh = context.resources.getDimension(R.dimen.timeline_error_stroke_width)
     private val arrowWidth = context.resources.getDimension(R.dimen.timeline_arrow_width)
     private val arrowHeight = context.resources.getDimension(R.dimen.timeline_arrow_height)
     private val strokeColor = context.colorCompat(R.color.timeline_stroke_color)
@@ -91,6 +92,7 @@ class TimelineView : View {
     }
     private val errorPaint = Paint().apply {
         color = errorColor
+        strokeWidth = errorStrokeWitdh
         style = Paint.Style.STROKE
     }
 
@@ -183,16 +185,16 @@ class TimelineView : View {
             is Termination.Error -> {
                 canvas.drawLine(
                         position - errorSize / 2,
-                        position - errorSize / 2,
+                        centerHeight - errorSize / 2,
                         position + errorSize / 2,
-                        position + errorSize / 2,
+                        centerHeight + errorSize / 2,
                         errorPaint
                 )
                 canvas.drawLine(
                         position - errorSize / 2,
+                        centerHeight + errorSize / 2,
                         position + errorSize / 2,
-                        position + errorSize / 2,
-                        position - errorSize / 2,
+                        centerHeight - errorSize / 2,
                         errorPaint
                 )
             }
