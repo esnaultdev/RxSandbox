@@ -14,4 +14,8 @@ class MapOperator<in T, out R>(private val mapping: Mapping<T, R>) : Operator<T,
                 timeline.termination
         )
     }
+
+    override fun expression(): String {
+        return "map { ${mapping.expression()} }"
+    }
 }

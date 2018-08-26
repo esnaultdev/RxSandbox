@@ -2,6 +2,7 @@ package aodev.blue.rxsandbox.ui
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.Event
@@ -18,10 +19,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val timelineVew: TimelineView = findViewById(R.id.timeline)
+        val sourceTimelineVew: TimelineView = findViewById(R.id.source_timeline)
+        val operatorView: TextView = findViewById(R.id.operator)
+        val resultTimelineView: TimelineView = findViewById(R.id.result_timeline)
 
         val operator = MapOperator(MultiplyMapping())
-        val timeline = Timeline(
+        val sourceTimeline = Timeline(
                 listOf(
                         Event(0f, 0),
                         Event(2f, 1),
@@ -32,8 +35,11 @@ class MainActivity : AppCompatActivity() {
                 ),
                 TerminationEvent(Config.timelineDuration.toFloat(), Termination.Complete)
         )
-        val mappedTimeline = operator.apply(timeline)
+        val resultTimeline = operator.apply(sourceTimeline)
 
-        timelineVew.timeline = mappedTimeline
+
+        sourceTimelineVew.timeline = sourceTimeline
+        operatorView.text = operator.expression()
+        resultTimelineView.timeline = resultTimeline
     }
 }

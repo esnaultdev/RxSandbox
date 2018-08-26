@@ -8,12 +8,39 @@
     tools:context=".ui.MainActivity">
 
     <aodev.blue.rxsandbox.ui.widget.TimelineView
-        android:id="@+id/timeline"
+        android:id="@+id/source_timeline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/operator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/operator"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/transparent"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textColor="@color/operator_text_color"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/result_timeline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/source_timeline"
+        tools:text="map { x -> x * 2 }"/>
+
+    <aodev.blue.rxsandbox.ui.widget.TimelineView
+        android:id="@+id/result_timeline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/operator"/>
 
 </android.support.constraint.ConstraintLayout>
