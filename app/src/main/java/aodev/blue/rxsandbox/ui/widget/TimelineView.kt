@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.Config
@@ -15,6 +16,7 @@ import aodev.blue.rxsandbox.model.TerminationEvent
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
+import aodev.blue.rxsandbox.utils.clamp
 import kotlin.properties.Delegates
 
 
@@ -34,6 +36,7 @@ class TimelineView : View {
             invalidate()
         }
     }
+    var readOnly: Boolean = false
 
 
     // Resources
@@ -84,6 +87,8 @@ class TimelineView : View {
     private val textBoundsRect = Rect()
 
 
+    //region Measurement
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val desiredWidth = (2 * padding + 2 * innerPadding + 10 * eventSize).toInt()
         val desiredHeight = (2 * padding + completeHeight).toInt()
@@ -133,6 +138,10 @@ class TimelineView : View {
             }
         }
     }
+
+    //endregion
+
+    //region Drawing
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -201,6 +210,10 @@ class TimelineView : View {
         }
     }
 
+    //endregion
+
+    //region Event position
+
     private fun eventPosition(time: Float): Float {
         val timeFactor = time / Config.timelineDuration
         val widthForEvents = width - 2 * padding - 2 * innerPadding
@@ -211,4 +224,77 @@ class TimelineView : View {
             (1 - timeFactor) * widthForEvents + startPadding
         }
     }
+
+    //endregion
+
+    //region Gestures
+
+    // The ‘active pointer’ is the one currently moving our object.
+    private var activePointerId = MotionEvent.INVALID_POINTER_ID
+    private var lastTouchX: Float = 0f
+
+    override fun onTouchEvent(ev: MotionEvent): Boolean {
+        if (readOnly) return false
+
+        val action = ev.actionMasked
+
+        when (action) {
+            MotionEvent.ACTION_DOWN -> {
+                val pointerIndex = ev.actionIndex
+                val x = ev.getX(pointerIndex)
+                val y = ev.getY(pointerIndex)
+
+                lastTouchX = x
+                activePointerId = ev.getPointerId(0)
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                // Find the index of the active pointer and fetch its position
+                val pointerIndex = ev.findPointerIndex(activePointerId)
+
+                val x = ev.getX(pointerIndex)
+
+                // Calculate the distance moved
+                val dx = x - lastTouchX
+                lastTouchX = x
+
+                val widthForEvents = width - 2 * padding - 2 * innerPadding
+                val timeDiff = dx / widthForEvents * Config.timelineDuration
+
+                // TODO properly handle this event move
+                timeline?.let { timeline ->
+                    timeline.termination?.let { termination ->
+                        val newTime = (termination.time + timeDiff)
+                                .clamp(0f, Config.timelineDuration.toFloat())
+                        val termEvent = termination.copy(time = newTime)
+                        this.timeline = timeline.copy(timeline.events, termination = termEvent)
+                    }
+                }
+            }
+
+            MotionEvent.ACTION_UP -> {
+                activePointerId = MotionEvent.INVALID_POINTER_ID
+            }
+
+            MotionEvent.ACTION_CANCEL -> {
+                activePointerId = MotionEvent.INVALID_POINTER_ID
+            }
+
+            MotionEvent.ACTION_POINTER_UP -> {
+                val pointerIndex = ev.actionIndex
+                val pointerId = ev.getPointerId(pointerIndex)
+
+                if (pointerId == activePointerId) {
+                    // This was our active pointer going up. Choose a new
+                    // active pointer and adjust accordingly.
+                    val newPointerIndex = if (pointerIndex == 0) 1 else 0
+                    lastTouchX = ev.getX(newPointerIndex)
+                    activePointerId = ev.getPointerId(newPointerIndex)
+                }
+            }
+        }
+        return true
+    }
+
+    //endregion
 }
