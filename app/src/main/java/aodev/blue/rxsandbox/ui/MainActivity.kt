@@ -41,5 +41,6 @@ class MainActivity : AppCompatActivity() {
         sourceTimelineVew.timeline = sourceTimeline
         operatorView.text = operator.expression()
         resultTimelineView.timeline = resultTimeline
+        resultTimelineView.readOnly = true
     }
 }

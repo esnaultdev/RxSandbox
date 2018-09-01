@@ -17,7 +17,6 @@ import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.utils.clamp
-import kotlin.properties.Delegates
 
 
 class TimelineView : View {
@@ -29,13 +28,24 @@ class TimelineView : View {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
             super(context, attrs, defStyleAttr, defStyleRes)
 
+    companion object {
+        private val initialTimeline = Timeline<Int>(emptyList(), null)
+
+        private const val EVENT_INDEX_NONE = -2
+        private const val EVENT_INDEX_TERMINATION = -1
+    }
 
     // Data
-    var timeline by Delegates.observable<Timeline<Int>?>(null) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            invalidate()
+    private var _timeline: Timeline<Int> = initialTimeline
+    var timeline: Timeline<Int>
+        set(value) {
+            if (!readOnly &&_timeline != value) {
+                _timeline = value
+                invalidate()
+            }
         }
-    }
+        get() = _timeline
+
     var readOnly: Boolean = false
 
 
@@ -147,10 +157,9 @@ class TimelineView : View {
         super.onDraw(canvas)
 
         drawLine(canvas)
-        timeline?.let { timeline ->
-            timeline.termination?.let { drawTerminationEvent(canvas, it) }
-            drawEvents(canvas, timeline.events)
-        }
+
+        _timeline.termination?.let { drawTerminationEvent(canvas, it) }
+        drawEvents(canvas, _timeline.events)
     }
 
     private fun drawLine(canvas: Canvas) {
@@ -195,7 +204,7 @@ class TimelineView : View {
 
     private fun drawEvents(canvas: Canvas, events: List<Event<Int>>) {
         val centerHeight = height.toFloat() / 2
-        events.forEach { event ->
+        events.sortedByDescending { it.time }.forEach { event ->
             val position = eventPosition(event.time)
 
             canvas.drawCircle(position, centerHeight, eventSize / 2, eventFillPaint)
@@ -232,6 +241,7 @@ class TimelineView : View {
     // The ‘active pointer’ is the one currently moving our object.
     private var activePointerId = MotionEvent.INVALID_POINTER_ID
     private var lastTouchX: Float = 0f
+    private var movingEventIndex = EVENT_INDEX_NONE
 
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         if (readOnly) return false
@@ -243,6 +253,7 @@ class TimelineView : View {
                 val pointerIndex = ev.actionIndex
                 val x = ev.getX(pointerIndex)
                 val y = ev.getY(pointerIndex)
+                movingEventIndex = getEventIndexForPosition(x, y)
 
                 lastTouchX = x
                 activePointerId = ev.getPointerId(0)
@@ -261,14 +272,11 @@ class TimelineView : View {
                 val widthForEvents = width - 2 * padding - 2 * innerPadding
                 val timeDiff = dx / widthForEvents * Config.timelineDuration
 
-                // TODO properly handle this event move
-                timeline?.let { timeline ->
-                    timeline.termination?.let { termination ->
-                        val newTime = (termination.time + timeDiff)
-                                .clamp(0f, Config.timelineDuration.toFloat())
-                        val termEvent = termination.copy(time = newTime)
-                        this.timeline = timeline.copy(timeline.events, termination = termEvent)
-                    }
+                val movingEventIndex = movingEventIndex
+                when (movingEventIndex) {
+                    EVENT_INDEX_NONE -> Unit
+                    EVENT_INDEX_TERMINATION -> moveTerminationEvent(timeDiff)
+                    else -> moveEvent(movingEventIndex, timeDiff)
                 }
             }
 
@@ -294,6 +302,40 @@ class TimelineView : View {
             }
         }
         return true
+    }
+
+    private fun getEventIndexForPosition(x: Float, y: Float): Int {
+        return 2
+    }
+
+    private fun moveTerminationEvent(timeDiff: Float) {
+        timeline.termination?.let { termination ->
+            val newTime = (termination.time + timeDiff)
+                    .clamp(0f, Config.timelineDuration.toFloat())
+            val termEvent = termination.moveTo(newTime)
+            this.timeline = timeline.copy(timeline.events, termination = termEvent)
+        }
+    }
+
+    private fun moveEvent(eventIndex: Int, timeDiff: Float) {
+        timeline = timeline.copy(
+                events = timeline.events.edit(eventIndex) { event ->
+                    val newTime = (event.time + timeDiff)
+                            .clamp(0f, Config.timelineDuration.toFloat())
+                    event.moveTo(newTime)
+                }
+        )
+    }
+
+    private fun <T> List<T>.edit(index: Int, transform: (element: T) -> T): List<T> {
+        if (this.size < index) return this.toList()
+
+        val destination = ArrayList<T>(this.size)
+        destination.addAll(this.subList(0, index))
+        destination.add(transform(this[index]))
+        destination.addAll(this.subList(index + 1, this.size))
+
+        return destination
     }
 
     //endregion
