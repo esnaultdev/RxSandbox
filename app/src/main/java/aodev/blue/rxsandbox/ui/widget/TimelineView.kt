@@ -38,11 +38,15 @@ class TimelineView : View {
 
     // Data
     private var _timeline: Timeline<Int> = initialTimeline
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     var timeline: Timeline<Int>
         set(value) {
-            if (!readOnly &&_timeline != value) {
+            if (!readOnly && _timeline != value) {
                 _timeline = value
-                invalidate()
             }
         }
         get() = _timeline
@@ -335,33 +339,42 @@ class TimelineView : View {
     }
 
     private fun moveTerminationEvent(timeDiff: Float) {
-        timeline.termination?.let { termination ->
+        _timeline.termination?.let { termination ->
             val newTime = (termination.time + timeDiff)
                     .clamp(0f, Config.timelineDuration.toFloat())
             val termEvent = termination.moveTo(newTime)
-            this.timeline = timeline.copy(timeline.events, termination = termEvent)
+
+            val events = _timeline.events.map {
+                if (it.time > newTime) {
+                    it.moveTo(newTime)
+                } else {
+                    it
+                }
+            }
+
+            this._timeline = _timeline.copy(events = events, termination = termEvent)
         }
     }
 
     private fun moveEvent(eventIndex: Int, timeDiff: Float) {
-        timeline = timeline.copy(
-                events = timeline.events.edit(eventIndex) { event ->
-                    val newTime = (event.time + timeDiff)
-                            .clamp(0f, Config.timelineDuration.toFloat())
-                    event.moveTo(newTime)
-                }
+        val oldEvent = _timeline.events.getOrNull(eventIndex) ?: return
+        val newTime = (oldEvent.time + timeDiff).clamp(0f, Config.timelineDuration.toFloat())
+
+        val events = _timeline.events.toMutableList()
+        events[eventIndex] = oldEvent.moveTo(newTime)
+
+        val termEvent = _timeline.termination?.let {
+            if (it.time < newTime) {
+                it.moveTo(newTime)
+            } else {
+                it
+            }
+        }
+
+        _timeline = _timeline.copy(
+                events = events,
+                termination = termEvent
         )
-    }
-
-    private fun <T> List<T>.edit(index: Int, transform: (element: T) -> T): List<T> {
-        if (this.size < index) return this.toList()
-
-        val destination = ArrayList<T>(this.size)
-        destination.addAll(this.subList(0, index))
-        destination.add(transform(this[index]))
-        destination.addAll(this.subList(index + 1, this.size))
-
-        return destination
     }
 
     //endregion
