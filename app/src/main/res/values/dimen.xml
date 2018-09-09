@@ -7,6 +7,7 @@
     <dimen name="timeline_padding_inner">48dp</dimen>
     <dimen name="timeline_event_size">36dp</dimen>
     <dimen name="timeline_event_text_size">16sp</dimen>
+    <dimen name="timeline_touch_target_size">48dp</dimen>
     <dimen name="timeline_complete_height">48dp</dimen>
     <dimen name="timeline_error_size">40dp</dimen>
     <dimen name="timeline_error_stroke_width">8dp</dimen>

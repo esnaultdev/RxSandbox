@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -60,6 +61,8 @@ class TimelineView : View {
     private val errorStrokeWidth = context.resources.getDimension(R.dimen.timeline_error_stroke_width)
     private val arrowWidth = context.resources.getDimension(R.dimen.timeline_arrow_width)
     private val arrowHeight = context.resources.getDimension(R.dimen.timeline_arrow_height)
+    private val touchTargetSize = context.resources.getDimension(R.dimen.timeline_touch_target_size)
+
     private val strokeColor = context.colorCompat(R.color.timeline_stroke_color)
     private val eventFillColor = context.colorCompat(R.color.timeline_event_fill_color)
     private val eventTextColor = context.colorCompat(R.color.timeline_event_text_color)
@@ -305,7 +308,30 @@ class TimelineView : View {
     }
 
     private fun getEventIndexForPosition(x: Float, y: Float): Int {
-        return 2
+        val boundingBoxes = _timeline.events.map { getEventBoundingBox(it.time) }.toMutableList()
+        val terminationBoundingBox = _timeline.termination?.let { getEventBoundingBox(it.time) }
+        if (terminationBoundingBox != null) {
+            boundingBoxes.add(terminationBoundingBox)
+        }
+
+        return boundingBoxes.mapIndexed { index, boundingBox -> index to boundingBox }
+                .filter { it.second.contains(x, y) }
+                .sortedBy { Math.abs(it.second.centerX() - x) }
+                .firstOrNull()
+                ?.first
+                ?.let { if (it == _timeline.events.size) EVENT_INDEX_TERMINATION else it }
+                ?: EVENT_INDEX_NONE
+    }
+
+    private fun getEventBoundingBox(eventTime: Float): RectF {
+        val centerHeight = height.toFloat() / 2
+        val eventPosition = eventPosition(eventTime)
+        return RectF(
+                eventPosition - touchTargetSize / 2,
+                centerHeight - touchTargetSize / 2,
+                eventPosition + touchTargetSize / 2,
+                centerHeight + touchTargetSize / 2
+        )
     }
 
     private fun moveTerminationEvent(timeDiff: Float) {
