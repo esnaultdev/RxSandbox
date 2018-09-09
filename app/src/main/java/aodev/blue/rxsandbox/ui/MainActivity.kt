@@ -12,7 +12,6 @@ import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.mapping.MultiplyMapping
 import aodev.blue.rxsandbox.model.operator.transform.MapOperator
 import aodev.blue.rxsandbox.ui.widget.TimelineView
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
