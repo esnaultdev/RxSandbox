@@ -18,6 +18,11 @@ import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.utils.clamp
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.Subject
 
 
 class TimelineView : View {
@@ -40,16 +45,22 @@ class TimelineView : View {
     private var _timeline: Timeline<Int> = initialTimeline
         set(value) {
             field = value
+            timelineSubject.onNext(value)
             invalidate()
         }
 
     var timeline: Timeline<Int>
         set(value) {
-            if (!readOnly && _timeline != value) {
+            // TODO protect an input timeline from being updated
+            if (_timeline != value) {
                 _timeline = value
             }
         }
         get() = _timeline
+
+    private val timelineSubject: Subject<Timeline<Int>> = BehaviorSubject.createDefault(initialTimeline)
+    val timelineFlowable: Flowable<Timeline<Int>>
+        get() = timelineSubject.toFlowable(BackpressureStrategy.LATEST)
 
     var readOnly: Boolean = false
 
