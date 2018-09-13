@@ -45,9 +45,9 @@ Filtering observables
 - TODO distinctUntilChanged
 - TODO elementAt
 - TODO filter
-- TODO first
+- CANT first
 - TODO ignoreElements
-- TODO last
+- CANT last
 - CANT sample
 - TODO skip
 - TODO skipLast

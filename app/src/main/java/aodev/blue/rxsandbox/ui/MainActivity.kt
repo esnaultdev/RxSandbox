@@ -9,8 +9,7 @@ import aodev.blue.rxsandbox.model.Event
 import aodev.blue.rxsandbox.model.Termination
 import aodev.blue.rxsandbox.model.TerminationEvent
 import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.mapping.MultiplyMapping
-import aodev.blue.rxsandbox.model.operator.transform.MapOperator
+import aodev.blue.rxsandbox.model.operator.filtering.SkipOperator
 import aodev.blue.rxsandbox.ui.widget.TimelineView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         val operatorView: TextView = findViewById(R.id.operator)
         val resultTimelineView: TimelineView = findViewById(R.id.result_timeline)
 
-        val operator = MapOperator(MultiplyMapping())
+        val operator = SkipOperator<Int>(2)
         val sourceTimeline = Timeline(
                 listOf(
                         Event(0f, 0),
