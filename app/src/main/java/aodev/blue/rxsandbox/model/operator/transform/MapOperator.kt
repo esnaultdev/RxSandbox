@@ -10,7 +10,7 @@ class MapOperator<in T, out R>(private val mapping: Mapping<T, R>) : Operator<T,
 
     override fun apply(timeline: Timeline<T>): Timeline<R> {
         return Timeline(
-                timeline.events.map { event -> Event(event.time, mapping.map(event.value)) },
+                timeline.events.map { Event(it.time, mapping.map(it.value)) }.toSet(),
                 timeline.termination
         )
     }

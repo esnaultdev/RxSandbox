@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         val operator = SkipOperator<Int>(2)
         val sourceTimeline = Timeline(
-                listOf(
+                setOf(
                         Event(0f, 0),
                         Event(2f, 1),
                         Event(4f, 2),

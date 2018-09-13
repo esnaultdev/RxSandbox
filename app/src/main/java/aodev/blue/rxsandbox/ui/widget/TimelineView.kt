@@ -20,7 +20,6 @@ import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.utils.clamp
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 
@@ -35,7 +34,7 @@ class TimelineView : View {
             super(context, attrs, defStyleAttr, defStyleRes)
 
     companion object {
-        private val initialTimeline = Timeline<Int>(emptyList(), null)
+        private val initialTimeline = Timeline<Int>(emptySet(), null)
 
         private const val EVENT_INDEX_NONE = -2
         private const val EVENT_INDEX_TERMINATION = -1
@@ -49,11 +48,15 @@ class TimelineView : View {
             invalidate()
         }
 
+    /**
+     * Exposed timeline for external use.
+     * Updating the timeline resets the current gestures.
+     */
     var timeline: Timeline<Int>
         set(value) {
-            // TODO protect an input timeline from being updated
             if (_timeline != value) {
                 _timeline = value
+                resetCurrentGesture()
             }
         }
         get() = _timeline
@@ -63,6 +66,13 @@ class TimelineView : View {
         get() = timelineSubject.toFlowable(BackpressureStrategy.LATEST)
 
     var readOnly: Boolean = false
+
+
+    // Gestures
+    private var activePointerId = MotionEvent.INVALID_POINTER_ID
+    private var lastTouchX: Float = 0f
+    private var movingEventIndex = EVENT_INDEX_NONE
+    private var eventsToMove: MutableList<Event<Int>> = mutableListOf()
 
 
     // Resources
@@ -177,7 +187,7 @@ class TimelineView : View {
         drawLine(canvas)
 
         _timeline.termination?.let { drawTerminationEvent(canvas, it) }
-        drawEvents(canvas, _timeline.events)
+        drawEvents(canvas, _timeline.sortedEvents)
     }
 
     private fun drawLine(canvas: Canvas) {
@@ -220,9 +230,9 @@ class TimelineView : View {
         }
     }
 
-    private fun drawEvents(canvas: Canvas, events: List<Event<Int>>) {
+    private fun drawEvents(canvas: Canvas, sortedEvents: List<Event<Int>>) {
         val centerHeight = height.toFloat() / 2
-        events.sortedByDescending { it.time }.forEach { event ->
+        sortedEvents.reversed().forEach { event ->
             val position = eventPosition(event.time)
 
             canvas.drawCircle(position, centerHeight, eventSize / 2, eventFillPaint)
@@ -256,11 +266,6 @@ class TimelineView : View {
 
     //region Gestures
 
-    // The ‘active pointer’ is the one currently moving our object.
-    private var activePointerId = MotionEvent.INVALID_POINTER_ID
-    private var lastTouchX: Float = 0f
-    private var movingEventIndex = EVENT_INDEX_NONE
-
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         if (readOnly) return false
 
@@ -271,6 +276,8 @@ class TimelineView : View {
                 val pointerIndex = ev.actionIndex
                 val x = ev.getX(pointerIndex)
                 val y = ev.getY(pointerIndex)
+
+                eventsToMove = _timeline.sortedEvents.toMutableList()
                 movingEventIndex = getEventIndexForPosition(x, y)
 
                 lastTouchX = x
@@ -323,7 +330,7 @@ class TimelineView : View {
     }
 
     private fun getEventIndexForPosition(x: Float, y: Float): Int {
-        val boundingBoxes = _timeline.events.map { getEventBoundingBox(it.time) }.toMutableList()
+        val boundingBoxes = eventsToMove.map { getEventBoundingBox(it.time) }.toMutableList()
         val terminationBoundingBox = _timeline.termination?.let { getEventBoundingBox(it.time) }
         if (terminationBoundingBox != null) {
             boundingBoxes.add(terminationBoundingBox)
@@ -363,16 +370,18 @@ class TimelineView : View {
                 }
             }
 
-            this._timeline = _timeline.copy(events = events, termination = termEvent)
+            this._timeline = _timeline.copy(
+                    events = events.toSet(),
+                    termination = termEvent
+            )
         }
     }
 
     private fun moveEvent(eventIndex: Int, timeDiff: Float) {
-        val oldEvent = _timeline.events.getOrNull(eventIndex) ?: return
+        val oldEvent = eventsToMove.getOrNull(eventIndex) ?: return
         val newTime = (oldEvent.time + timeDiff).clamp(0f, Config.timelineDuration.toFloat())
 
-        val events = _timeline.events.toMutableList()
-        events[eventIndex] = oldEvent.moveTo(newTime)
+        eventsToMove[eventIndex] = oldEvent.moveTo(newTime)
 
         val termEvent = _timeline.termination?.let {
             if (it.time < newTime) {
@@ -383,9 +392,16 @@ class TimelineView : View {
         }
 
         _timeline = _timeline.copy(
-                events = events,
+                events = eventsToMove.toSet(),
                 termination = termEvent
         )
+    }
+
+    private fun resetCurrentGesture() {
+        activePointerId = MotionEvent.INVALID_POINTER_ID
+        lastTouchX = 0f
+        movingEventIndex = EVENT_INDEX_NONE
+        eventsToMove = mutableListOf()
     }
 
     //endregion
