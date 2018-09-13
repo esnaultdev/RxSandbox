@@ -14,6 +14,6 @@ class SkipOperator<T>(private val count: Int) : Operator<T, T> {
     }
 
     override fun expression(): String {
-        return "skip $count"
+        return "skip($count)"
     }
 }

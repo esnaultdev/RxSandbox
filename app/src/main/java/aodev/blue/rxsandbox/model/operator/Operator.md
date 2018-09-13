@@ -49,8 +49,8 @@ Filtering observables
 - TODO ignoreElements
 - CANT last
 - CANT sample
-- TODO skip
-- TODO skipLast
+- DONE skip
+- DONE skipLast
 - TODO take
 - TODO takeLast
 
