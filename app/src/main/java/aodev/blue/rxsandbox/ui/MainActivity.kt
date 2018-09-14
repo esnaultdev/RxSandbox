@@ -10,6 +10,7 @@ import aodev.blue.rxsandbox.model.Termination
 import aodev.blue.rxsandbox.model.TerminationEvent
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.operator.filtering.DebounceOperator
+import aodev.blue.rxsandbox.model.operator.filtering.IgnoreElementsOperator
 import aodev.blue.rxsandbox.ui.widget.TimelineView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         val operatorView: TextView = findViewById(R.id.operator)
         val resultTimelineView: TimelineView = findViewById(R.id.result_timeline)
 
-        val operator = DebounceOperator<Int>(2f)
+        val operator = IgnoreElementsOperator<Int>()
         val sourceTimeline = Timeline(
                 setOf(
                         Event(0f, 0),

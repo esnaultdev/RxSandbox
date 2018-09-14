@@ -43,10 +43,10 @@ Filtering observables
 - DONE debounce
 - TODO distinct
 - TODO distinctUntilChanged
-- TODO elementAt
+- CANT elementAt
 - TODO filter
 - CANT first
-- TODO ignoreElements
+- PART ignoreElements
 - CANT last
 - CANT sample
 - DONE skip
