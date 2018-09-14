@@ -44,7 +44,7 @@ Filtering observables
 - TODO distinct
 - TODO distinctUntilChanged
 - CANT elementAt
-- TODO filter
+- DONE filter
 - CANT first
 - PART ignoreElements
 - CANT last

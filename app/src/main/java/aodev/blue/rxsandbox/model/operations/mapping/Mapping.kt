@@ -1,4 +1,4 @@
-package aodev.blue.rxsandbox.model.mapping
+package aodev.blue.rxsandbox.model.operations.mapping
 
 
 interface Mapping<in T, out R> {

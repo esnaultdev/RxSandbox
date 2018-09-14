@@ -1,4 +1,4 @@
-package aodev.blue.rxsandbox.model.mapping
+package aodev.blue.rxsandbox.model.operations.mapping
 
 
 class MultiplyMapping : Mapping<Int, Int> {

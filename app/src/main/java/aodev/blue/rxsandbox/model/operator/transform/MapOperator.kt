@@ -2,7 +2,7 @@ package aodev.blue.rxsandbox.model.operator.transform
 
 import aodev.blue.rxsandbox.model.Event
 import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.mapping.Mapping
+import aodev.blue.rxsandbox.model.operations.mapping.Mapping
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
