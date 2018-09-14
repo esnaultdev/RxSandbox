@@ -40,7 +40,7 @@ Transforming observables
 Filtering observables
 ---------------------
 
-- TODO debounce
+- DONE debounce
 - TODO distinct
 - TODO distinctUntilChanged
 - TODO elementAt

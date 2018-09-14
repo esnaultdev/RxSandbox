@@ -16,7 +16,8 @@ class SkipLastOperator<T>(private val count: Int) : Operator<T, T> {
                 is Termination.Complete -> {
                     // This is the representation on the ReactiveX doc but the event times are
                     // really weird. All the items should be emitted when the source completes.
-                    val events = timeline.sortedEvents.zip(timeline.sortedEvents.drop(count))
+                    val events = timeline.sortedEvents
+                            .zip(timeline.sortedEvents.drop(count))
                             .map { Event(it.second.time, it.first.value) }
                             .toSet()
                     Timeline(events.toSet(), timeline.termination)
