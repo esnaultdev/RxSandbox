@@ -52,7 +52,7 @@ Filtering observables
 - DONE skip
 - DONE skipLast
 - DONE take
-- TODO takeLast
+- DONE takeLast
 
 
 Combining observables

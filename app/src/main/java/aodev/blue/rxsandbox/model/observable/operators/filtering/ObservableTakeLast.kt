@@ -5,18 +5,18 @@ import aodev.blue.rxsandbox.model.observable.ObservableTermination
 import aodev.blue.rxsandbox.model.observable.ObservableTimeline
 
 
-class ObservableSkipLast<T>(
+class ObservableTakeLast<T>(
         private val count: Int
 ) : Operator<ObservableTimeline<T>, ObservableTimeline<T>> {
 
-    // TODO verify the behavior of the skipLast with an error
+    // TODO verify the behavior of the takeLast with an error
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
         return when (input.termination) {
             ObservableTermination.None -> ObservableTimeline(emptySet(), input.termination)
             is ObservableTermination.Error -> ObservableTimeline(emptySet(), input.termination)
             is ObservableTermination.Complete -> {
-                val events = input.sortedEvents.dropLast(count)
+                val events = input.sortedEvents.takeLast(count)
                         .map { it.moveTo(input.termination.time) }
                         .toSet()
                 ObservableTimeline(events.toSet(), input.termination)
@@ -25,6 +25,6 @@ class ObservableSkipLast<T>(
     }
 
     override fun expression(): String {
-        return "skipLast($count)"
+        return "takeLast($count)"
     }
 }
