@@ -51,7 +51,7 @@ Filtering observables
 - CANT sample
 - DONE skip
 - DONE skipLast
-- TODO take
+- DONE take
 - TODO takeLast
 
 
