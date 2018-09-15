@@ -11,10 +11,9 @@ import android.view.MotionEvent
 import android.view.View
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.Config
-import aodev.blue.rxsandbox.model.Event
-import aodev.blue.rxsandbox.model.Termination
-import aodev.blue.rxsandbox.model.TerminationEvent
-import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.observable.ObservableEvent
+import aodev.blue.rxsandbox.model.observable.ObservableTermination
+import aodev.blue.rxsandbox.model.observable.ObservableTimeline
 import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.utils.clamp
@@ -24,7 +23,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 
 
-class TimelineView : View {
+class ObservableTimelineView : View {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -34,14 +33,14 @@ class TimelineView : View {
             super(context, attrs, defStyleAttr, defStyleRes)
 
     companion object {
-        private val initialTimeline = Timeline<Int>(emptySet(), null)
+        private val initialTimeline = ObservableTimeline<Int>(emptySet(), ObservableTermination.None)
 
         private const val EVENT_INDEX_NONE = -2
         private const val EVENT_INDEX_TERMINATION = -1
     }
 
     // Data
-    private var _timeline: Timeline<Int> = initialTimeline
+    private var _timeline: ObservableTimeline<Int> = initialTimeline
         set(value) {
             field = value
             timelineSubject.onNext(value)
@@ -52,7 +51,7 @@ class TimelineView : View {
      * Exposed timeline for external use.
      * Updating the timeline resets the current gestures.
      */
-    var timeline: Timeline<Int>
+    var timeline: ObservableTimeline<Int>
         set(value) {
             if (_timeline != value) {
                 _timeline = value
@@ -61,8 +60,8 @@ class TimelineView : View {
         }
         get() = _timeline
 
-    private val timelineSubject: Subject<Timeline<Int>> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineFlowable: Flowable<Timeline<Int>>
+    private val timelineSubject: Subject<ObservableTimeline<Int>> = BehaviorSubject.createDefault(initialTimeline)
+    val timelineFlowable: Flowable<ObservableTimeline<Int>>
         get() = timelineSubject.toFlowable(BackpressureStrategy.LATEST)
 
     var readOnly: Boolean = false
@@ -72,7 +71,7 @@ class TimelineView : View {
     private var activePointerId = MotionEvent.INVALID_POINTER_ID
     private var lastTouchX: Float = 0f
     private var movingEventIndex = EVENT_INDEX_NONE
-    private var eventsToMove: MutableList<Event<Int>> = mutableListOf()
+    private var eventsToMove: MutableList<ObservableEvent<Int>> = mutableListOf()
 
 
     // Resources
@@ -98,7 +97,7 @@ class TimelineView : View {
     private val strokePaint = Paint().apply {
         flags = Paint.ANTI_ALIAS_FLAG
         color = strokeColor
-        strokeWidth = this@TimelineView.strokeWidth
+        strokeWidth = this@ObservableTimelineView.strokeWidth
         style = Paint.Style.STROKE
     }
     private val arrowPaint = Paint().apply {
@@ -197,12 +196,12 @@ class TimelineView : View {
         canvas.drawPath(arrowPath, arrowPaint)
     }
 
-    private fun drawTerminationEvent(canvas: Canvas, event: TerminationEvent) {
+    private fun drawTerminationEvent(canvas: Canvas, termination: ObservableTermination) {
         val centerHeight = height.toFloat() / 2
-        val position = eventPosition(event.time)
 
-        when (event.value) {
-            is Termination.Complete -> {
+        when (termination) {
+            is ObservableTermination.Complete -> {
+                val position = eventPosition(termination.time)
                 canvas.drawLine(
                         position,
                         centerHeight - completeHeight / 2,
@@ -211,7 +210,8 @@ class TimelineView : View {
                         strokePaint
                 )
             }
-            is Termination.Error -> {
+            is ObservableTermination.Error -> {
+                val position = eventPosition(termination.time)
                 canvas.drawLine(
                         position - errorSize / 2,
                         centerHeight - errorSize / 2,
@@ -230,7 +230,7 @@ class TimelineView : View {
         }
     }
 
-    private fun drawEvents(canvas: Canvas, sortedEvents: List<Event<Int>>) {
+    private fun drawEvents(canvas: Canvas, sortedEvents: List<ObservableEvent<Int>>) {
         val centerHeight = height.toFloat() / 2
         sortedEvents.reversed().forEach { event ->
             val position = eventPosition(event.time)
@@ -330,10 +330,19 @@ class TimelineView : View {
     }
 
     private fun getEventIndexForPosition(x: Float, y: Float): Int {
-        val boundingBoxes = eventsToMove.map { getEventBoundingBox(it.time) }.toMutableList()
-        val terminationBoundingBox = _timeline.termination?.let { getEventBoundingBox(it.time) }
-        if (terminationBoundingBox != null) {
-            boundingBoxes.add(terminationBoundingBox)
+        val eventBoundingBoxes = eventsToMove.map { getEventBoundingBox(it.time) }
+
+        val termination = _timeline.termination
+        val terminationBoundingBox = when (termination) {
+            ObservableTermination.None -> null
+            is ObservableTermination.Complete -> getEventBoundingBox(termination.time)
+            is ObservableTermination.Error -> getEventBoundingBox(termination.time)
+        }
+
+        val boundingBoxes = if (terminationBoundingBox != null) {
+            eventBoundingBoxes + terminationBoundingBox
+        } else {
+            eventBoundingBoxes
         }
 
         return boundingBoxes.mapIndexed { index, boundingBox -> index to boundingBox }
@@ -357,24 +366,44 @@ class TimelineView : View {
     }
 
     private fun moveTerminationEvent(timeDiff: Float) {
-        _timeline.termination?.let { termination ->
-            val newTime = (termination.time + timeDiff)
-                    .clamp(0f, Config.timelineDuration.toFloat())
-            val termEvent = termination.moveTo(newTime)
+        val termination = _timeline.termination
 
-            val events = _timeline.events.map {
-                if (it.time > newTime) {
-                    it.moveTo(newTime)
-                } else {
-                    it
+        when (termination) {
+            ObservableTermination.None -> Unit
+            is ObservableTermination.Complete -> {
+                moveTerminationEvent(timeDiff, termination.time) {
+                    ObservableTermination.Complete(it)
                 }
             }
-
-            this._timeline = _timeline.copy(
-                    events = events.toSet(),
-                    termination = termEvent
-            )
+            is ObservableTermination.Error -> {
+                moveTerminationEvent(timeDiff, termination.time) {
+                    ObservableTermination.Error(it)
+                }
+            }
         }
+    }
+
+    private fun moveTerminationEvent(
+            timeDiff: Float,
+            time: Float,
+            makeWithTime: (Float) -> ObservableTermination) {
+
+        val newTime = (time + timeDiff).clamp(0f, Config.timelineDuration.toFloat())
+        val termEvent = makeWithTime(newTime)
+
+        // Move the last events that might
+        val events = _timeline.events.map {
+            if (it.time > newTime) {
+                it.moveTo(newTime)
+            } else {
+                it
+            }
+        }
+
+        this._timeline = _timeline.copy(
+                events = events.toSet(),
+                termination = termEvent
+        )
     }
 
     private fun moveEvent(eventIndex: Int, timeDiff: Float) {
@@ -383,17 +412,28 @@ class TimelineView : View {
 
         eventsToMove[eventIndex] = oldEvent.moveTo(newTime)
 
-        val termEvent = _timeline.termination?.let {
-            if (it.time < newTime) {
-                it.moveTo(newTime)
-            } else {
-                it
+        val termination = _timeline.termination
+        val newTermination = when (termination) {
+            ObservableTermination.None -> termination
+            is ObservableTermination.Complete -> {
+                if (termination.time < newTime) {
+                    ObservableTermination.Complete(newTime)
+                } else {
+                    termination
+                }
+            }
+            is ObservableTermination.Error -> {
+                if (termination.time < newTime) {
+                    ObservableTermination.Error(newTime)
+                } else {
+                    termination
+                }
             }
         }
 
         _timeline = _timeline.copy(
                 events = eventsToMove.toSet(),
-                termination = termEvent
+                termination = newTermination
         )
     }
 

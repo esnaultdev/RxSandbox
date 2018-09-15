@@ -5,15 +5,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.Config
-import aodev.blue.rxsandbox.model.Event
-import aodev.blue.rxsandbox.model.Termination
-import aodev.blue.rxsandbox.model.TerminationEvent
-import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.observable.ObservableEvent
+import aodev.blue.rxsandbox.model.observable.ObservableTermination
+import aodev.blue.rxsandbox.model.observable.ObservableTimeline
 import aodev.blue.rxsandbox.model.operations.predicate.EvenPredicate
-import aodev.blue.rxsandbox.model.operator.filtering.DebounceOperator
-import aodev.blue.rxsandbox.model.operator.filtering.FilterOperator
-import aodev.blue.rxsandbox.model.operator.filtering.IgnoreElementsOperator
-import aodev.blue.rxsandbox.ui.widget.TimelineView
+import aodev.blue.rxsandbox.model.observable.operators.filtering.ObservableFilter
+import aodev.blue.rxsandbox.ui.widget.ObservableTimelineView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -28,21 +25,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val sourceTimelineView: TimelineView = findViewById(R.id.source_timeline)
+        val sourceTimelineView: ObservableTimelineView = findViewById(R.id.source_timeline)
         val operatorView: TextView = findViewById(R.id.operator)
-        val resultTimelineView: TimelineView = findViewById(R.id.result_timeline)
+        val resultTimelineView: ObservableTimelineView = findViewById(R.id.result_timeline)
 
-        val operator = FilterOperator(EvenPredicate())
-        val sourceTimeline = Timeline(
+        val operator = ObservableFilter(EvenPredicate())
+        val sourceTimeline = ObservableTimeline(
                 setOf(
-                        Event(0f, 0),
-                        Event(2f, 1),
-                        Event(4f, 2),
-                        Event(6f, 3),
-                        Event(8f, 4),
-                        Event(10f, 5)
+                        ObservableEvent(0f, 0),
+                        ObservableEvent(2f, 1),
+                        ObservableEvent(4f, 2),
+                        ObservableEvent(6f, 3),
+                        ObservableEvent(8f, 4),
+                        ObservableEvent(10f, 5)
                 ),
-                TerminationEvent(Config.timelineDuration.toFloat(), Termination.Complete)
+                ObservableTermination.Complete(Config.timelineDuration.toFloat())
         )
 
         sourceTimelineView.timeline = sourceTimeline
