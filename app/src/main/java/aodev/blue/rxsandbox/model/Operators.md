@@ -17,7 +17,7 @@ Creating observables
 - DONE empty
 - PART from
 - TODO interval
-- TODO just
+- DONE just
 - DONE never
 - DONE throw
 - TODO range
