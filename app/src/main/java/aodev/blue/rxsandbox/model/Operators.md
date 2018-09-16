@@ -20,7 +20,7 @@ Creating observables
 - DONE just
 - DONE never
 - DONE throw
-- TODO range
+- DONE range
 - TODO repeat
 - CANT start
 - TODO timer
