@@ -16,7 +16,7 @@ Creating observables
 - CANT defer
 - DONE empty
 - PART from
-- TODO interval
+- DONE interval
 - DONE just
 - DONE never
 - DONE throw
