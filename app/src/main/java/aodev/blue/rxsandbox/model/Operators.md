@@ -41,8 +41,8 @@ Filtering observables
 ---------------------
 
 - DONE debounce
-- TODO distinct
-- TODO distinctUntilChanged
+- DONE distinct
+- DONE distinctUntilChanged
 - DONE elementAt
 - DONE filter
 - DONE first
