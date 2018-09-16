@@ -12,6 +12,10 @@ class ObservableDebounce<T>(
         private val duration: Float
 ) : Operator<ObservableTimeline<T>, ObservableTimeline<T>> {
 
+    init {
+        require(duration >= 0)
+    }
+
     // TODO Verify the behavior of the debounce with an error
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {

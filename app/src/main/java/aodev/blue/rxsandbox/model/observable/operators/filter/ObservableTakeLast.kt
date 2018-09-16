@@ -9,6 +9,10 @@ class ObservableTakeLast<T>(
         private val count: Int
 ) : Operator<ObservableTimeline<T>, ObservableTimeline<T>> {
 
+    init {
+        require(count >= 0)
+    }
+
     // TODO verify the behavior of the takeLast with an error
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {

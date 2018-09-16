@@ -9,6 +9,10 @@ class ObservableSkipLast<T>(
         private val count: Int
 ) : Operator<ObservableTimeline<T>, ObservableTimeline<T>> {
 
+    init {
+        require(count >= 0)
+    }
+
     // TODO verify the behavior of the skipLast with an error
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {

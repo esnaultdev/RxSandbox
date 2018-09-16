@@ -9,6 +9,10 @@ class ObservableTake<T>(
         private val count: Int
 ) : Operator<ObservableTimeline<T>, ObservableTimeline<T>> {
 
+    init {
+        require(count >= 0)
+    }
+
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
         return if (input.events.size >= count) {
             val events = input.sortedEvents.take(count).toSet()

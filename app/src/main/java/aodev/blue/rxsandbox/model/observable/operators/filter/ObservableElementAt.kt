@@ -11,6 +11,10 @@ class ObservableElementAt<T>(
         private val index: Int
 ) : Operator<ObservableTimeline<T>, SingleTimeline<T>> {
 
+    init {
+        require(index >= 0)
+    }
+
     override fun apply(input: ObservableTimeline<T>): SingleTimeline<T> {
         return when (input.termination) {
             is ObservableTermination.None -> SingleTimeline(SingleResult.None())

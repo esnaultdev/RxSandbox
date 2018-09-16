@@ -8,6 +8,10 @@ class ObservableSkip<T>(
         private val count: Int
 ) : Operator<ObservableTimeline<T>, ObservableTimeline<T>> {
 
+    init {
+        require(count >= 0)
+    }
+
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
         return ObservableTimeline(
                 input.sortedEvents.drop(count).toSet(),
