@@ -1,4 +1,4 @@
-package aodev.blue.rxsandbox.model.observable.operators.filtering
+package aodev.blue.rxsandbox.model.observable.operators.filter
 
 import aodev.blue.rxsandbox.model.Operator
 import aodev.blue.rxsandbox.model.observable.ObservableTermination
@@ -7,16 +7,14 @@ import aodev.blue.rxsandbox.model.single.SingleResult
 import aodev.blue.rxsandbox.model.single.SingleTimeline
 
 
-class ObservableElementAt<T>(
-        private val index: Int
-) : Operator<ObservableTimeline<T>, SingleTimeline<T>> {
+class ObservableLast<T> : Operator<ObservableTimeline<T>, SingleTimeline<T>> {
 
     override fun apply(input: ObservableTimeline<T>): SingleTimeline<T> {
         return when (input.termination) {
             is ObservableTermination.None -> SingleTimeline(SingleResult.None())
             is ObservableTermination.Complete -> {
-                if (input.events.size > index) {
-                    val event = input.sortedEvents[index]
+                if (input.events.isNotEmpty()) {
+                    val event = input.sortedEvents.last()
                     SingleTimeline(SingleResult.Success(event.time, event.value))
                 } else {
                     SingleTimeline(SingleResult.Error(input.termination.time))
@@ -29,6 +27,6 @@ class ObservableElementAt<T>(
     }
 
     override fun expression(): String {
-        return "elementAt($index)"
+        return "last"
     }
 }

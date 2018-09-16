@@ -14,12 +14,12 @@ Creating observables
 
 - CANT create
 - CANT defer
-- TODO empty
+- DONE empty
 - PART from
 - TODO interval
 - TODO just
-- TODO never
-- TODO throw
+- DONE never
+- DONE throw
 - TODO range
 - TODO repeat
 - CANT start

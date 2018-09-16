@@ -1,4 +1,4 @@
-package aodev.blue.rxsandbox.model.observable.operators.filtering
+package aodev.blue.rxsandbox.model.observable.operators.filter
 
 import aodev.blue.rxsandbox.model.Operator
 import aodev.blue.rxsandbox.model.completable.CompletableResult

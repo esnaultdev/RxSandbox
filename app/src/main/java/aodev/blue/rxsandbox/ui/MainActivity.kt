@@ -9,7 +9,7 @@ import aodev.blue.rxsandbox.model.observable.ObservableEvent
 import aodev.blue.rxsandbox.model.observable.ObservableTermination
 import aodev.blue.rxsandbox.model.observable.ObservableTimeline
 import aodev.blue.rxsandbox.model.operations.predicate.EvenPredicate
-import aodev.blue.rxsandbox.model.observable.operators.filtering.ObservableFilter
+import aodev.blue.rxsandbox.model.observable.operators.filter.ObservableFilter
 import aodev.blue.rxsandbox.ui.widget.ObservableTimelineView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
