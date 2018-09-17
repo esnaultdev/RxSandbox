@@ -21,7 +21,7 @@ Creating observables
 - DONE never
 - DONE throw
 - DONE range
-- TODO repeat
+- PART repeat
 - CANT start
 - TODO timer
 

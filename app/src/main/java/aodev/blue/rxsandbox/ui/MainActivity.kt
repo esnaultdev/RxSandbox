@@ -8,8 +8,7 @@ import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.observable.ObservableEvent
 import aodev.blue.rxsandbox.model.observable.ObservableTermination
 import aodev.blue.rxsandbox.model.observable.ObservableTimeline
-import aodev.blue.rxsandbox.model.operations.predicate.EvenPredicate
-import aodev.blue.rxsandbox.model.observable.operators.filter.ObservableFilter
+import aodev.blue.rxsandbox.model.observable.operators.create.ObservableRepeat
 import aodev.blue.rxsandbox.ui.widget.ObservableTimelineView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -29,15 +28,11 @@ class MainActivity : AppCompatActivity() {
         val operatorView: TextView = findViewById(R.id.operator)
         val resultTimelineView: ObservableTimelineView = findViewById(R.id.result_timeline)
 
-        val operator = ObservableFilter(EvenPredicate())
+        val operator = ObservableRepeat<Int>()
         val sourceTimeline = ObservableTimeline(
                 setOf(
                         ObservableEvent(0f, 0),
-                        ObservableEvent(2f, 1),
-                        ObservableEvent(4f, 2),
-                        ObservableEvent(6f, 3),
-                        ObservableEvent(8f, 4),
-                        ObservableEvent(10f, 5)
+                        ObservableEvent(2f, 1)
                 ),
                 ObservableTermination.Complete(Config.timelineDuration.toFloat())
         )
