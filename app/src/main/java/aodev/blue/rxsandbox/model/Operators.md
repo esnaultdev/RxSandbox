@@ -23,7 +23,7 @@ Creating observables
 - DONE range
 - PART repeat
 - CANT start
-- TODO timer
+- DONE timer
 
 
 Transforming observables
@@ -77,14 +77,14 @@ Error handling operators
 Observable utility operators
 ----------------------------
 
-- TODO delay
+- DONE delay
 - CANT do
 - CANT materialize/dematerialize
 - CANT observeOn
 - CANT serialize
 - CANT subscribe
 - CANT subscribeOn
-- TODO timeInterval
+- CANT timeInterval
 - TODO timeout
 - CANT timestamp
 - CANT using
