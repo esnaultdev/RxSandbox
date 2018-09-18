@@ -15,10 +15,10 @@ class ObservableTimer(private val delay: Float) : Creator<ObservableTimeline<Int
 
     override fun create(): ObservableTimeline<Int> {
         return if (delay > Config.timelineDuration) {
-            ObservableTimeline(emptySet(), ObservableTermination.None)
+            ObservableTimeline(emptyList(), ObservableTermination.None)
         } else {
             ObservableTimeline(
-                    setOf(ObservableEvent(delay, 0)),
+                    listOf(ObservableEvent(delay, 0)),
                     ObservableTermination.Complete(delay)
             )
         }

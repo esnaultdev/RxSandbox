@@ -7,7 +7,7 @@ import aodev.blue.rxsandbox.model.observable.ObservableTimeline
 class ObservableDistinct<T> : Operator<ObservableTimeline<T>, ObservableTimeline<T>> {
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
-        val events = input.sortedEvents.distinctBy { it.value }.toSet()
+        val events = input.events.distinctBy { it.value }
 
         return ObservableTimeline(
                 events = events,

@@ -11,7 +11,7 @@ class ObservableFilter<T>(
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
         return ObservableTimeline(
-                input.events.filter { predicate.check(it.value) }.toSet(),
+                input.events.filter { predicate.check(it.value) },
                 input.termination
         )
     }

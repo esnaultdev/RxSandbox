@@ -12,7 +12,7 @@ class ObservableMap<in T, out R>(
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<R> {
         return ObservableTimeline(
-                input.events.map { ObservableEvent(it.time, mapping.map(it.value)) }.toSet(),
+                input.events.map { ObservableEvent(it.time, mapping.map(it.value)) },
                 input.termination
         )
     }

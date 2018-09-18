@@ -22,7 +22,7 @@ class ObservableDelay<T>(
             } else {
                 null
             }
-        }.toSet()
+        }
 
         val delayedTermination = when (input.termination) {
             ObservableTermination.None -> ObservableTermination.None

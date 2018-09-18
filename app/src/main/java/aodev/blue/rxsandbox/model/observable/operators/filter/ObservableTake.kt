@@ -15,7 +15,7 @@ class ObservableTake<T>(
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
         return if (input.events.size >= count) {
-            val events = input.sortedEvents.take(count).toSet()
+            val events = input.events.take(count)
             ObservableTimeline(
                     events,
                     ObservableTermination.Complete(events.lastOrNull()?.time ?: 0f)

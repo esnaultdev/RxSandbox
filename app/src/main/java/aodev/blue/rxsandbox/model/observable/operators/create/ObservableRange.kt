@@ -18,7 +18,7 @@ class ObservableRange(
 
     override fun create(): ObservableTimeline<Int> {
         return ObservableTimeline(
-                (from..to).map { ObservableEvent(0f, it) }.toSet(),
+                (from..to).map { ObservableEvent(0f, it) },
                 ObservableTermination.Complete(0f)
         )
     }

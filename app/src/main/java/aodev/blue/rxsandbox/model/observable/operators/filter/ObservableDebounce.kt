@@ -19,12 +19,12 @@ class ObservableDebounce<T>(
     // TODO Verify the behavior of the debounce with an error
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
-        val firstEvents = input.sortedEvents
-                .zip(input.sortedEvents.drop(1))
+        val firstEvents = input.events
+                .zip(input.events.drop(1))
                 .filter { (event, next) -> next.time - event.time >= duration }
                 .map { (event, _) -> event.moveTo(event.time + duration) }
 
-        val lastEvent: ObservableEvent<T>? = input.sortedEvents.lastOrNull()?.let {
+        val lastEvent: ObservableEvent<T>? = input.events.lastOrNull()?.let {
             when (input.termination) {
                 ObservableTermination.None -> {
                     val newTime = (it.time + duration).clamp(0f, Config.timelineDuration.toFloat())
@@ -41,7 +41,7 @@ class ObservableDebounce<T>(
         val events = if (lastEvent != null) firstEvents + lastEvent else firstEvents
 
         return ObservableTimeline(
-                events.toSet(),
+                events,
                 input.termination
         )
     }

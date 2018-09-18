@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         val operator = ObservableDelay<Int>(2f)
         val sourceTimeline = ObservableTimeline(
-                setOf(
+                listOf(
                         ObservableEvent(0f, 0),
                         ObservableEvent(2f, 1),
                         ObservableEvent(4f, 2),

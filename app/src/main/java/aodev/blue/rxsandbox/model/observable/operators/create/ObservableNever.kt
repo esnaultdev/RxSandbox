@@ -9,7 +9,7 @@ class ObservableNever<T> : Creator<ObservableTimeline<T>> {
 
     override fun create(): ObservableTimeline<T> {
         return ObservableTimeline(
-                emptySet(),
+                emptyList(),
                 ObservableTermination.None
         )
     }

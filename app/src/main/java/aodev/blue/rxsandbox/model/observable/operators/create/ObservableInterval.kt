@@ -18,7 +18,7 @@ class ObservableInterval(private val interval: Float) : Creator<ObservableTimeli
         val events = (0..count).map { ObservableEvent(it * interval, it) }
 
         return ObservableTimeline(
-                events.toSet(),
+                events,
                 ObservableTermination.None
         )
     }

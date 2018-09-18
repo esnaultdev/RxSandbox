@@ -33,7 +33,7 @@ class ObservableTimelineView : View {
             super(context, attrs, defStyleAttr, defStyleRes)
 
     companion object {
-        private val initialTimeline = ObservableTimeline<Int>(emptySet(), ObservableTermination.None)
+        private val initialTimeline = ObservableTimeline<Int>(emptyList(), ObservableTermination.None)
 
         private const val EVENT_INDEX_NONE = -2
         private const val EVENT_INDEX_TERMINATION = -1
@@ -184,9 +184,8 @@ class ObservableTimelineView : View {
         super.onDraw(canvas)
 
         drawLine(canvas)
-
-        _timeline.termination?.let { drawTerminationEvent(canvas, it) }
-        drawEvents(canvas, _timeline.sortedEvents)
+        drawTerminationEvent(canvas, _timeline.termination)
+        drawEvents(canvas, _timeline.events)
     }
 
     private fun drawLine(canvas: Canvas) {
@@ -277,7 +276,7 @@ class ObservableTimelineView : View {
                 val x = ev.getX(pointerIndex)
                 val y = ev.getY(pointerIndex)
 
-                eventsToMove = _timeline.sortedEvents.toMutableList()
+                eventsToMove = _timeline.events.toMutableList()
                 movingEventIndex = getEventIndexForPosition(x, y)
 
                 lastTouchX = x
@@ -401,7 +400,7 @@ class ObservableTimelineView : View {
         }
 
         this._timeline = _timeline.copy(
-                events = events.toSet(),
+                events = events,
                 termination = termEvent
         )
     }
@@ -432,7 +431,7 @@ class ObservableTimelineView : View {
         }
 
         _timeline = _timeline.copy(
-                events = eventsToMove.toSet(),
+                events = eventsToMove,
                 termination = newTermination
         )
     }

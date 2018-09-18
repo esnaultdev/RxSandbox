@@ -10,7 +10,7 @@ class ObservableJust<T>(private vararg val values: T) : Creator<ObservableTimeli
 
     override fun create(): ObservableTimeline<T> {
         return ObservableTimeline(
-                values.map { ObservableEvent(0f, it) }.toSet(),
+                values.map { ObservableEvent(0f, it) },
                 ObservableTermination.Complete(0f)
         )
     }

@@ -15,7 +15,7 @@ class ObservableRepeat<T> : Operator<ObservableTimeline<T>, ObservableTimeline<T
             is ObservableTermination.Error -> input
             is ObservableTermination.Complete -> {
                 if (input.termination.time == 0f) {
-                    ObservableTimeline(emptySet(), ObservableTermination.None)
+                    ObservableTimeline(emptyList(), ObservableTermination.None)
                 } else {
                     val repeatTime = input.termination.time
                     val repeatCount = (Config.timelineDuration / repeatTime).toInt()
@@ -28,7 +28,7 @@ class ObservableRepeat<T> : Operator<ObservableTimeline<T>, ObservableTimeline<T
                                 null
                             }
                         }
-                    }.flatten().toSet()
+                    }.flatten()
 
                     ObservableTimeline(
                         events,

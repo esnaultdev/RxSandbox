@@ -8,16 +8,16 @@ class ObservableDistinctUntilChanged<T> : Operator<ObservableTimeline<T>, Observ
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
         val events = when (input.events.size) {
-            0 -> emptySet()
-            1 -> setOf(input.sortedEvents.first())
+            0 -> emptyList()
+            1 -> listOf(input.events.first())
             else -> {
-                val firstEvent = input.sortedEvents.first()
-                val otherEvents = input.sortedEvents.drop(1)
-                        .zip(input.sortedEvents)
+                val firstEvent = input.events.first()
+                val otherEvents = input.events.drop(1)
+                        .zip(input.events)
                         .filter { it.first.value != it.second.value }
                         .map { it.first }
 
-                mutableSetOf(firstEvent).apply { addAll(otherEvents) }
+                mutableListOf(firstEvent).apply { addAll(otherEvents) }
             }
         }
 

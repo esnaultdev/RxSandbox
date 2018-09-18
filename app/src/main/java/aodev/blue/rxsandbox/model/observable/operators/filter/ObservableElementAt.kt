@@ -20,7 +20,7 @@ class ObservableElementAt<T>(
             is ObservableTermination.None -> SingleTimeline(SingleResult.None())
             is ObservableTermination.Complete -> {
                 if (input.events.size > index) {
-                    val event = input.sortedEvents[index]
+                    val event = input.events[index]
                     SingleTimeline(SingleResult.Success(event.time, event.value))
                 } else {
                     SingleTimeline(SingleResult.Error(input.termination.time))

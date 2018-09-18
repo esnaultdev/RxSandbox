@@ -15,11 +15,13 @@ sealed class ObservableTermination {
 }
 
 data class ObservableTimeline<out T>(
-        val events: Set<ObservableEvent<T>>,
+        val events: List<ObservableEvent<T>>,
         val termination: ObservableTermination
 ) {
-
-    val sortedEvents: List<ObservableEvent<T>> by lazy(LazyThreadSafetyMode.NONE) {
-        events.sortedBy { it.time }
+    init {
+        val eventsSorted = events.zip(events.drop(1)).all { (event, nextEvent) ->
+            event.time <= nextEvent.time
+        }
+        require(eventsSorted) { "Observable events not sorted" }
     }
 }

@@ -14,7 +14,7 @@ class ObservableSkip<T>(
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
         return ObservableTimeline(
-                input.sortedEvents.drop(count).toSet(),
+                input.events.drop(count),
                 input.termination
         )
     }

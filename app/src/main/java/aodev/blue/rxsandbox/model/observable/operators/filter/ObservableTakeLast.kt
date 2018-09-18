@@ -17,13 +17,12 @@ class ObservableTakeLast<T>(
 
     override fun apply(input: ObservableTimeline<T>): ObservableTimeline<T> {
         return when (input.termination) {
-            ObservableTermination.None -> ObservableTimeline(emptySet(), input.termination)
-            is ObservableTermination.Error -> ObservableTimeline(emptySet(), input.termination)
+            ObservableTermination.None -> ObservableTimeline(emptyList(), input.termination)
+            is ObservableTermination.Error -> ObservableTimeline(emptyList(), input.termination)
             is ObservableTermination.Complete -> {
-                val events = input.sortedEvents.takeLast(count)
+                val events = input.events.takeLast(count)
                         .map { it.moveTo(input.termination.time) }
-                        .toSet()
-                ObservableTimeline(events.toSet(), input.termination)
+                ObservableTimeline(events, input.termination)
             }
         }
     }

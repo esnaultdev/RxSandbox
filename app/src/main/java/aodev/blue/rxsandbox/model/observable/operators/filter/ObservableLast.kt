@@ -14,7 +14,7 @@ class ObservableLast<T> : Operator<ObservableTimeline<T>, SingleTimeline<T>> {
             is ObservableTermination.None -> SingleTimeline(SingleResult.None())
             is ObservableTermination.Complete -> {
                 if (input.events.isNotEmpty()) {
-                    val event = input.sortedEvents.last()
+                    val event = input.events.last()
                     SingleTimeline(SingleResult.Success(event.time, event.value))
                 } else {
                     SingleTimeline(SingleResult.Error(input.termination.time))

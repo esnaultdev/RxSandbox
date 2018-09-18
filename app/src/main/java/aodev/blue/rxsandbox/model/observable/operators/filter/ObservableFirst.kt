@@ -11,7 +11,7 @@ class ObservableFirst<T> : Operator<ObservableTimeline<T>, SingleTimeline<T>> {
 
     override fun apply(input: ObservableTimeline<T>): SingleTimeline<T> {
         return if (input.events.isNotEmpty()) {
-            val event = input.sortedEvents.first()
+            val event = input.events.first()
             SingleTimeline(SingleResult.Success(event.time, event.value))
         } else {
             when (input.termination) {
