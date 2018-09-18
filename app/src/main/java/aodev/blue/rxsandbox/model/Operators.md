@@ -93,9 +93,9 @@ Observable utility operators
 Conditional and Boolean operators
 ---------------------------------
 
-- TODO all
+- DONE all
 - CANT amb
-- TODO any
+- DONE any
 - TODO contains
 - CANT defaultIfEmpty
 - TODO sequenceEqual
