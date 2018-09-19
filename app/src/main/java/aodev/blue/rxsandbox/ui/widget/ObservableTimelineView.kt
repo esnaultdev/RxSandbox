@@ -431,7 +431,7 @@ class ObservableTimelineView : View {
         }
 
         _timeline = _timeline.copy(
-                events = eventsToMove,
+                events = eventsToMove.sortedBy { it.time },
                 termination = newTermination
         )
     }
