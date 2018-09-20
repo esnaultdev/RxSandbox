@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.RectF
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -37,6 +38,8 @@ class ObservableTimelineView : View {
 
         private const val EVENT_INDEX_NONE = -2
         private const val EVENT_INDEX_TERMINATION = -1
+
+        private const val TYPE_TEXT = "observable"
     }
 
     // Data
@@ -80,6 +83,8 @@ class ObservableTimelineView : View {
     private val innerPaddingStart = context.resources.getDimension(R.dimen.timeline_padding_inner_start)
     private val innerPaddingEnd = context.resources.getDimension(R.dimen.timeline_padding_inner_end)
     private val lineDashSize = context.resources.getDimension(R.dimen.timeline_line_dash_size)
+    private val typeTextSize = context.resources.getDimension(R.dimen.timeline_type_text_size)
+    private val typeTextPadding = context.resources.getDimension(R.dimen.timeline_type_text_padding)
     private val eventSize = context.resources.getDimension(R.dimen.timeline_event_size)
     private val eventTextSize = context.resources.getDimension(R.dimen.timeline_event_text_size)
     private val completeHeight = context.resources.getDimension(R.dimen.timeline_complete_height)
@@ -90,6 +95,7 @@ class ObservableTimelineView : View {
     private val touchTargetSize = context.resources.getDimension(R.dimen.timeline_touch_target_size)
 
     private val strokeColor = context.colorCompat(R.color.timeline_stroke_color)
+    private val typeTextColor = context.colorCompat(R.color.timeline_type_text_color)
     private val eventFillColor = context.colorCompat(R.color.timeline_event_fill_color)
     private val eventTextColor = context.colorCompat(R.color.timeline_event_text_color)
     private val errorColor = context.colorCompat(R.color.timeline_error_color)
@@ -119,6 +125,12 @@ class ObservableTimelineView : View {
         color = errorColor
         strokeWidth = errorStrokeWidth
         style = Paint.Style.STROKE
+    }
+    private val typeTextPaint = Paint().apply {
+        flags = Paint.ANTI_ALIAS_FLAG
+        color = eventTextColor
+        textSize = typeTextSize
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)
     }
 
     // Draw
@@ -221,6 +233,7 @@ class ObservableTimelineView : View {
         super.onDraw(canvas)
 
         drawLine(canvas)
+        drawTypeText(canvas)
         drawTerminationEvent(canvas, _timeline.termination)
         drawEvents(canvas, _timeline.events)
     }
@@ -228,6 +241,16 @@ class ObservableTimelineView : View {
     private fun drawLine(canvas: Canvas) {
         canvas.drawPath(arrowPath, arrowPaint)
         canvas.drawPath(linePath, strokePaint)
+    }
+
+    private fun drawTypeText(canvas: Canvas) {
+        val text = TYPE_TEXT
+
+        typeTextPaint.getTextBounds(text, 0, text.length, textBoundsRect)
+        val textX = width - typeTextPadding - textBoundsRect.width().toFloat() - textBoundsRect.left
+        val textY = height - typeTextPadding - textBoundsRect.bottom
+
+        canvas.drawText(text, textX, textY, typeTextPaint)
     }
 
     private fun drawTerminationEvent(canvas: Canvas, termination: ObservableTermination) {

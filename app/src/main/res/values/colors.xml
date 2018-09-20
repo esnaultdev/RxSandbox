@@ -14,6 +14,7 @@
 
     <color name="timeline_stroke_color">#000000</color>
     <color name="timeline_event_text_color">@color/text_secondary</color>
+    <color name="timeline_type_text_color">@color/text_secondary</color>
     <color name="timeline_event_fill_color">#64B5F6</color>
     <color name="timeline_error_color">#E53935</color>
 
