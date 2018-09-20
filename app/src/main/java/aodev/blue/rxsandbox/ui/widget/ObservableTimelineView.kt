@@ -288,11 +288,10 @@ class ObservableTimelineView : View {
     private fun eventPosition(time: Float): Float {
         val timeFactor = time / Config.timelineDuration
         val widthForEvents = width - 2 * padding - innerPaddingStart - innerPaddingEnd
-        val startPadding = padding + innerPaddingStart
         return if (isLtr) {
-            timeFactor * widthForEvents + startPadding
+            timeFactor * widthForEvents + padding + innerPaddingStart
         } else {
-            (1 - timeFactor) * widthForEvents + startPadding
+            (1 - timeFactor) * widthForEvents + padding + innerPaddingEnd
         }
     }
 
@@ -325,7 +324,7 @@ class ObservableTimelineView : View {
                 val x = ev.getX(pointerIndex)
 
                 // Calculate the distance moved
-                val dx = x - lastTouchX
+                val dx = if (isLtr) x - lastTouchX else lastTouchX - x
                 lastTouchX = x
 
                 val widthForEvents = width - 2 * padding - innerPaddingStart - innerPaddingEnd

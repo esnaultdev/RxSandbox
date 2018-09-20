@@ -4,7 +4,7 @@
     <!-- Timeline -->
     <dimen name="timeline_stroke_width">2dp</dimen>
     <dimen name="timeline_padding">16dp</dimen>
-    <dimen name="timeline_padding_inner_start">36dp</dimen>
+    <dimen name="timeline_padding_inner_start">32dp</dimen>
     <dimen name="timeline_padding_inner_end">48dp</dimen>
     <dimen name="timeline_event_size">36dp</dimen>
     <dimen name="timeline_event_text_size">16sp</dimen>
