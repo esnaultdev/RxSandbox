@@ -77,7 +77,8 @@ class ObservableTimelineView : View {
     // Resources
     private val strokeWidth = context.resources.getDimension(R.dimen.timeline_stroke_width)
     private val padding = context.resources.getDimension(R.dimen.timeline_padding)
-    private val innerPadding = context.resources.getDimension(R.dimen.timeline_padding_inner)
+    private val innerPaddingStart = context.resources.getDimension(R.dimen.timeline_padding_inner_start)
+    private val innerPaddingEnd = context.resources.getDimension(R.dimen.timeline_padding_inner_end)
     private val lineDashSize = context.resources.getDimension(R.dimen.timeline_line_dash_size)
     private val eventSize = context.resources.getDimension(R.dimen.timeline_event_size)
     private val eventTextSize = context.resources.getDimension(R.dimen.timeline_event_text_size)
@@ -129,7 +130,7 @@ class ObservableTimelineView : View {
     //region Measurement
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val desiredWidth = (2 * padding + 2 * innerPadding + 10 * eventSize).toInt()
+        val desiredWidth = (2 * padding + innerPaddingStart + innerPaddingEnd + 10 * eventSize).toInt()
         val desiredHeight = (2 * padding + completeHeight).toInt()
 
         val widthMode = View.MeasureSpec.getMode(widthMeasureSpec)
@@ -191,20 +192,20 @@ class ObservableTimelineView : View {
 
             // Start dashed line
             val dashDx = if (isLtr) lineDashSize else -lineDashSize
-            val startDashCount = (innerPadding / (2 * lineDashSize)).toInt()
+            val startDashCount = (innerPaddingStart / (2 * lineDashSize)).toInt()
             repeat(startDashCount) {
                 rLineTo(dashDx, 0f)
                 rMoveTo(dashDx, 0f)
             }
 
             // Continuous line
-            val lineWidth = width - 2 * padding - 2 * innerPadding
+            val lineWidth = width - 2 * padding - innerPaddingStart - innerPaddingEnd
             val lineDx = if (isLtr) lineWidth else -lineWidth
             rLineTo(lineDx, 0f)
 
             // End dashed line
             // We subtract one to keep the arrow pointy
-            val endDashCount = ((innerPadding) / (2 * lineDashSize)).toInt() - 1
+            val endDashCount = ((innerPaddingEnd) / (2 * lineDashSize)).toInt() - 1
             repeat(endDashCount) {
                 rMoveTo(dashDx, 0f)
                 rLineTo(dashDx, 0f)
@@ -286,8 +287,8 @@ class ObservableTimelineView : View {
 
     private fun eventPosition(time: Float): Float {
         val timeFactor = time / Config.timelineDuration
-        val widthForEvents = width - 2 * padding - 2 * innerPadding
-        val startPadding = padding + innerPadding
+        val widthForEvents = width - 2 * padding - innerPaddingStart - innerPaddingEnd
+        val startPadding = padding + innerPaddingStart
         return if (isLtr) {
             timeFactor * widthForEvents + startPadding
         } else {
@@ -327,7 +328,7 @@ class ObservableTimelineView : View {
                 val dx = x - lastTouchX
                 lastTouchX = x
 
-                val widthForEvents = width - 2 * padding - 2 * innerPadding
+                val widthForEvents = width - 2 * padding - innerPaddingStart - innerPaddingEnd
                 val timeDiff = dx / widthForEvents * Config.timelineDuration
 
                 val movingEventIndex = movingEventIndex
