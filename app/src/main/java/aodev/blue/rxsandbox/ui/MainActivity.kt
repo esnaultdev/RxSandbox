@@ -5,11 +5,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.Config
+import aodev.blue.rxsandbox.model.completable.CompletableResult
+import aodev.blue.rxsandbox.model.completable.CompletableTimeline
+import aodev.blue.rxsandbox.model.completable.operators.utility.CompletableDelay
 import aodev.blue.rxsandbox.model.observable.ObservableEvent
 import aodev.blue.rxsandbox.model.observable.ObservableTermination
 import aodev.blue.rxsandbox.model.observable.ObservableTimeline
 import aodev.blue.rxsandbox.model.observable.operators.utility.ObservableDelay
-import aodev.blue.rxsandbox.ui.widget.ObservableTimelineView
+import aodev.blue.rxsandbox.ui.widget.CompletableTimelineView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -24,21 +27,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val sourceTimelineView: ObservableTimelineView = findViewById(R.id.source_timeline)
+        val sourceTimelineView: CompletableTimelineView = findViewById(R.id.source_timeline)
         val operatorView: TextView = findViewById(R.id.operator)
-        val resultTimelineView: ObservableTimelineView = findViewById(R.id.result_timeline)
+        val resultTimelineView: CompletableTimelineView = findViewById(R.id.result_timeline)
 
-        val operator = ObservableDelay<Int>(2f)
-        val sourceTimeline = ObservableTimeline(
-                listOf(
-                        ObservableEvent(0f, 0),
-                        ObservableEvent(2f, 1),
-                        ObservableEvent(4f, 2),
-                        ObservableEvent(6f, 3),
-                        ObservableEvent(8f, 4)
-                ),
-                ObservableTermination.Complete(Config.timelineDuration.toFloat())
-        )
+        val operator = CompletableDelay(2f)
+        val sourceTimeline = CompletableTimeline(CompletableResult.Complete(0f))
 
         sourceTimelineView.timeline = sourceTimeline
         operatorView.text = operator.expression()
