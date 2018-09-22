@@ -115,7 +115,7 @@ class ObservableTimelineView : View {
 
     // Draw
     private val textBoundsRect = Rect()
-    private val lineDrawer = TimelineLineDrawer(context, isLtr, TimelineViewTypeText.OBSERVABLE)
+    private val lineDrawer = TimelineLineDrawer(context, TimelineViewTypeText.OBSERVABLE)
 
     //region Measurement
 
@@ -147,6 +147,7 @@ class ObservableTimelineView : View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+        lineDrawer.isLtr = isLtr
         lineDrawer.onSizeChanged(w, h)
     }
 

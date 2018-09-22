@@ -15,9 +15,10 @@ import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
  */
 class TimelineLineDrawer(
         context: Context,
-        private val isLtr: Boolean,
         private val typeText: String
 ) {
+
+    var isLtr: Boolean = true
 
     // Resources
     private val padding = context.resources.getDimension(R.dimen.timeline_padding)

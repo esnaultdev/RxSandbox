@@ -94,7 +94,7 @@ class CompletableTimelineView : View {
     }
 
     // Drawing
-    private val lineDrawer = TimelineLineDrawer(context, isLtr, TimelineViewTypeText.COMPLETABLE)
+    private val lineDrawer = TimelineLineDrawer(context, TimelineViewTypeText.COMPLETABLE)
 
 
     //region Measurement
@@ -127,6 +127,7 @@ class CompletableTimelineView : View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+        lineDrawer.isLtr = isLtr
         lineDrawer.onSizeChanged(w, h)
     }
 
