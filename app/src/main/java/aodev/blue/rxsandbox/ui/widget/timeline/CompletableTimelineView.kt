@@ -2,7 +2,6 @@ package aodev.blue.rxsandbox.ui.widget.timeline
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -12,8 +11,10 @@ import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.completable.CompletableResult
 import aodev.blue.rxsandbox.model.completable.CompletableTimeline
 import aodev.blue.rxsandbox.ui.utils.basicMeasure
-import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
+import aodev.blue.rxsandbox.ui.widget.timeline.drawer.CompleteEventDrawer
+import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ErrorEventDrawer
+import aodev.blue.rxsandbox.ui.widget.timeline.drawer.TimelineLineDrawer
 import aodev.blue.rxsandbox.utils.clamp
 import aodev.blue.rxsandbox.utils.exhaustive
 import io.reactivex.BackpressureStrategy
@@ -70,33 +71,16 @@ class CompletableTimelineView : View {
 
 
     // Resources
-    private val strokeWidth = context.resources.getDimension(R.dimen.timeline_stroke_width)
     private val padding = context.resources.getDimension(R.dimen.timeline_padding)
     private val innerPaddingStart = context.resources.getDimension(R.dimen.timeline_padding_inner_start)
     private val innerPaddingEnd = context.resources.getDimension(R.dimen.timeline_padding_inner_end)
-    private val completeHeight = context.resources.getDimension(R.dimen.timeline_complete_height)
-    private val errorSize = context.resources.getDimension(R.dimen.timeline_error_size)
-    private val errorStrokeWidth = context.resources.getDimension(R.dimen.timeline_error_stroke_width)
     private val touchTargetSize = context.resources.getDimension(R.dimen.timeline_touch_target_size)
 
-    private val strokeColor = context.colorCompat(R.color.timeline_stroke_color)
-    private val errorColor = context.colorCompat(R.color.timeline_error_color)
-
-    // Paint
-    private val strokePaint = Paint().apply {
-        flags = Paint.ANTI_ALIAS_FLAG
-        color = strokeColor
-        strokeWidth = this@CompletableTimelineView.strokeWidth
-        style = Paint.Style.STROKE
-    }
-    private val errorPaint = Paint().apply {
-        color = errorColor
-        strokeWidth = errorStrokeWidth
-        style = Paint.Style.STROKE
-    }
 
     // Drawing
     private val lineDrawer = TimelineLineDrawer(context, TimelineViewTypeText.COMPLETABLE)
+    private val completeEventDrawer = CompleteEventDrawer(context)
+    private val errorEventDrawer = ErrorEventDrawer(context)
 
 
     //region Measurement
@@ -133,30 +117,11 @@ class CompletableTimelineView : View {
             is CompletableResult.None -> Unit
             is CompletableResult.Complete -> {
                 val position = resultPosition(result.time)
-                canvas.drawLine(
-                        position,
-                        centerHeight - completeHeight / 2,
-                        position,
-                        centerHeight + completeHeight / 2,
-                        strokePaint
-                )
+                completeEventDrawer.draw(canvas, position, centerHeight)
             }
             is CompletableResult.Error -> {
                 val position = resultPosition(result.time)
-                canvas.drawLine(
-                        position - errorSize / 2,
-                        centerHeight - errorSize / 2,
-                        position + errorSize / 2,
-                        centerHeight + errorSize / 2,
-                        errorPaint
-                )
-                canvas.drawLine(
-                        position - errorSize / 2,
-                        centerHeight + errorSize / 2,
-                        position + errorSize / 2,
-                        centerHeight - errorSize / 2,
-                        errorPaint
-                )
+                errorEventDrawer.draw(canvas, position, centerHeight)
             }
         }.exhaustive
     }

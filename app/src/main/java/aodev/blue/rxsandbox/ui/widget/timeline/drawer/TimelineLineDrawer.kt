@@ -1,4 +1,4 @@
-package aodev.blue.rxsandbox.ui.widget.timeline
+package aodev.blue.rxsandbox.ui.widget.timeline.drawer
 
 import android.content.Context
 import android.graphics.Canvas

@@ -2,8 +2,6 @@ package aodev.blue.rxsandbox.ui.widget.timeline
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -13,8 +11,10 @@ import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.single.SingleResult
 import aodev.blue.rxsandbox.model.single.SingleTimeline
 import aodev.blue.rxsandbox.ui.utils.basicMeasure
-import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
+import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ErrorEventDrawer
+import aodev.blue.rxsandbox.ui.widget.timeline.drawer.TimelineLineDrawer
+import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ValueEventDrawer
 import aodev.blue.rxsandbox.utils.clamp
 import aodev.blue.rxsandbox.utils.exhaustive
 import io.reactivex.BackpressureStrategy
@@ -69,48 +69,16 @@ class SingleTimelineView : View {
     private var lastTouchX: Float = 0f
     private var isMoving = false
 
-
     // Resources
-    private val strokeWidth = context.resources.getDimension(R.dimen.timeline_stroke_width)
     private val padding = context.resources.getDimension(R.dimen.timeline_padding)
     private val innerPaddingStart = context.resources.getDimension(R.dimen.timeline_padding_inner_start)
     private val innerPaddingEnd = context.resources.getDimension(R.dimen.timeline_padding_inner_end)
-    private val eventSize = context.resources.getDimension(R.dimen.timeline_event_size)
-    private val eventTextSize = context.resources.getDimension(R.dimen.timeline_event_text_size)
-    private val errorSize = context.resources.getDimension(R.dimen.timeline_error_size)
-    private val errorStrokeWidth = context.resources.getDimension(R.dimen.timeline_error_stroke_width)
     private val touchTargetSize = context.resources.getDimension(R.dimen.timeline_touch_target_size)
 
-    private val strokeColor = context.colorCompat(R.color.timeline_stroke_color)
-    private val eventFillColor = context.colorCompat(R.color.timeline_event_fill_color)
-    private val eventTextColor = context.colorCompat(R.color.timeline_event_text_color)
-    private val errorColor = context.colorCompat(R.color.timeline_error_color)
-
-    // Paint
-    private val strokePaint = Paint().apply {
-        flags = Paint.ANTI_ALIAS_FLAG
-        color = strokeColor
-        strokeWidth = this@SingleTimelineView.strokeWidth
-        style = Paint.Style.STROKE
-    }
-    private val eventFillPaint = Paint().apply {
-        color = eventFillColor
-        style = Paint.Style.FILL
-    }
-    private val eventTextPaint = Paint().apply {
-        flags = Paint.ANTI_ALIAS_FLAG
-        color = eventTextColor
-        textSize = eventTextSize
-    }
-    private val errorPaint = Paint().apply {
-        color = errorColor
-        strokeWidth = errorStrokeWidth
-        style = Paint.Style.STROKE
-    }
-
     // Drawing
-    private val textBoundsRect = Rect()
     private val lineDrawer = TimelineLineDrawer(context, TimelineViewTypeText.SINGLE)
+    private val errorEventDrawer = ErrorEventDrawer(context)
+    private val valueEventDrawer = ValueEventDrawer(context)
 
 
     //region Measurement
@@ -147,33 +115,11 @@ class SingleTimelineView : View {
             is SingleResult.None -> Unit
             is SingleResult.Success -> {
                 val position = resultPosition(result.time)
-
-                canvas.drawCircle(position, centerHeight, eventSize / 2, eventFillPaint)
-                canvas.drawCircle(position, centerHeight, eventSize / 2, strokePaint)
-
-                val eventText = result.value.toString()
-                eventTextPaint.getTextBounds(eventText, 0, eventText.length, textBoundsRect)
-                val textX = position - textBoundsRect.width().toFloat() / 2 - textBoundsRect.left
-                val textY = centerHeight + textBoundsRect.height().toFloat() / 2 - textBoundsRect.bottom
-
-                canvas.drawText(eventText, textX, textY, eventTextPaint)
+                valueEventDrawer.draw(canvas, position, centerHeight, result.value)
             }
             is SingleResult.Error -> {
                 val position = resultPosition(result.time)
-                canvas.drawLine(
-                        position - errorSize / 2,
-                        centerHeight - errorSize / 2,
-                        position + errorSize / 2,
-                        centerHeight + errorSize / 2,
-                        errorPaint
-                )
-                canvas.drawLine(
-                        position - errorSize / 2,
-                        centerHeight + errorSize / 2,
-                        position + errorSize / 2,
-                        centerHeight - errorSize / 2,
-                        errorPaint
-                )
+                errorEventDrawer.draw(canvas, position, centerHeight)
             }
         }.exhaustive
     }
