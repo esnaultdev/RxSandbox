@@ -1,12 +1,10 @@
-package aodev.blue.rxsandbox.ui.widget
+package aodev.blue.rxsandbox.ui.widget.timeline
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.RectF
-import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -38,8 +36,6 @@ class ObservableTimelineView : View {
 
         private const val EVENT_INDEX_NONE = -2
         private const val EVENT_INDEX_TERMINATION = -1
-
-        private const val TYPE_TEXT = "observable"
     }
 
     // Data
@@ -82,20 +78,14 @@ class ObservableTimelineView : View {
     private val padding = context.resources.getDimension(R.dimen.timeline_padding)
     private val innerPaddingStart = context.resources.getDimension(R.dimen.timeline_padding_inner_start)
     private val innerPaddingEnd = context.resources.getDimension(R.dimen.timeline_padding_inner_end)
-    private val lineDashSize = context.resources.getDimension(R.dimen.timeline_line_dash_size)
-    private val typeTextSize = context.resources.getDimension(R.dimen.timeline_type_text_size)
-    private val typeTextPadding = context.resources.getDimension(R.dimen.timeline_type_text_padding)
     private val eventSize = context.resources.getDimension(R.dimen.timeline_event_size)
     private val eventTextSize = context.resources.getDimension(R.dimen.timeline_event_text_size)
     private val completeHeight = context.resources.getDimension(R.dimen.timeline_complete_height)
     private val errorSize = context.resources.getDimension(R.dimen.timeline_error_size)
     private val errorStrokeWidth = context.resources.getDimension(R.dimen.timeline_error_stroke_width)
-    private val arrowWidth = context.resources.getDimension(R.dimen.timeline_arrow_width)
-    private val arrowHeight = context.resources.getDimension(R.dimen.timeline_arrow_height)
     private val touchTargetSize = context.resources.getDimension(R.dimen.timeline_touch_target_size)
 
     private val strokeColor = context.colorCompat(R.color.timeline_stroke_color)
-    private val typeTextColor = context.colorCompat(R.color.timeline_type_text_color)
     private val eventFillColor = context.colorCompat(R.color.timeline_event_fill_color)
     private val eventTextColor = context.colorCompat(R.color.timeline_event_text_color)
     private val errorColor = context.colorCompat(R.color.timeline_error_color)
@@ -107,10 +97,6 @@ class ObservableTimelineView : View {
         color = strokeColor
         strokeWidth = this@ObservableTimelineView.strokeWidth
         style = Paint.Style.STROKE
-    }
-    private val arrowPaint = Paint().apply {
-        color = strokeColor
-        style = Paint.Style.FILL_AND_STROKE
     }
     private val eventFillPaint = Paint().apply {
         color = eventFillColor
@@ -126,18 +112,10 @@ class ObservableTimelineView : View {
         strokeWidth = errorStrokeWidth
         style = Paint.Style.STROKE
     }
-    private val typeTextPaint = Paint().apply {
-        flags = Paint.ANTI_ALIAS_FLAG
-        color = eventTextColor
-        textSize = typeTextSize
-        typeface = Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)
-    }
 
     // Draw
-    private val arrowPath = Path()
-    private val linePath = Path()
     private val textBoundsRect = Rect()
-
+    private val lineDrawer = TimelineLineDrawer(context, isLtr, TimelineViewTypeText.OBSERVABLE)
 
     //region Measurement
 
@@ -169,60 +147,7 @@ class ObservableTimelineView : View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        computePaths(w, h)
-    }
-
-    //endregion
-
-    //region Paths
-
-    private fun computePaths(width: Int, height: Int) {
-        arrowPath.run {
-            reset()
-
-            // Starting from the pointy end
-            if (isLtr) {
-                moveTo(width - padding, height.toFloat() / 2)
-                rLineTo(-arrowWidth, -arrowHeight / 2)
-                rLineTo(0f, arrowHeight)
-                rLineTo(arrowWidth, -arrowHeight / 2)
-                close()
-            } else {
-                moveTo(padding, height.toFloat() / 2)
-                rLineTo(arrowWidth, -arrowHeight / 2)
-                rLineTo(0f, arrowHeight)
-                rLineTo(-arrowWidth, -arrowHeight / 2)
-                close()
-            }
-        }
-
-        linePath.run {
-            reset()
-
-            val initialX = if (isLtr) padding else width - padding
-            moveTo(initialX, height.toFloat() / 2)
-
-            // Start dashed line
-            val dashDx = if (isLtr) lineDashSize else -lineDashSize
-            val startDashCount = (innerPaddingStart / (2 * lineDashSize)).toInt()
-            repeat(startDashCount) {
-                rLineTo(dashDx, 0f)
-                rMoveTo(dashDx, 0f)
-            }
-
-            // Continuous line
-            val lineWidth = width - 2 * padding - innerPaddingStart - innerPaddingEnd
-            val lineDx = if (isLtr) lineWidth else -lineWidth
-            rLineTo(lineDx, 0f)
-
-            // End dashed line
-            // We subtract one to keep the arrow pointy
-            val endDashCount = ((innerPaddingEnd) / (2 * lineDashSize)).toInt() - 1
-            repeat(endDashCount) {
-                rMoveTo(dashDx, 0f)
-                rLineTo(dashDx, 0f)
-            }
-        }
+        lineDrawer.onSizeChanged(w, h)
     }
 
     //endregion
@@ -232,25 +157,9 @@ class ObservableTimelineView : View {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        drawLine(canvas)
-        drawTypeText(canvas)
+        lineDrawer.draw(canvas)
         drawTerminationEvent(canvas, _timeline.termination)
         drawEvents(canvas, _timeline.events)
-    }
-
-    private fun drawLine(canvas: Canvas) {
-        canvas.drawPath(arrowPath, arrowPaint)
-        canvas.drawPath(linePath, strokePaint)
-    }
-
-    private fun drawTypeText(canvas: Canvas) {
-        val text = TYPE_TEXT
-
-        typeTextPaint.getTextBounds(text, 0, text.length, textBoundsRect)
-        val textX = width - typeTextPadding - textBoundsRect.width().toFloat() - textBoundsRect.left
-        val textY = height - typeTextPadding - textBoundsRect.bottom
-
-        canvas.drawText(text, textX, textY, typeTextPaint)
     }
 
     private fun drawTerminationEvent(canvas: Canvas, termination: ObservableTermination) {

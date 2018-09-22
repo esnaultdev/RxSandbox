@@ -4,15 +4,10 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.completable.CompletableResult
 import aodev.blue.rxsandbox.model.completable.CompletableTimeline
 import aodev.blue.rxsandbox.model.completable.operators.utility.CompletableDelay
-import aodev.blue.rxsandbox.model.observable.ObservableEvent
-import aodev.blue.rxsandbox.model.observable.ObservableTermination
-import aodev.blue.rxsandbox.model.observable.ObservableTimeline
-import aodev.blue.rxsandbox.model.observable.operators.utility.ObservableDelay
-import aodev.blue.rxsandbox.ui.widget.CompletableTimelineView
+import aodev.blue.rxsandbox.ui.widget.timeline.CompletableTimelineView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
