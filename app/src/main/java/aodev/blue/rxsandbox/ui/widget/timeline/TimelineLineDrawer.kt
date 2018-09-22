@@ -129,7 +129,12 @@ class TimelineLineDrawer(
         val text = typeText
 
         typeTextPaint.getTextBounds(text, 0, text.length, textBoundsRect)
-        val textX = canvas.width - typeTextPadding - textBoundsRect.width().toFloat() - textBoundsRect.left
+
+        val textX = if (isLtr) {
+            canvas.width - typeTextPadding - textBoundsRect.width().toFloat() - textBoundsRect.left
+        } else {
+            typeTextPadding + textBoundsRect.left
+        }
         val textY = canvas.height - typeTextPadding - textBoundsRect.bottom
 
         canvas.drawText(text, textX, textY, typeTextPaint)
