@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
-    <aodev.blue.rxsandbox.ui.widget.timeline.MaybeTimelineView
+    <aodev.blue.rxsandbox.ui.widget.timeline.SingleTimelineView
         android:id="@+id/source_timeline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <aodev.blue.rxsandbox.ui.widget.timeline.MaybeTimelineView
+    <aodev.blue.rxsandbox.ui.widget.timeline.SingleTimelineView
         android:id="@+id/result_timeline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
