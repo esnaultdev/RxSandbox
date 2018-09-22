@@ -13,6 +13,7 @@ import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.observable.ObservableEvent
 import aodev.blue.rxsandbox.model.observable.ObservableTermination
 import aodev.blue.rxsandbox.model.observable.ObservableTimeline
+import aodev.blue.rxsandbox.ui.utils.basicMeasure
 import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.utils.clamp
@@ -123,25 +124,7 @@ class ObservableTimelineView : View {
         val desiredWidth = (2 * padding + innerPaddingStart + innerPaddingEnd + 10 * eventSize).toInt()
         val desiredHeight = (2 * padding + completeHeight).toInt()
 
-        val widthMode = View.MeasureSpec.getMode(widthMeasureSpec)
-        val widthSize = View.MeasureSpec.getSize(widthMeasureSpec)
-        val heightMode = View.MeasureSpec.getMode(heightMeasureSpec)
-        val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
-
-        val width = when (widthMode) {
-            View.MeasureSpec.EXACTLY -> widthSize
-            View.MeasureSpec.AT_MOST -> minOf(desiredWidth, widthSize)
-            View.MeasureSpec.UNSPECIFIED -> desiredWidth
-            else -> throw IllegalArgumentException("Illegal measure spec")
-        }
-
-        val height = when (heightMode) {
-            View.MeasureSpec.EXACTLY -> heightSize
-            View.MeasureSpec.AT_MOST -> minOf(desiredHeight, heightSize)
-            View.MeasureSpec.UNSPECIFIED -> desiredHeight
-            else -> throw IllegalArgumentException("Illegal measure spec")
-        }
-
+        val (width, height) = basicMeasure(widthMeasureSpec, heightMeasureSpec, desiredWidth, desiredHeight)
         setMeasuredDimension(width, height)
     }
 
@@ -218,13 +201,15 @@ class ObservableTimelineView : View {
 
     //region Event position
 
+    private val availableWidth: Float
+        get() = width - 2 * padding - innerPaddingStart - innerPaddingEnd
+
     private fun eventPosition(time: Float): Float {
         val timeFactor = time / Config.timelineDuration
-        val widthForEvents = width - 2 * padding - innerPaddingStart - innerPaddingEnd
         return if (isLtr) {
-            timeFactor * widthForEvents + padding + innerPaddingStart
+            timeFactor * availableWidth + padding + innerPaddingStart
         } else {
-            (1 - timeFactor) * widthForEvents + padding + innerPaddingEnd
+            (1 - timeFactor) * availableWidth + padding + innerPaddingEnd
         }
     }
 
@@ -260,8 +245,7 @@ class ObservableTimelineView : View {
                 val dx = if (isLtr) x - lastTouchX else lastTouchX - x
                 lastTouchX = x
 
-                val widthForEvents = width - 2 * padding - innerPaddingStart - innerPaddingEnd
-                val timeDiff = dx / widthForEvents * Config.timelineDuration
+                val timeDiff = dx / availableWidth * Config.timelineDuration
 
                 val movingEventIndex = movingEventIndex
                 when (movingEventIndex) {
