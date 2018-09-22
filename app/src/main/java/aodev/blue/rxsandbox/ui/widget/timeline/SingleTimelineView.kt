@@ -3,14 +3,15 @@ package aodev.blue.rxsandbox.ui.widget.timeline
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.Config
-import aodev.blue.rxsandbox.model.completable.CompletableResult
-import aodev.blue.rxsandbox.model.completable.CompletableTimeline
+import aodev.blue.rxsandbox.model.single.SingleResult
+import aodev.blue.rxsandbox.model.single.SingleTimeline
 import aodev.blue.rxsandbox.ui.utils.basicMeasure
 import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
@@ -21,7 +22,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 
 
-class CompletableTimelineView : View {
+class SingleTimelineView : View {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -31,11 +32,11 @@ class CompletableTimelineView : View {
             super(context, attrs, defStyleAttr, defStyleRes)
 
     companion object {
-        private val initialTimeline = CompletableTimeline(CompletableResult.None)
+        private val initialTimeline = SingleTimeline<Int>(SingleResult.None())
     }
 
     // Data
-    private var _timeline: CompletableTimeline = initialTimeline
+    private var _timeline: SingleTimeline<Int> = initialTimeline
         set(value) {
             field = value
             timelineSubject.onNext(value)
@@ -46,7 +47,7 @@ class CompletableTimelineView : View {
      * Exposed timeline for external use.
      * Updating the timeline resets the current gestures.
      */
-    var timeline: CompletableTimeline
+    var timeline: SingleTimeline<Int>
         set(value) {
             if (_timeline != value) {
                 _timeline = value
@@ -55,8 +56,8 @@ class CompletableTimelineView : View {
         }
         get() = _timeline
 
-    private val timelineSubject: Subject<CompletableTimeline> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineFlowable: Flowable<CompletableTimeline>
+    private val timelineSubject: Subject<SingleTimeline<Int>> = BehaviorSubject.createDefault(initialTimeline)
+    val timelineFlowable: Flowable<SingleTimeline<Int>>
         get() = timelineSubject.toFlowable(BackpressureStrategy.LATEST)
 
     var readOnly: Boolean = false
@@ -73,20 +74,32 @@ class CompletableTimelineView : View {
     private val padding = context.resources.getDimension(R.dimen.timeline_padding)
     private val innerPaddingStart = context.resources.getDimension(R.dimen.timeline_padding_inner_start)
     private val innerPaddingEnd = context.resources.getDimension(R.dimen.timeline_padding_inner_end)
-    private val completeHeight = context.resources.getDimension(R.dimen.timeline_complete_height)
+    private val eventSize = context.resources.getDimension(R.dimen.timeline_event_size)
+    private val eventTextSize = context.resources.getDimension(R.dimen.timeline_event_text_size)
     private val errorSize = context.resources.getDimension(R.dimen.timeline_error_size)
     private val errorStrokeWidth = context.resources.getDimension(R.dimen.timeline_error_stroke_width)
     private val touchTargetSize = context.resources.getDimension(R.dimen.timeline_touch_target_size)
 
     private val strokeColor = context.colorCompat(R.color.timeline_stroke_color)
+    private val eventFillColor = context.colorCompat(R.color.timeline_event_fill_color)
+    private val eventTextColor = context.colorCompat(R.color.timeline_event_text_color)
     private val errorColor = context.colorCompat(R.color.timeline_error_color)
 
     // Paint
     private val strokePaint = Paint().apply {
         flags = Paint.ANTI_ALIAS_FLAG
         color = strokeColor
-        strokeWidth = this@CompletableTimelineView.strokeWidth
+        strokeWidth = this@SingleTimelineView.strokeWidth
         style = Paint.Style.STROKE
+    }
+    private val eventFillPaint = Paint().apply {
+        color = eventFillColor
+        style = Paint.Style.FILL
+    }
+    private val eventTextPaint = Paint().apply {
+        flags = Paint.ANTI_ALIAS_FLAG
+        color = eventTextColor
+        textSize = eventTextSize
     }
     private val errorPaint = Paint().apply {
         color = errorColor
@@ -95,7 +108,8 @@ class CompletableTimelineView : View {
     }
 
     // Drawing
-    private val lineDrawer = TimelineLineDrawer(context, TimelineViewTypeText.COMPLETABLE)
+    private val textBoundsRect = Rect()
+    private val lineDrawer = TimelineLineDrawer(context, TimelineViewTypeText.SINGLE)
 
 
     //region Measurement
@@ -125,21 +139,24 @@ class CompletableTimelineView : View {
         drawResult(canvas, _timeline.result)
     }
 
-    private fun drawResult(canvas: Canvas, result: CompletableResult) {
+    private fun drawResult(canvas: Canvas, result: SingleResult<Int>) {
         val centerHeight = height.toFloat() / 2
 
         when (result) {
-            is CompletableResult.Complete -> {
+            is SingleResult.Success -> {
                 val position = resultPosition(result.time)
-                canvas.drawLine(
-                        position,
-                        centerHeight - completeHeight / 2,
-                        position,
-                        centerHeight + completeHeight / 2,
-                        strokePaint
-                )
+
+                canvas.drawCircle(position, centerHeight, eventSize / 2, eventFillPaint)
+                canvas.drawCircle(position, centerHeight, eventSize / 2, strokePaint)
+
+                val eventText = result.value.toString()
+                eventTextPaint.getTextBounds(eventText, 0, eventText.length, textBoundsRect)
+                val textX = position - textBoundsRect.width().toFloat() / 2 - textBoundsRect.left
+                val textY = centerHeight + textBoundsRect.height().toFloat() / 2 - textBoundsRect.bottom
+
+                canvas.drawText(eventText, textX, textY, eventTextPaint)
             }
-            is CompletableResult.Error -> {
+            is SingleResult.Error -> {
                 val position = resultPosition(result.time)
                 canvas.drawLine(
                         position - errorSize / 2,
@@ -242,9 +259,9 @@ class CompletableTimelineView : View {
     private fun isTouchingResult(x: Float, y: Float): Boolean {
         val result = _timeline.result
         val boundingBox = when (result) {
-            CompletableResult.None -> null
-            is CompletableResult.Complete -> getResultBoundingBox(result.time)
-            is CompletableResult.Error -> getResultBoundingBox(result.time)
+            is SingleResult.None -> null
+            is SingleResult.Success -> getResultBoundingBox(result.time)
+            is SingleResult.Error -> getResultBoundingBox(result.time)
         }
 
         return boundingBox?.contains(x, y) ?: false
@@ -265,15 +282,15 @@ class CompletableTimelineView : View {
         val result = _timeline.result
 
         when (result) {
-            CompletableResult.None -> Unit
-            is CompletableResult.Complete -> {
+            is SingleResult.None -> Unit
+            is SingleResult.Success -> {
                 moveResult(timeDiff, result.time) {
-                    CompletableResult.Complete(it)
+                    SingleResult.Success(it, result.value)
                 }
             }
-            is CompletableResult.Error -> {
+            is SingleResult.Error -> {
                 moveResult(timeDiff, result.time) {
-                    CompletableResult.Error(it)
+                    SingleResult.Error(it)
                 }
             }
         }
@@ -282,7 +299,7 @@ class CompletableTimelineView : View {
     private fun moveResult(
             timeDiff: Float,
             time: Float,
-            makeWithTime: (Float) -> CompletableResult
+            makeWithTime: (Float) -> SingleResult<Int>
     ) {
 
         val newTime = (time + timeDiff).clamp(0f, Config.timelineDuration.toFloat())

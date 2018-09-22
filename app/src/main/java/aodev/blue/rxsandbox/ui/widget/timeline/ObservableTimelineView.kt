@@ -122,7 +122,7 @@ class ObservableTimelineView : View {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val desiredWidth = (2 * padding + innerPaddingStart + innerPaddingEnd + 10 * eventSize).toInt()
-        val desiredHeight = (2 * padding + completeHeight).toInt()
+        val desiredHeight = (2 * padding + touchTargetSize).toInt()
 
         val (width, height) = basicMeasure(widthMeasureSpec, heightMeasureSpec, desiredWidth, desiredHeight)
         setMeasuredDimension(width, height)
@@ -193,7 +193,7 @@ class ObservableTimelineView : View {
             val textX = position - textBoundsRect.width().toFloat() / 2 - textBoundsRect.left
             val textY = centerHeight + textBoundsRect.height().toFloat() / 2 - textBoundsRect.bottom
 
-            canvas.drawText(event.value.toString(), textX, textY, eventTextPaint)
+            canvas.drawText(eventText, textX, textY, eventTextPaint)
         }
     }
 

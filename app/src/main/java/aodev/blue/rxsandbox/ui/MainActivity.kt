@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.model.completable.CompletableResult
-import aodev.blue.rxsandbox.model.completable.CompletableTimeline
-import aodev.blue.rxsandbox.model.completable.operators.utility.CompletableDelay
-import aodev.blue.rxsandbox.ui.widget.timeline.CompletableTimelineView
+import aodev.blue.rxsandbox.model.single.SingleResult
+import aodev.blue.rxsandbox.model.single.SingleTimeline
+import aodev.blue.rxsandbox.model.single.operators.utility.SingleDelay
+import aodev.blue.rxsandbox.ui.widget.timeline.SingleTimelineView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -22,12 +22,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val sourceTimelineView: CompletableTimelineView = findViewById(R.id.source_timeline)
+        val sourceTimelineView: SingleTimelineView = findViewById(R.id.source_timeline)
         val operatorView: TextView = findViewById(R.id.operator)
-        val resultTimelineView: CompletableTimelineView = findViewById(R.id.result_timeline)
+        val resultTimelineView: SingleTimelineView = findViewById(R.id.result_timeline)
 
-        val operator = CompletableDelay(2f)
-        val sourceTimeline = CompletableTimeline(CompletableResult.Complete(0f))
+        val operator = SingleDelay<Int>(2f)
+        val sourceTimeline = SingleTimeline<Int>(SingleResult.Success(0f, 0))
 
         sourceTimelineView.timeline = sourceTimeline
         operatorView.text = operator.expression()
