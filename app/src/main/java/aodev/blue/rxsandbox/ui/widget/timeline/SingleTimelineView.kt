@@ -16,6 +16,7 @@ import aodev.blue.rxsandbox.ui.utils.basicMeasure
 import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.utils.clamp
+import aodev.blue.rxsandbox.utils.exhaustive
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.BehaviorSubject
@@ -143,6 +144,7 @@ class SingleTimelineView : View {
         val centerHeight = height.toFloat() / 2
 
         when (result) {
+            is SingleResult.None -> Unit
             is SingleResult.Success -> {
                 val position = resultPosition(result.time)
 
@@ -173,7 +175,7 @@ class SingleTimelineView : View {
                         errorPaint
                 )
             }
-        }
+        }.exhaustive
     }
 
     //endregion
@@ -293,7 +295,7 @@ class SingleTimelineView : View {
                     SingleResult.Error(it)
                 }
             }
-        }
+        }.exhaustive
     }
 
     private fun moveResult(

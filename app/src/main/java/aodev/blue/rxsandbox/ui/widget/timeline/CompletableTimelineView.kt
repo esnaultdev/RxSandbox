@@ -15,6 +15,7 @@ import aodev.blue.rxsandbox.ui.utils.basicMeasure
 import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.utils.clamp
+import aodev.blue.rxsandbox.utils.exhaustive
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.BehaviorSubject
@@ -129,6 +130,7 @@ class CompletableTimelineView : View {
         val centerHeight = height.toFloat() / 2
 
         when (result) {
+            is CompletableResult.None -> Unit
             is CompletableResult.Complete -> {
                 val position = resultPosition(result.time)
                 canvas.drawLine(
@@ -156,7 +158,7 @@ class CompletableTimelineView : View {
                         errorPaint
                 )
             }
-        }
+        }.exhaustive
     }
 
     //endregion
@@ -276,7 +278,7 @@ class CompletableTimelineView : View {
                     CompletableResult.Error(it)
                 }
             }
-        }
+        }.exhaustive
     }
 
     private fun moveResult(
