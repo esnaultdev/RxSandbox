@@ -14,8 +14,7 @@ import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ErrorEventDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.TimelineLineDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ValueEventDrawer
 import aodev.blue.rxsandbox.utils.exhaustive
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 
@@ -55,8 +54,8 @@ class SingleTimelineView : View {
         get() = _timeline
 
     private val timelineSubject: Subject<SingleTimeline<Int>> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineFlowable: Flowable<SingleTimeline<Int>>
-        get() = timelineSubject.toFlowable(BackpressureStrategy.LATEST)
+    val timelineObservable: Observable<SingleTimeline<Int>>
+        get() = timelineSubject.hide()
 
     var readOnly: Boolean = false
 

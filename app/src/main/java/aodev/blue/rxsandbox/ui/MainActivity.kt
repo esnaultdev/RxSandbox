@@ -8,6 +8,7 @@ import aodev.blue.rxsandbox.model.single.SingleResult
 import aodev.blue.rxsandbox.model.single.SingleTimeline
 import aodev.blue.rxsandbox.model.single.operators.utility.SingleDelay
 import aodev.blue.rxsandbox.ui.widget.timeline.SingleTimelineView
+import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -33,7 +34,8 @@ class MainActivity : AppCompatActivity() {
         operatorView.text = operator.expression()
         resultTimelineView.readOnly = true
 
-        sourceTimelineView.timelineFlowable
+        sourceTimelineView.timelineObservable
+                .toFlowable(BackpressureStrategy.LATEST)
                 .subscribeOn(Schedulers.computation())
                 .map { operator.apply(it) }
                 .observeOn(AndroidSchedulers.mainThread())
