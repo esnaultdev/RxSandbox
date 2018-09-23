@@ -2,12 +2,10 @@ package aodev.blue.rxsandbox.ui.widget.timeline
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.completable.CompletableResult
 import aodev.blue.rxsandbox.model.completable.CompletableTimeline
 import aodev.blue.rxsandbox.ui.utils.basicMeasure
@@ -15,7 +13,6 @@ import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.CompleteEventDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ErrorEventDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.TimelineLineDrawer
-import aodev.blue.rxsandbox.utils.clamp
 import aodev.blue.rxsandbox.utils.exhaustive
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -52,7 +49,7 @@ class CompletableTimelineView : View {
         set(value) {
             if (_timeline != value) {
                 _timeline = value
-                resetCurrentGesture()
+                gestureHelper.resetCurrentGesture()
             }
         }
         get() = _timeline
@@ -63,25 +60,20 @@ class CompletableTimelineView : View {
 
     var readOnly: Boolean = false
 
-
-    // Gestures
-    private var activePointerId = MotionEvent.INVALID_POINTER_ID
-    private var lastTouchX: Float = 0f
-    private var isMoving = false
-
-
     // Resources
     private val padding = context.resources.getDimension(R.dimen.timeline_padding)
     private val innerPaddingStart = context.resources.getDimension(R.dimen.timeline_padding_inner_start)
     private val innerPaddingEnd = context.resources.getDimension(R.dimen.timeline_padding_inner_end)
     private val touchTargetSize = context.resources.getDimension(R.dimen.timeline_touch_target_size)
 
-
     // Drawing
     private val lineDrawer = TimelineLineDrawer(context, TimelineViewTypeText.COMPLETABLE)
     private val completeEventDrawer = CompleteEventDrawer(context)
     private val errorEventDrawer = ErrorEventDrawer(context)
 
+    // Gestures
+    private val timePositionMapper = TimePositionMapper(padding, innerPaddingStart, innerPaddingEnd)
+    private val gestureHelper = GestureHelper(timePositionMapper, this::isTouchingResult, this::moveResult)
 
     //region Measurement
 
@@ -95,6 +87,10 @@ class CompletableTimelineView : View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+
+        timePositionMapper.isLtr = isLtr
+        timePositionMapper.width = w
+
         lineDrawer.isLtr = isLtr
         lineDrawer.onSizeChanged(w, h)
     }
@@ -116,30 +112,14 @@ class CompletableTimelineView : View {
         when (result) {
             is CompletableResult.None -> Unit
             is CompletableResult.Complete -> {
-                val position = resultPosition(result.time)
+                val position = timePositionMapper.position(result.time)
                 completeEventDrawer.draw(canvas, position, centerHeight)
             }
             is CompletableResult.Error -> {
-                val position = resultPosition(result.time)
+                val position = timePositionMapper.position(result.time)
                 errorEventDrawer.draw(canvas, position, centerHeight)
             }
         }.exhaustive
-    }
-
-    //endregion
-
-    //region Result position
-
-    private val availableWidth: Float
-        get() = width - 2 * padding - innerPaddingStart - innerPaddingEnd
-
-    private fun resultPosition(time: Float): Float {
-        val timeFactor = time / Config.timelineDuration
-        return if (isLtr) {
-            timeFactor * availableWidth + padding + innerPaddingStart
-        } else {
-            (1 - timeFactor) * availableWidth + padding + innerPaddingEnd
-        }
     }
 
     //endregion
@@ -149,118 +129,45 @@ class CompletableTimelineView : View {
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         if (readOnly) return false
 
-        val action = ev.actionMasked
-
-        when (action) {
-            MotionEvent.ACTION_DOWN -> {
-                val pointerIndex = ev.actionIndex
-                val x = ev.getX(pointerIndex)
-                val y = ev.getY(pointerIndex)
-
-                if (isTouchingResult(x, y)) {
-                    isMoving = true
-                }
-
-                lastTouchX = x
-                activePointerId = ev.getPointerId(0)
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                // Find the index of the active pointer and fetch its position
-                val pointerIndex = ev.findPointerIndex(activePointerId)
-
-                val x = ev.getX(pointerIndex)
-
-                // Calculate the distance moved
-                val dx = if (isLtr) x - lastTouchX else lastTouchX - x
-                lastTouchX = x
-
-                val timeDiff = dx / availableWidth * Config.timelineDuration
-
-                if (isMoving) {
-                    moveResult(timeDiff)
-                }
-            }
-
-            MotionEvent.ACTION_UP -> {
-                activePointerId = MotionEvent.INVALID_POINTER_ID
-            }
-
-            MotionEvent.ACTION_CANCEL -> {
-                activePointerId = MotionEvent.INVALID_POINTER_ID
-            }
-
-            MotionEvent.ACTION_POINTER_UP -> {
-                val pointerIndex = ev.actionIndex
-                val pointerId = ev.getPointerId(pointerIndex)
-
-                if (pointerId == activePointerId) {
-                    // This was our active pointer going up. Choose a new
-                    // active pointer and adjust accordingly.
-                    val newPointerIndex = if (pointerIndex == 0) 1 else 0
-                    lastTouchX = ev.getX(newPointerIndex)
-                    activePointerId = ev.getPointerId(newPointerIndex)
-                }
-            }
-        }
+        gestureHelper.onTouchEvent(ev)
         return true
     }
 
     private fun isTouchingResult(x: Float, y: Float): Boolean {
-        val result = _timeline.result
-        val boundingBox = when (result) {
-            CompletableResult.None -> null
-            is CompletableResult.Complete -> getResultBoundingBox(result.time)
-            is CompletableResult.Error -> getResultBoundingBox(result.time)
+        val centerHeight = height.toFloat() / 2
+        val halfTargetSize = touchTargetSize / 2
+        if (y < centerHeight - halfTargetSize || y > centerHeight + halfTargetSize) {
+            return false
         }
 
-        return boundingBox?.contains(x, y) ?: false
+        val result = _timeline.result
+        return when (result) {
+            is CompletableResult.None -> false
+            is CompletableResult.Complete -> isTouchingResultWithTime(x, result.time)
+            is CompletableResult.Error -> isTouchingResultWithTime(x, result.time)
+        }
     }
 
-    private fun getResultBoundingBox(eventTime: Float): RectF {
-        val centerHeight = height.toFloat() / 2
-        val eventPosition = resultPosition(eventTime)
-        return RectF(
-                eventPosition - touchTargetSize / 2,
-                centerHeight - touchTargetSize / 2,
-                eventPosition + touchTargetSize / 2,
-                centerHeight + touchTargetSize / 2
-        )
+    private fun isTouchingResultWithTime(x: Float, eventTime: Float): Boolean {
+        val eventPosition = timePositionMapper.position(eventTime)
+        val halfTargetSize = touchTargetSize / 2
+        return x >= eventPosition - halfTargetSize && x <= eventPosition + halfTargetSize
     }
 
-    private fun moveResult(timeDiff: Float) {
+    private fun moveResult(newTime: Float) {
         val result = _timeline.result
 
         when (result) {
-            CompletableResult.None -> Unit
+            is CompletableResult.None -> Unit
             is CompletableResult.Complete -> {
-                moveResult(timeDiff, result.time) {
-                    CompletableResult.Complete(it)
-                }
+                val newResult = CompletableResult.Complete(newTime)
+                this._timeline = _timeline.copy(result = newResult)
             }
             is CompletableResult.Error -> {
-                moveResult(timeDiff, result.time) {
-                    CompletableResult.Error(it)
-                }
+                val newResult = CompletableResult.Error(newTime)
+                this._timeline = _timeline.copy(result = newResult)
             }
         }.exhaustive
-    }
-
-    private fun moveResult(
-            timeDiff: Float,
-            time: Float,
-            makeWithTime: (Float) -> CompletableResult
-    ) {
-
-        val newTime = (time + timeDiff).clamp(0f, Config.timelineDuration.toFloat())
-        val result = makeWithTime(newTime)
-
-        this._timeline = _timeline.copy(result = result)
-    }
-
-    private fun resetCurrentGesture() {
-        activePointerId = MotionEvent.INVALID_POINTER_ID
-        lastTouchX = 0f
     }
 
     //endregion

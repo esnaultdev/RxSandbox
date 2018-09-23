@@ -72,8 +72,8 @@ class SingleTimelineView : View {
     private val valueEventDrawer = ValueEventDrawer(context)
 
     // Gestures
-    private val timePositonMapper = TimePositionMapper(padding, innerPaddingStart, innerPaddingEnd)
-    private val gestureHelper = GestureHelper(timePositonMapper, this::isTouchingResult, this::moveResult)
+    private val timePositionMapper = TimePositionMapper(padding, innerPaddingStart, innerPaddingEnd)
+    private val gestureHelper = GestureHelper(timePositionMapper, this::isTouchingResult, this::moveResult)
 
     //region Measurement
 
@@ -87,9 +87,11 @@ class SingleTimelineView : View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+
+        timePositionMapper.isLtr = isLtr
+        timePositionMapper.width = w
+
         lineDrawer.isLtr = isLtr
-        timePositonMapper.isLtr = isLtr
-        timePositonMapper.width = w
         lineDrawer.onSizeChanged(w, h)
     }
 
@@ -110,11 +112,11 @@ class SingleTimelineView : View {
         when (result) {
             is SingleResult.None -> Unit
             is SingleResult.Success -> {
-                val position = timePositonMapper.position(result.time)
+                val position = timePositionMapper.position(result.time)
                 valueEventDrawer.draw(canvas, position, centerHeight, result.value)
             }
             is SingleResult.Error -> {
-                val position = timePositonMapper.position(result.time)
+                val position = timePositionMapper.position(result.time)
                 errorEventDrawer.draw(canvas, position, centerHeight)
             }
         }.exhaustive
@@ -147,7 +149,7 @@ class SingleTimelineView : View {
     }
 
     private fun isTouchingResultWithTime(x: Float, eventTime: Float): Boolean {
-        val eventPosition = timePositonMapper.position(eventTime)
+        val eventPosition = timePositionMapper.position(eventTime)
         val halfTargetSize = touchTargetSize / 2
         return x >= eventPosition - halfTargetSize && x <= eventPosition + halfTargetSize
     }
