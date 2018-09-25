@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">RxSandbox</string>
+
+    <!-- Type selection -->
+    <string name="type_selection_observable">Observable</string>
+    <string name="type_selection_single">Single</string>
+    <string name="type_selection_maybe">Maybe</string>
+    <string name="type_selection_completable">Completable</string>
 </resources>

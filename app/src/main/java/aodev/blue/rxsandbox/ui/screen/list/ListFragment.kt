@@ -9,7 +9,11 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import aodev.blue.rxsandbox.R
+import aodev.blue.rxsandbox.model.StreamType
+import aodev.blue.rxsandbox.model.completableOperators
+import aodev.blue.rxsandbox.model.maybeOperators
 import aodev.blue.rxsandbox.model.observableOperators
+import aodev.blue.rxsandbox.model.singleOperators
 
 
 class ListFragment : Fragment() {
@@ -30,7 +34,14 @@ class ListFragment : Fragment() {
         val adapter = OperatorAdapter(requireContext(), this::onOperatorClicked)
         recyclerView.adapter = adapter
 
-        adapter.categories = observableOperators
+        val streamTypeIndex = arguments?.getInt("stream_type", 0) ?: 0
+        val streamType = StreamType.values()[streamTypeIndex]
+        adapter.categories = when (streamType) {
+            StreamType.OBSERVABLE -> observableOperators
+            StreamType.SINGLE -> singleOperators
+            StreamType.MAYBE -> maybeOperators
+            StreamType.COMPLETABLE -> completableOperators
+        }
     }
 
     private fun onOperatorClicked(name: String) {

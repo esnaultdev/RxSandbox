@@ -2,13 +2,28 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/fragment_list">
+    app:startDestination="@id/fragment_type_selection">
+
+    <fragment
+        android:id="@+id/fragment_type_selection"
+        android:name="aodev.blue.rxsandbox.ui.screen.typeselection.TypeSelectionFragment"
+        android:label="Type selection"
+        tools:layout="@layout/fragment_type_selection">
+
+        <action
+            android:id="@+id/action_select_type"
+            app:destination="@id/fragment_list"/>
+
+    </fragment>
 
     <fragment
         android:id="@+id/fragment_list"
         android:name="aodev.blue.rxsandbox.ui.screen.list.ListFragment"
         android:label="List"
         tools:layout="@layout/fragment_list">
+
+        <argument
+            android:name="stream_type"/>
 
         <action
             android:id="@+id/action_see_details"

@@ -12,6 +12,10 @@
     <color name="text_secondary">#99000000</color>
     <color name="text_disabled">#61000000</color>
 
+    <color name="text_primary_inverse">#FFFFFFFF</color>
+    <color name="text_secondary_inverse">#DDFFFFFF</color>
+    <color name="text_disabled_inverse">#61FFFFFF</color>
+
     <color name="timeline_stroke_color">#000000</color>
     <color name="timeline_event_text_color">@color/text_secondary</color>
     <color name="timeline_type_text_color">@color/text_secondary</color>
