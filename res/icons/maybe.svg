@@ -1,7 +1,7 @@
 <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
  <g>
   <line x1="0" x2="8" y1="16" y2="16" stroke-width="2" stroke="#000" fill="none"/>
-  <ellipse cx="16" cy="16" rx="8" ry="8" stroke-width="2" stroke="#000" fill="none" stroke-dasharray="4, 4"/>
+  <ellipse cx="16" cy="16" rx="8" ry="8" stroke-width="2" stroke="#000" fill="none" stroke-dasharray="4.187, 4.187" stroke-dashoffset="2.093"/>
   <line x1="24" x2="32" y1="16" y2="16" stroke-width="2" stroke="#000" fill="none"/>
  </g>
 </svg>
