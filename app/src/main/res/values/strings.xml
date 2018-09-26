@@ -2,8 +2,16 @@
     <string name="app_name">RxSandbox</string>
 
     <!-- Type selection -->
+    <string name="type_selection_screen_title">Type selection</string>
     <string name="type_selection_observable">Observable</string>
     <string name="type_selection_single">Single</string>
     <string name="type_selection_maybe">Maybe</string>
     <string name="type_selection_completable">Completable</string>
+
+    <!-- Operators list -->
+    <string name="operators_list_screen_title_observable">Observable operators</string>
+    <string name="operators_list_screen_title_single">Single operators</string>
+    <string name="operators_list_screen_title_maybe">Maybe operators</string>
+    <string name="operators_list_screen_title_completable">Completable operators</string>
+
 </resources>

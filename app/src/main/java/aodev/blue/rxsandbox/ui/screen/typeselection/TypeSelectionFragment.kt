@@ -6,11 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.StreamType
 
 
 class TypeSelectionFragment : Fragment() {
+
+    private val navController
+        get() = findNavController()
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -38,8 +42,7 @@ class TypeSelectionFragment : Fragment() {
     }
 
     private fun onTypeClicked(type: StreamType) {
-        val view = requireNotNull(view)
         val arguments = Bundle().apply { putInt("stream_type", type.ordinal) }
-        Navigation.findNavController(view).navigate(R.id.action_select_type, arguments)
+        navController.navigate(R.id.action_select_type, arguments)
     }
 }

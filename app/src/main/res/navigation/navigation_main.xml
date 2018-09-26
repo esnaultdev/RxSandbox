@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/fragment_type_selection"
         android:name="aodev.blue.rxsandbox.ui.screen.typeselection.TypeSelectionFragment"
-        android:label="Type selection"
+        android:label="@string/type_selection_screen_title"
         tools:layout="@layout/fragment_type_selection">
 
         <action

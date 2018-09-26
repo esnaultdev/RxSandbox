@@ -7,9 +7,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import aodev.blue.rxsandbox.R
+import aodev.blue.rxsandbox.ui.screen.NavigationLabelListener
 
 
 class DetailsFragment : Fragment() {
+
+    private val operatorName: String by lazy(LazyThreadSafetyMode.NONE) {
+        arguments?.getString("operator_name") ?: ""
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -23,7 +28,8 @@ class DetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val operatorNameTextView: TextView = view.findViewById(R.id.operator_name)
+        operatorNameTextView.text = operatorName
 
-        arguments?.let { operatorNameTextView.text = it.getString("operator_name") }
+        (activity as? NavigationLabelListener)?.updateLabel(operatorName)
     }
 }
