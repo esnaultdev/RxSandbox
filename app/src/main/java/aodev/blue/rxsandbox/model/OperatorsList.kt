@@ -2,13 +2,6 @@ package aodev.blue.rxsandbox.model
 
 val observableOperators = listOf(
         OperatorCategory(
-                name = "conditional",
-                operatorNames = listOf(
-                        "all",
-                        "any"
-                )
-        ),
-        OperatorCategory(
                 name = "create",
                 operatorNames = listOf(
                         "empty",
@@ -19,6 +12,12 @@ val observableOperators = listOf(
                         "repeat",
                         "throw",
                         "timer"
+                )
+        ),
+        OperatorCategory(
+                name = "transform",
+                operatorNames = listOf(
+                        "map"
                 )
         ),
         OperatorCategory(
@@ -39,15 +38,16 @@ val observableOperators = listOf(
                 )
         ),
         OperatorCategory(
-                name = "transform",
-                operatorNames = listOf(
-                        "map"
-                )
-        ),
-        OperatorCategory(
                 name = "utility",
                 operatorNames = listOf(
                         "delay"
+                )
+        ),
+        OperatorCategory(
+                name = "conditional",
+                operatorNames = listOf(
+                        "all",
+                        "any"
                 )
         )
 )

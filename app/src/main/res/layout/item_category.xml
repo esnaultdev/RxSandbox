@@ -2,16 +2,18 @@
 <TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/operator_name"
+    android:id="@+id/category_name"
     android:layout_width="match_parent"
     android:layout_height="48dp"
     android:layout_centerVertical="true"
-    android:background="?selectableItemBackground"
+    android:background="@color/operator_list_category_background"
     android:ellipsize="end"
     android:gravity="center_vertical"
     android:lines="1"
     android:paddingEnd="16dp"
     android:paddingStart="16dp"
-    android:textColor="@color/text_primary"
-    android:textSize="16sp"
-    tools:text="map"/>
+    android:textAllCaps="true"
+    android:textColor="@color/operator_list_category_text"
+    android:textSize="12sp"
+    android:textStyle="bold"
+    tools:text="filtering"/>

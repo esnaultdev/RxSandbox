@@ -2,7 +2,7 @@
     <string name="app_name">RxSandbox</string>
 
     <!-- Type selection -->
-    <string name="type_selection_screen_title">Type selection</string>
+    <string name="type_selection_screen_title">@string/app_name</string>
     <string name="type_selection_observable">Observable</string>
     <string name="type_selection_single">Single</string>
     <string name="type_selection_maybe">Maybe</string>
