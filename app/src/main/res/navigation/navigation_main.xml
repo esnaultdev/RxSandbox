@@ -19,7 +19,6 @@
     <fragment
         android:id="@+id/fragment_list"
         android:name="aodev.blue.rxsandbox.ui.screen.list.ListFragment"
-        android:label="List"
         tools:layout="@layout/fragment_list">
 
         <argument
@@ -34,7 +33,6 @@
     <fragment
         android:id="@+id/fragment_details"
         android:name="aodev.blue.rxsandbox.ui.screen.details.DetailsFragment"
-        android:label="Details"
         tools:layout="@layout/fragment_details">
 
         <argument
