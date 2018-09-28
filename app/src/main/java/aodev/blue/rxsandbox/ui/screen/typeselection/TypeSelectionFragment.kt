@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -27,16 +28,16 @@ class TypeSelectionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<View>(R.id.type_selection_observable_card).setOnClickListener {
+        view.findViewById<Button>(R.id.type_selection_observable_button).setOnClickListener {
             onTypeClicked(StreamType.OBSERVABLE)
         }
-        view.findViewById<View>(R.id.type_selection_single_card).setOnClickListener {
+        view.findViewById<Button>(R.id.type_selection_single_button).setOnClickListener {
             onTypeClicked(StreamType.SINGLE)
         }
-        view.findViewById<View>(R.id.type_selection_maybe_card).setOnClickListener {
+        view.findViewById<Button>(R.id.type_selection_maybe_button).setOnClickListener {
             onTypeClicked(StreamType.MAYBE)
         }
-        view.findViewById<View>(R.id.type_selection_completable_card).setOnClickListener {
+        view.findViewById<Button>(R.id.type_selection_completable_button).setOnClickListener {
             onTypeClicked(StreamType.COMPLETABLE)
         }
     }

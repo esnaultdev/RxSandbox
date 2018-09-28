@@ -10,14 +10,14 @@
         android:name="line"
         android:fillColor="#00000000"
         android:pathData="M0,16 l32,0"
-        android:strokeColor="#ffffff"
+        android:strokeColor="@color/stream_type_icon_stroke"
         android:strokeWidth="2"/>
 
     <path
         android:name="event"
         android:fillColor="#00000000"
         android:pathData="M16,16 m0,-8 l0,16"
-        android:strokeColor="#ffffff"
+        android:strokeColor="@color/stream_type_icon_stroke"
         android:strokeWidth="2"/>
 
 </vector>

@@ -6,9 +6,13 @@
 
     <!-- Common colors -->
     <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_background">#FAFAFA</color>
+    <color name="black">#000000</color>
+    <color name="black_15">#26000000</color>
 
     <!-- Material -->
-    <color name="divider">#26000000</color>
+    <color name="divider">@color/black_15</color>
 
     <!-- Text colors -->
     <color name="text_primary">#DD000000</color>
@@ -24,6 +28,10 @@
     <color name="timeline_type_text_color">@color/text_secondary</color>
     <color name="timeline_event_fill_color">#64B5F6</color>
     <color name="timeline_error_color">#E53935</color>
+
+    <!-- Stream Type icon -->
+    <color name="stream_type_icon_stroke">@color/white</color>
+    <color name="stream_type_icon_fill">@color/black_15</color>
 
     <color name="operator_text_color">@color/text_primary</color>
 

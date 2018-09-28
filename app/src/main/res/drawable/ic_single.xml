@@ -10,19 +10,19 @@
         android:name="line"
         android:fillColor="#00000000"
         android:pathData="M0,16 l8,0 M24,16 l8,0"
-        android:strokeColor="#ffffff"
+        android:strokeColor="@color/stream_type_icon_stroke"
         android:strokeWidth="2"/>
 
     <path
         android:name="event_fill"
-        android:fillColor="#26000000"
+        android:fillColor="@color/stream_type_icon_fill"
         android:pathData="M16,16 m-8,0 a8,8 0 1 1 16,0 a8,8 0 1 1 -16,0"/>
 
     <path
         android:name="event"
         android:fillColor="#00000000"
         android:pathData="M16,16 m-8,0 a8,8 0 1 1 16,0 a8,8 0 1 1 -16,0"
-        android:strokeColor="#ffffff"
+        android:strokeColor="@color/stream_type_icon_stroke"
         android:strokeWidth="2"/>
 
 </vector>
