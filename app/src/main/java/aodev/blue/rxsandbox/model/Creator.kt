@@ -1,10 +1,9 @@
 package aodev.blue.rxsandbox.model
 
 
+interface Creator<out R> : Operator<Unit, R> {
 
-interface Creator<out T> {
+    override fun apply(input: Unit): R = create()
 
-    fun create(): T
-
-    fun expression(): String
+    fun create(): R
 }

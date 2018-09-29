@@ -1,13 +1,13 @@
 package aodev.blue.rxsandbox.model.operations.mapping
 
 
-class MultiplyMapping : Mapping<Int, Int> {
+class MultiplyMapping(private val factor: Int) : Mapping<Int, Int> {
 
     override fun map(value: Int): Int {
-        return value * 2
+        return value * factor
     }
 
     override fun expression(): String {
-        return "x -> x * 2"
+        return "x -> x * $factor"
     }
 }
