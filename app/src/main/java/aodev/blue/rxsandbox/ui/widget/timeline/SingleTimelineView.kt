@@ -6,8 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.model.single.SingleResult
-import aodev.blue.rxsandbox.model.single.SingleTimeline
+import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.ui.utils.basicMeasure
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ErrorEventDrawer
@@ -29,11 +28,11 @@ class SingleTimelineView : View {
             super(context, attrs, defStyleAttr, defStyleRes)
 
     companion object {
-        private val initialTimeline = SingleTimeline<Int>(SingleResult.None())
+        private val initialTimeline = SingleT<Int>(SingleT.Result.None())
     }
 
     // Data
-    private var _timeline: SingleTimeline<Int> = initialTimeline
+    private var _timeline: SingleT<Int> = initialTimeline
         set(value) {
             field = value
             timelineSubject.onNext(value)
@@ -44,7 +43,7 @@ class SingleTimelineView : View {
      * Exposed timeline for external use.
      * Updating the timeline resets the current gestures.
      */
-    var timeline: SingleTimeline<Int>
+    var timeline: SingleT<Int>
         set(value) {
             if (_timeline != value) {
                 _timeline = value
@@ -53,8 +52,8 @@ class SingleTimelineView : View {
         }
         get() = _timeline
 
-    private val timelineSubject: Subject<SingleTimeline<Int>> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineObservable: Observable<SingleTimeline<Int>>
+    private val timelineSubject: Subject<SingleT<Int>> = BehaviorSubject.createDefault(initialTimeline)
+    val timelineObservable: Observable<SingleT<Int>>
         get() = timelineSubject.hide()
 
     var readOnly: Boolean = false
@@ -105,16 +104,16 @@ class SingleTimelineView : View {
         drawResult(canvas, _timeline.result)
     }
 
-    private fun drawResult(canvas: Canvas, result: SingleResult<Int>) {
+    private fun drawResult(canvas: Canvas, result: SingleT.Result<Int>) {
         val centerHeight = height.toFloat() / 2
 
         when (result) {
-            is SingleResult.None -> Unit
-            is SingleResult.Success -> {
+            is SingleT.Result.None -> Unit
+            is SingleT.Result.Success -> {
                 val position = timePositionMapper.position(result.time)
                 valueEventDrawer.draw(canvas, position, centerHeight, result.value)
             }
-            is SingleResult.Error -> {
+            is SingleT.Result.Error -> {
                 val position = timePositionMapper.position(result.time)
                 errorEventDrawer.draw(canvas, position, centerHeight)
             }
@@ -141,9 +140,9 @@ class SingleTimelineView : View {
 
         val result = _timeline.result
         return when (result) {
-            is SingleResult.None -> false
-            is SingleResult.Success -> isTouchingResultWithTime(x, result.time)
-            is SingleResult.Error -> isTouchingResultWithTime(x, result.time)
+            is SingleT.Result.None -> false
+            is SingleT.Result.Success -> isTouchingResultWithTime(x, result.time)
+            is SingleT.Result.Error -> isTouchingResultWithTime(x, result.time)
         }
     }
 
@@ -157,13 +156,13 @@ class SingleTimelineView : View {
         val result = _timeline.result
 
         when (result) {
-            is SingleResult.None -> Unit
-            is SingleResult.Success -> {
-                val newResult = SingleResult.Success(newTime, result.value)
+            is SingleT.Result.None -> Unit
+            is SingleT.Result.Success -> {
+                val newResult = SingleT.Result.Success(newTime, result.value)
                 this._timeline = _timeline.copy(result = newResult)
             }
-            is SingleResult.Error -> {
-                val newResult = SingleResult.Error<Int>(newTime)
+            is SingleT.Result.Error -> {
+                val newResult = SingleT.Result.Error<Int>(newTime)
                 this._timeline = _timeline.copy(result = newResult)
             }
         }.exhaustive

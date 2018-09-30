@@ -6,8 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.model.completable.CompletableResult
-import aodev.blue.rxsandbox.model.completable.CompletableTimeline
+import aodev.blue.rxsandbox.model.CompletableT
 import aodev.blue.rxsandbox.ui.utils.basicMeasure
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.CompleteEventDrawer
@@ -29,11 +28,11 @@ class CompletableTimelineView : View {
             super(context, attrs, defStyleAttr, defStyleRes)
 
     companion object {
-        private val initialTimeline = CompletableTimeline(CompletableResult.None)
+        private val initialTimeline = CompletableT(CompletableT.Result.None)
     }
 
     // Data
-    private var _timeline: CompletableTimeline = initialTimeline
+    private var _timeline: CompletableT = initialTimeline
         set(value) {
             field = value
             timelineSubject.onNext(value)
@@ -44,7 +43,7 @@ class CompletableTimelineView : View {
      * Exposed timeline for external use.
      * Updating the timeline resets the current gestures.
      */
-    var timeline: CompletableTimeline
+    var timeline: CompletableT
         set(value) {
             if (_timeline != value) {
                 _timeline = value
@@ -53,8 +52,8 @@ class CompletableTimelineView : View {
         }
         get() = _timeline
 
-    private val timelineSubject: Subject<CompletableTimeline> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineObservable: Observable<CompletableTimeline>
+    private val timelineSubject: Subject<CompletableT> = BehaviorSubject.createDefault(initialTimeline)
+    val timelineObservable: Observable<CompletableT>
         get() = timelineSubject.hide()
 
     var readOnly: Boolean = false
@@ -105,16 +104,16 @@ class CompletableTimelineView : View {
         drawResult(canvas, _timeline.result)
     }
 
-    private fun drawResult(canvas: Canvas, result: CompletableResult) {
+    private fun drawResult(canvas: Canvas, result: CompletableT.Result) {
         val centerHeight = height.toFloat() / 2
 
         when (result) {
-            is CompletableResult.None -> Unit
-            is CompletableResult.Complete -> {
+            is CompletableT.Result.None -> Unit
+            is CompletableT.Result.Complete -> {
                 val position = timePositionMapper.position(result.time)
                 completeEventDrawer.draw(canvas, position, centerHeight)
             }
-            is CompletableResult.Error -> {
+            is CompletableT.Result.Error -> {
                 val position = timePositionMapper.position(result.time)
                 errorEventDrawer.draw(canvas, position, centerHeight)
             }
@@ -141,9 +140,9 @@ class CompletableTimelineView : View {
 
         val result = _timeline.result
         return when (result) {
-            is CompletableResult.None -> false
-            is CompletableResult.Complete -> isTouchingResultWithTime(x, result.time)
-            is CompletableResult.Error -> isTouchingResultWithTime(x, result.time)
+            is CompletableT.Result.None -> false
+            is CompletableT.Result.Complete -> isTouchingResultWithTime(x, result.time)
+            is CompletableT.Result.Error -> isTouchingResultWithTime(x, result.time)
         }
     }
 
@@ -157,13 +156,13 @@ class CompletableTimelineView : View {
         val result = _timeline.result
 
         when (result) {
-            is CompletableResult.None -> Unit
-            is CompletableResult.Complete -> {
-                val newResult = CompletableResult.Complete(newTime)
+            is CompletableT.Result.None -> Unit
+            is CompletableT.Result.Complete -> {
+                val newResult = CompletableT.Result.Complete(newTime)
                 this._timeline = _timeline.copy(result = newResult)
             }
-            is CompletableResult.Error -> {
-                val newResult = CompletableResult.Error(newTime)
+            is CompletableT.Result.Error -> {
+                val newResult = CompletableT.Result.Error(newTime)
                 this._timeline = _timeline.copy(result = newResult)
             }
         }.exhaustive

@@ -6,8 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.model.maybe.MaybeResult
-import aodev.blue.rxsandbox.model.maybe.MaybeTimeline
+import aodev.blue.rxsandbox.model.MaybeT
 import aodev.blue.rxsandbox.ui.utils.basicMeasure
 import aodev.blue.rxsandbox.ui.utils.extension.isLtr
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.CompleteEventDrawer
@@ -30,11 +29,11 @@ class MaybeTimelineView : View {
             super(context, attrs, defStyleAttr, defStyleRes)
 
     companion object {
-        private val initialTimeline = MaybeTimeline<Int>(MaybeResult.None())
+        private val initialTimeline = MaybeT<Int>(MaybeT.Result.None())
     }
 
     // Data
-    private var _timeline: MaybeTimeline<Int> = initialTimeline
+    private var _timeline: MaybeT<Int> = initialTimeline
         set(value) {
             field = value
             timelineSubject.onNext(value)
@@ -45,7 +44,7 @@ class MaybeTimelineView : View {
      * Exposed timeline for external use.
      * Updating the timeline resets the current gestures.
      */
-    var timeline: MaybeTimeline<Int>
+    var timeline: MaybeT<Int>
         set(value) {
             if (_timeline != value) {
                 _timeline = value
@@ -54,8 +53,8 @@ class MaybeTimelineView : View {
         }
         get() = _timeline
 
-    private val timelineSubject: Subject<MaybeTimeline<Int>> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineObservable: Observable<MaybeTimeline<Int>>
+    private val timelineSubject: Subject<MaybeT<Int>> = BehaviorSubject.createDefault(initialTimeline)
+    val timelineObservable: Observable<MaybeT<Int>>
         get() = timelineSubject.hide()
 
     var readOnly: Boolean = false
@@ -107,20 +106,20 @@ class MaybeTimelineView : View {
         drawResult(canvas, _timeline.result)
     }
 
-    private fun drawResult(canvas: Canvas, result: MaybeResult<Int>) {
+    private fun drawResult(canvas: Canvas, result: MaybeT.Result<Int>) {
         val centerHeight = height.toFloat() / 2
 
         when (result) {
-            is MaybeResult.None -> Unit
-            is MaybeResult.Success -> {
+            is MaybeT.Result.None -> Unit
+            is MaybeT.Result.Success -> {
                 val position = timePositionMapper.position(result.time)
                 valueEventDrawer.draw(canvas, position, centerHeight, result.value)
             }
-            is MaybeResult.Complete -> {
+            is MaybeT.Result.Complete -> {
                 val position = timePositionMapper.position(result.time)
                 completeEventDrawer.draw(canvas, position, centerHeight)
             }
-            is MaybeResult.Error -> {
+            is MaybeT.Result.Error -> {
                 val position = timePositionMapper.position(result.time)
                 errorEventDrawer.draw(canvas, position, centerHeight)
             }
@@ -147,10 +146,10 @@ class MaybeTimelineView : View {
 
         val result = _timeline.result
         return when (result) {
-            is MaybeResult.None -> false
-            is MaybeResult.Complete -> isTouchingResultWithTime(x, result.time)
-            is MaybeResult.Success -> isTouchingResultWithTime(x, result.time)
-            is MaybeResult.Error -> isTouchingResultWithTime(x, result.time)
+            is MaybeT.Result.None -> false
+            is MaybeT.Result.Complete -> isTouchingResultWithTime(x, result.time)
+            is MaybeT.Result.Success -> isTouchingResultWithTime(x, result.time)
+            is MaybeT.Result.Error -> isTouchingResultWithTime(x, result.time)
         }
     }
 
@@ -164,17 +163,17 @@ class MaybeTimelineView : View {
         val result = _timeline.result
 
         when (result) {
-            is MaybeResult.None -> Unit
-            is MaybeResult.Complete -> {
-                val newResult = MaybeResult.Complete<Int>(newTime)
+            is MaybeT.Result.None -> Unit
+            is MaybeT.Result.Complete -> {
+                val newResult = MaybeT.Result.Complete<Int>(newTime)
                 this._timeline = _timeline.copy(result = newResult)
             }
-            is MaybeResult.Success -> {
-                val newResult = MaybeResult.Success(newTime, result.value)
+            is MaybeT.Result.Success -> {
+                val newResult = MaybeT.Result.Success(newTime, result.value)
                 this._timeline = _timeline.copy(result = newResult)
             }
-            is MaybeResult.Error -> {
-                val newResult = MaybeResult.Error<Int>(newTime)
+            is MaybeT.Result.Error -> {
+                val newResult = MaybeT.Result.Error<Int>(newTime)
                 this._timeline = _timeline.copy(result = newResult)
             }
         }.exhaustive

@@ -1,9 +1,10 @@
 package aodev.blue.rxsandbox.model.sample
 
-import aodev.blue.rxsandbox.model.Operator
+import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class OperatorSample<T, R>(
-        val input: T,
-        val operator: Operator<T, R>
+class OperatorSample(
+        val input: List<Timeline<Int>>,
+        val operator: Operator<Int, Int, Any, Timeline<Int>>
 )
