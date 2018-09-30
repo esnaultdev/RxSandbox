@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import aodev.blue.rxsandbox.R
+import aodev.blue.rxsandbox.model.sample.getObservableSample
 import aodev.blue.rxsandbox.ui.screen.NavigationLabelListener
 
 
@@ -31,5 +32,8 @@ class DetailsFragment : Fragment() {
         operatorNameTextView.text = operatorName
 
         (activity as? NavigationLabelListener)?.updateLabel(operatorName)
+
+        val sample = getObservableSample(operatorName)
+        // TODO Display the sample
     }
 }

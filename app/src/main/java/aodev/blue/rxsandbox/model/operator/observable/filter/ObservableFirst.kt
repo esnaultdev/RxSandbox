@@ -3,18 +3,16 @@ package aodev.blue.rxsandbox.model.operator.observable.filter
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
-import aodev.blue.rxsandbox.model.operator.ParamsObservable
 
 
-class ObservableFirst<T> : Operator<T, T, ParamsObservable<T>, SingleT<T>> {
+class ObservableFirst<T> : Operator<T, T> {
 
-    override fun params(input: List<Timeline<T>>): ParamsObservable<T>? {
-        return ParamsObservable.fromInput(input)
-    }
-
-    override fun apply(params: ParamsObservable<T>): SingleT<T> {
-        return apply(params.observable)
+    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
+        return Input.Observable.from(input) {
+            apply(it)
+        }
     }
 
     fun apply(input: ObservableT<T>): SingleT<T> {

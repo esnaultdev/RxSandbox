@@ -6,5 +6,5 @@ import aodev.blue.rxsandbox.model.operator.Operator
 
 class OperatorSample(
         val input: List<Timeline<Int>>,
-        val operator: Operator<Int, Int, Any, Timeline<Int>>
+        val operator: Operator<Int, Int>
 )

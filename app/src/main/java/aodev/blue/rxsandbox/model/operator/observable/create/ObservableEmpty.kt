@@ -2,21 +2,19 @@ package aodev.blue.rxsandbox.model.operator.observable.create
 
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
-import aodev.blue.rxsandbox.model.operator.ParamsNone
 
 
-class ObservableEmpty : Operator<Unit, Unit, ParamsNone, ObservableT<Unit>> {
+class ObservableEmpty<T> : Operator<T, T> {
 
-    override fun params(input: List<Timeline<Unit>>): ParamsNone? {
-        return ParamsNone.fromInput(input)
+    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
+        return Input.None.from(input) {
+            apply()
+        }
     }
 
-    override fun apply(params: ParamsNone): ObservableT<Unit> {
-        return apply()
-    }
-
-    fun apply(): ObservableT<Unit> {
+    fun apply(): ObservableT<T> {
         return ObservableT(
                 emptyList(),
                 ObservableT.Termination.Complete(0f)

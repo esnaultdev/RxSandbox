@@ -3,24 +3,20 @@ package aodev.blue.rxsandbox.model.operator.single.utility
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
-import aodev.blue.rxsandbox.model.operator.ParamsSingle
 
 
-class SingleDelay<T>(
-        private val delay: Float
-) : Operator<T, T, ParamsSingle<T>, SingleT<T>> {
+class SingleDelay<T>(private val delay: Float) : Operator<T, T> {
 
     init {
         require(delay >= 0)
     }
 
-    override fun params(input: List<Timeline<T>>): ParamsSingle<T>? {
-        return ParamsSingle.fromInput(input)
-    }
-
-    override fun apply(params: ParamsSingle<T>): SingleT<T> {
-        return apply(params.single)
+    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
+        return Input.Single.from(input) {
+            apply(it)
+        }
     }
 
     fun apply(input: SingleT<T>): SingleT<T> {

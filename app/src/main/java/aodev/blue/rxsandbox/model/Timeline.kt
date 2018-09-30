@@ -69,7 +69,7 @@ data class MaybeT<out T>(
 
 data class CompletableT(
         val result: Result
-) : Timeline<Unit>() {
+) : Timeline<Nothing>() {
 
     sealed class Result {
         object None : Result()

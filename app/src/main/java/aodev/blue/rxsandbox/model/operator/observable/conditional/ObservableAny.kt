@@ -5,19 +5,15 @@ import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.operator.Operator
 import aodev.blue.rxsandbox.model.operation.predicate.Predicate
-import aodev.blue.rxsandbox.model.operator.ParamsObservable
+import aodev.blue.rxsandbox.model.operator.Input
 
 
-class ObservableAny<T>(
-        private val predicate: Predicate<T>
-) : Operator<T, Boolean, ParamsObservable<T>, SingleT<Boolean>> {
+class ObservableAny<T>(private val predicate: Predicate<T>) : Operator<T, Boolean> {
 
-    override fun params(input: List<Timeline<T>>): ParamsObservable<T>? {
-        return ParamsObservable.fromInput(input)
-    }
-
-    override fun apply(params: ParamsObservable<T>): SingleT<Boolean> {
-        return apply(params.observable)
+    override fun apply(input: List<Timeline<T>>): Timeline<Boolean>? {
+        return Input.Observable.from(input) {
+            apply(it)
+        }
     }
 
     fun apply(input: ObservableT<T>): SingleT<Boolean> {

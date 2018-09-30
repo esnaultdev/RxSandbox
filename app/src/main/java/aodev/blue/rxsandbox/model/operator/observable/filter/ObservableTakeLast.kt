@@ -2,13 +2,11 @@ package aodev.blue.rxsandbox.model.operator.observable.filter
 
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
-import aodev.blue.rxsandbox.model.operator.ParamsObservable
 
 
-class ObservableTakeLast<T>(
-        private val count: Int
-) : Operator<T, T, ParamsObservable<T>, ObservableT<T>> {
+class ObservableTakeLast<T>(private val count: Int) : Operator<T, T> {
 
     init {
         require(count >= 0)
@@ -16,12 +14,10 @@ class ObservableTakeLast<T>(
 
     // TODO verify the behavior of the takeLast with an error
 
-    override fun params(input: List<Timeline<T>>): ParamsObservable<T>? {
-        return ParamsObservable.fromInput(input)
-    }
-
-    override fun apply(params: ParamsObservable<T>): ObservableT<T> {
-        return apply(params.observable)
+    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
+        return Input.Observable.from(input) {
+            apply(it)
+        }
     }
 
     fun apply(input: ObservableT<T>): ObservableT<T> {

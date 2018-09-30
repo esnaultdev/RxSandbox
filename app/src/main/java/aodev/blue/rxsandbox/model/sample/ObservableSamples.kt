@@ -2,8 +2,6 @@ package aodev.blue.rxsandbox.model.sample
 
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.ObservableT.Companion.eventsOf
-import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAll
-import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAny
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableEmpty
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableInterval
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableJust
@@ -27,13 +25,9 @@ import aodev.blue.rxsandbox.model.operator.observable.transform.ObservableMap
 import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableDelay
 import aodev.blue.rxsandbox.model.operation.mapping.MultiplyMapping
 import aodev.blue.rxsandbox.model.operation.predicate.EvenPredicate
-import java.lang.IllegalArgumentException
 
 
-/*
- TODO Refactor this so that it compiles
-
-fun getObservableSample(operatorName: String): OperatorSample {
+fun getObservableSample(operatorName: String): OperatorSample? {
     return when (operatorName) {
         // Create
         "empty" -> {
@@ -331,6 +325,8 @@ fun getObservableSample(operatorName: String): OperatorSample {
             )
         }
         // Conditional
+        /*
+        // TODO Make these samples available when booleans are supported for display
         "all" -> {
             OperatorSample(
                     input = listOf(
@@ -365,7 +361,7 @@ fun getObservableSample(operatorName: String): OperatorSample {
                     operator = ObservableAny(EvenPredicate())
             )
         }
-        else -> throw IllegalArgumentException("No observable operator for name $operatorName")
+        */
+        else -> null
     }
 }
-*/

@@ -4,19 +4,15 @@ import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.operator.Operator
 import aodev.blue.rxsandbox.model.operation.predicate.Predicate
-import aodev.blue.rxsandbox.model.operator.ParamsObservable
+import aodev.blue.rxsandbox.model.operator.Input
 
 
-class ObservableFilter<T>(
-        private val predicate: Predicate<T>
-) : Operator<T, T, ParamsObservable<T>, ObservableT<T>> {
+class ObservableFilter<T>(private val predicate: Predicate<T>) : Operator<T, T> {
 
-    override fun params(input: List<Timeline<T>>): ParamsObservable<T>? {
-        return ParamsObservable.fromInput(input)
-    }
-
-    override fun apply(params: ParamsObservable<T>): ObservableT<T> {
-        return apply(params.observable)
+    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
+        return Input.Observable.from(input) {
+            apply(it)
+        }
     }
 
     fun apply(input: ObservableT<T>): ObservableT<T> {

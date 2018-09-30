@@ -3,24 +3,20 @@ package aodev.blue.rxsandbox.model.operator.observable.utility
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
-import aodev.blue.rxsandbox.model.operator.ParamsObservable
 
 
-class ObservableDelay<T>(
-        private val delay: Float
-) : Operator<T, T, ParamsObservable<T>, ObservableT<T>> {
+class ObservableDelay<T>(private val delay: Float) : Operator<T, T> {
 
     init {
         require(delay >= 0)
     }
 
-    override fun params(input: List<Timeline<T>>): ParamsObservable<T>? {
-        return ParamsObservable.fromInput(input)
-    }
-
-    override fun apply(params: ParamsObservable<T>): ObservableT<T> {
-        return apply(params.observable)
+    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
+        return Input.Observable.from(input) {
+            apply(it)
+        }
     }
 
     fun apply(input: ObservableT<T>): ObservableT<T> {

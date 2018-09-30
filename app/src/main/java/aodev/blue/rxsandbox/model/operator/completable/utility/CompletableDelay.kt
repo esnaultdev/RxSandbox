@@ -3,24 +3,20 @@ package aodev.blue.rxsandbox.model.operator.completable.utility
 import aodev.blue.rxsandbox.model.CompletableT
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
-import aodev.blue.rxsandbox.model.operator.ParamsCompletable
 
 
-class CompletableDelay(
-        private val delay: Float
-) : Operator<Unit, Unit, ParamsCompletable, CompletableT> {
+class CompletableDelay<T>(private val delay: Float) : Operator<T, T> {
 
     init {
         require(delay >= 0)
     }
 
-    override fun params(input: List<Timeline<Unit>>): ParamsCompletable? {
-        return ParamsCompletable.fromInput(input)
-    }
-
-    override fun apply(params: ParamsCompletable): CompletableT {
-        return apply(params.completable)
+    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
+        return Input.Completable.from(input) {
+            apply(it)
+        }
     }
 
     fun apply(input: CompletableT): CompletableT {

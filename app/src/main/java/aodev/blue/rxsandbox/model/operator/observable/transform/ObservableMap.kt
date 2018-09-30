@@ -4,19 +4,15 @@ import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.operator.Operator
 import aodev.blue.rxsandbox.model.operation.mapping.Mapping
-import aodev.blue.rxsandbox.model.operator.ParamsObservable
+import aodev.blue.rxsandbox.model.operator.Input
 
 
-class ObservableMap<T, out R>(
-        private val mapping: Mapping<T, R>
-) : Operator<T, R, ParamsObservable<T>, ObservableT<R>> {
+class ObservableMap<T, out R>(private val mapping: Mapping<T, R>) : Operator<T, R> {
 
-    override fun params(input: List<Timeline<T>>): ParamsObservable<T>? {
-        return ParamsObservable.fromInput(input)
-    }
-
-    override fun apply(params: ParamsObservable<T>): ObservableT<R> {
-        return apply(params.observable)
+    override fun apply(input: List<Timeline<T>>): Timeline<R>? {
+        return Input.Observable.from(input) {
+            apply(it)
+        }
     }
 
     fun apply(input: ObservableT<T>): ObservableT<R> {
