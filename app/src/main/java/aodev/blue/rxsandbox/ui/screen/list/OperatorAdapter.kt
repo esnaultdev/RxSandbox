@@ -54,11 +54,11 @@ class OperatorAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ViewType.OPERATOR -> {
-                val view = layoutInflater.inflate(R.layout.item_operator, parent, false)
+                val view = layoutInflater.inflate(R.layout.item_list_operator, parent, false)
                 OperatorViewHolder(view, onOperatorClicked)
             }
             ViewType.CATEGORY -> {
-                val view = layoutInflater.inflate(R.layout.item_category, parent, false)
+                val view = layoutInflater.inflate(R.layout.item_list_category, parent, false)
                 CategoryViewHolder(view)
             }
             else -> throw IllegalArgumentException("Invalid view type $viewType")

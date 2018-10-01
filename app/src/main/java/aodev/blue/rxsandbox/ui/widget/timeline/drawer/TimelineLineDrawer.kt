@@ -7,7 +7,7 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
+import aodev.blue.rxsandbox.ui.utils.extension.getColorCompat
 
 
 /**
@@ -30,8 +30,8 @@ class TimelineLineDrawer(
     private val typeTextPadding = context.resources.getDimension(R.dimen.timeline_type_text_padding)
     private val arrowWidth = context.resources.getDimension(R.dimen.timeline_arrow_width)
     private val arrowHeight = context.resources.getDimension(R.dimen.timeline_arrow_height)
-    private val strokeColor = context.colorCompat(R.color.timeline_stroke_color)
-    private val typeTextColor = context.colorCompat(R.color.timeline_type_text_color)
+    private val strokeColor = context.getColorCompat(R.color.timeline_stroke_color)
+    private val typeTextColor = context.getColorCompat(R.color.timeline_type_text_color)
 
     // Paints
     private val strokePaint = Paint().apply {

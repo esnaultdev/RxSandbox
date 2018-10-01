@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
+import aodev.blue.rxsandbox.ui.utils.extension.getColorCompat
 
 
 /**
@@ -14,7 +14,7 @@ class CompleteEventDrawer(context: Context) {
 
     private val strokeWidth = context.resources.getDimension(R.dimen.timeline_stroke_width)
     private val completeHeight = context.resources.getDimension(R.dimen.timeline_complete_height)
-    private val strokeColor = context.colorCompat(R.color.timeline_stroke_color)
+    private val strokeColor = context.getColorCompat(R.color.timeline_stroke_color)
 
     private val paint = Paint().apply {
         flags = Paint.ANTI_ALIAS_FLAG

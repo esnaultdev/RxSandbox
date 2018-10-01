@@ -34,7 +34,6 @@
     <color name="stream_type_icon_fill">@color/black_15</color>
 
     <color name="operator_text_color">@color/text_primary</color>
-
     <color name="operator_list_category_background">#EEEEEE</color>
     <color name="operator_list_category_text">@color/text_secondary</color>
 

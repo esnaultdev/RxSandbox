@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.sample.getObservableSample
 import aodev.blue.rxsandbox.ui.screen.NavigationLabelListener
+import aodev.blue.rxsandbox.ui.widget.operator.OperatorView
 
 
 class DetailsFragment : Fragment() {
@@ -28,12 +29,14 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val operatorNameTextView: TextView = view.findViewById(R.id.operator_name)
-        operatorNameTextView.text = operatorName
-
         (activity as? NavigationLabelListener)?.updateLabel(operatorName)
 
         val sample = getObservableSample(operatorName)
-        // TODO Display the sample
+        if (sample != null) {
+            val operatorView: OperatorView = view.findViewById(R.id.details_operator)
+            operatorView.text = sample.operator.expression()
+        } else {
+            TODO("Properly handle a missing operator")
+        }
     }
 }

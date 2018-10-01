@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.ui.utils.extension.colorCompat
+import aodev.blue.rxsandbox.ui.utils.extension.getColorCompat
 
 
 /**
@@ -14,7 +14,7 @@ class ErrorEventDrawer(context: Context) {
 
     private val errorSize = context.resources.getDimension(R.dimen.timeline_error_size)
     private val errorStrokeWidth = context.resources.getDimension(R.dimen.timeline_error_stroke_width)
-    private val errorColor = context.colorCompat(R.color.timeline_error_color)
+    private val errorColor = context.getColorCompat(R.color.timeline_error_color)
 
     private val errorPaint = Paint().apply {
         color = errorColor
