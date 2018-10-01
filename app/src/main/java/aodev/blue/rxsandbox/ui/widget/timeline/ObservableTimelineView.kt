@@ -60,7 +60,7 @@ class ObservableTimelineView : View {
         get() = _timeline
 
     private val timelineSubject: Subject<ObservableT<Int>> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineFlowable: Observable<ObservableT<Int>>
+    val timelineObservable: Observable<ObservableT<Int>>
         get() = timelineSubject.hide()
 
     var readOnly: Boolean = false
