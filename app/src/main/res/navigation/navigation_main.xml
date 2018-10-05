@@ -22,7 +22,7 @@
         tools:layout="@layout/fragment_list">
 
         <argument
-            android:name="stream_type"/>
+            android:name="timeline_type"/>
 
         <action
             android:id="@+id/action_see_details"
@@ -34,6 +34,9 @@
         android:id="@+id/fragment_details"
         android:name="aodev.blue.rxsandbox.ui.screen.details.DetailsFragment"
         tools:layout="@layout/fragment_details">
+
+        <argument
+            android:name="timeline_type"/>
 
         <argument
             android:name="operator_name"/>

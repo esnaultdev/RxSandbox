@@ -1,6 +1,6 @@
 package aodev.blue.rxsandbox.model
 
 
-enum class StreamType {
+enum class TimelineType {
     OBSERVABLE, SINGLE, MAYBE, COMPLETABLE
 }

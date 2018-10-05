@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.model.StreamType
+import aodev.blue.rxsandbox.model.TimelineType
 
 
 class TypeSelectionFragment : Fragment() {
@@ -29,21 +28,21 @@ class TypeSelectionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<Button>(R.id.type_selection_observable_button).setOnClickListener {
-            onTypeClicked(StreamType.OBSERVABLE)
+            onTypeClicked(TimelineType.OBSERVABLE)
         }
         view.findViewById<Button>(R.id.type_selection_single_button).setOnClickListener {
-            onTypeClicked(StreamType.SINGLE)
+            onTypeClicked(TimelineType.SINGLE)
         }
         view.findViewById<Button>(R.id.type_selection_maybe_button).setOnClickListener {
-            onTypeClicked(StreamType.MAYBE)
+            onTypeClicked(TimelineType.MAYBE)
         }
         view.findViewById<Button>(R.id.type_selection_completable_button).setOnClickListener {
-            onTypeClicked(StreamType.COMPLETABLE)
+            onTypeClicked(TimelineType.COMPLETABLE)
         }
     }
 
-    private fun onTypeClicked(type: StreamType) {
-        val arguments = Bundle().apply { putInt("stream_type", type.ordinal) }
+    private fun onTypeClicked(type: TimelineType) {
+        val arguments = Bundle().apply { putInt("timeline_type", type.ordinal) }
         navController.navigate(R.id.action_select_type, arguments)
     }
 }

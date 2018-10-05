@@ -13,9 +13,13 @@ import aodev.blue.rxsandbox.model.CompletableT
 import aodev.blue.rxsandbox.model.MaybeT
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.SingleT
+import aodev.blue.rxsandbox.model.TimelineType
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.sample.OperatorSample
+import aodev.blue.rxsandbox.model.sample.getCompletableSample
+import aodev.blue.rxsandbox.model.sample.getMaybeSample
 import aodev.blue.rxsandbox.model.sample.getObservableSample
+import aodev.blue.rxsandbox.model.sample.getSingleSample
 import aodev.blue.rxsandbox.ui.screen.NavigationLabelListener
 import aodev.blue.rxsandbox.ui.widget.operator.OperatorView
 import aodev.blue.rxsandbox.ui.widget.timeline.CompletableTimelineView
@@ -40,6 +44,10 @@ class DetailsFragment : Fragment() {
     private val operatorName: String by lazy(LazyThreadSafetyMode.NONE) {
         arguments?.getString("operator_name") ?: ""
     }
+    private val timelineType: TimelineType by lazy(LazyThreadSafetyMode.NONE) {
+        val streamTypeIndex = arguments?.getInt("timeline_type", 0) ?: 0
+        TimelineType.values()[streamTypeIndex]
+    }
 
     // UI
     private var resultView: View? = null
@@ -62,7 +70,12 @@ class DetailsFragment : Fragment() {
 
         (activity as? NavigationLabelListener)?.updateLabel(operatorName)
 
-        val sample = getObservableSample(operatorName)
+        val sample = when(timelineType) {
+            TimelineType.OBSERVABLE -> getObservableSample(operatorName)
+            TimelineType.SINGLE -> getSingleSample(operatorName)
+            TimelineType.MAYBE -> getMaybeSample(operatorName)
+            TimelineType.COMPLETABLE -> getCompletableSample(operatorName)
+        }
         if (sample != null) {
             setupViews(view, sample)
         } else {
