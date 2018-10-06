@@ -59,12 +59,12 @@ Combining observables
 ---------------------
 
 - CANT and/then/when
-- CANT combineLatest
+- TODO combineLatest
 - CANT join
-- CANT merge
+- TODO merge
 - TODO startWith
 - CANT switch
-- CANT zip
+- TODO zip
 
 
 Error handling operators
@@ -94,10 +94,10 @@ Conditional and Boolean operators
 ---------------------------------
 
 - DONE all
-- CANT amb
+- TODO amb
 - DONE any
 - TODO contains
-- CANT defaultIfEmpty
+- PART defaultIfEmpty
 - TODO sequenceEqual
 - TODO skipWhile
 - TODO takeUntil
@@ -108,7 +108,7 @@ Mathematical and Aggregate operators
 ------------------------------------
 
 - TODO average
-- CANT concat
+- TODO concat
 - TODO count
 - TODO max
 - TODO min
