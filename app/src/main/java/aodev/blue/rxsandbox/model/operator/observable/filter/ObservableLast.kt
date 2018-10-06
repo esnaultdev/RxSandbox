@@ -32,7 +32,5 @@ class ObservableLast<T> : Operator<T, T> {
         }
     }
 
-    override fun expression(): String {
-        return "last"
-    }
+    override val expression: String = "last"
 }

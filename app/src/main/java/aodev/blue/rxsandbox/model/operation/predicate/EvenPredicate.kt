@@ -7,7 +7,5 @@ class EvenPredicate : Predicate<Int> {
         return value % 2 == 0
     }
 
-    override fun expression(): String {
-        return "x -> x % 2 == 0"
-    }
+    override val expression = "x -> x % 2 == 0"
 }

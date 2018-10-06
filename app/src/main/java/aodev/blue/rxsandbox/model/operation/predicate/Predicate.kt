@@ -5,5 +5,5 @@ interface Predicate<in T> {
 
     fun check(value: T): Boolean
 
-    fun expression(): String
+    val expression: String
 }

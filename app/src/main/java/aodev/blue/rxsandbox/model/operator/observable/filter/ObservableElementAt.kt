@@ -36,7 +36,5 @@ class ObservableElementAt<T>(private val index: Int) : Operator<T, T> {
         }
     }
 
-    override fun expression(): String {
-        return "elementAt($index)"
-    }
+    override val expression: String = "elementAt($index)"
 }

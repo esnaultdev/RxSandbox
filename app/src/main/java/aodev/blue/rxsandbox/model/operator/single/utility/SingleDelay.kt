@@ -44,7 +44,5 @@ class SingleDelay<T>(private val delay: Float) : Operator<T, T> {
         return SingleT(delayedResult)
     }
 
-    override fun expression(): String {
-        return "delay(${"%.1f".format(delay)})"
-    }
+    override val expression: String = "delay(${"%.1f".format(delay)})"
 }

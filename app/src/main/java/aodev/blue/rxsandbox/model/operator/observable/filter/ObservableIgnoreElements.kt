@@ -25,7 +25,5 @@ class ObservableIgnoreElements<T> : Operator<T, T> {
         return CompletableT(result)
     }
 
-    override fun expression(): String {
-        return "ignoreElements"
-    }
+    override val expression: String = "ignoreElements"
 }

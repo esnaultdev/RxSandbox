@@ -7,7 +7,5 @@ class MultiplyMapping(private val factor: Int) : Mapping<Int, Int> {
         return value * factor
     }
 
-    override fun expression(): String {
-        return "x -> x * $factor"
-    }
+    override val expression = "x -> x * $factor"
 }

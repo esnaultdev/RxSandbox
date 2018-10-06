@@ -35,7 +35,5 @@ class ObservableDistinctUntilChanged<T> : Operator<T, T> {
         )
     }
 
-    override fun expression(): String {
-        return "distinctUntilChanged"
-    }
+    override val expression: String = "distinctUntilChanged"
 }

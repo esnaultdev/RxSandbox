@@ -50,7 +50,5 @@ class ObservableDebounce<T>(private val duration: Float) : Operator<T, T> {
         )
     }
 
-    override fun expression(): String {
-            return "debounce(${"%.1f".format(duration)})"
-    }
+    override val expression: String = "debounce(${"%.1f".format(duration)})"
 }

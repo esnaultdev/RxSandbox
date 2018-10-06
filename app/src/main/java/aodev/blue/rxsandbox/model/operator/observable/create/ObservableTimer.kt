@@ -30,7 +30,5 @@ class ObservableTimer<T>(private val delay: Float) : Operator<T, Int> {
         }
     }
 
-    override fun expression(): String {
-        return "timer(${"%.1f".format(delay)})"
-    }
+    override val expression: String = "timer(${"%.1f".format(delay)})"
 }

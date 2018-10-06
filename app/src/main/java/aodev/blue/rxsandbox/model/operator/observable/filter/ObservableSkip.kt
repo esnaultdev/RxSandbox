@@ -25,7 +25,5 @@ class ObservableSkip<T>(private val count: Int) : Operator<T, T> {
         )
     }
 
-    override fun expression(): String {
-        return "skip($count)"
-    }
+    override val expression: String = "skip($count)"
 }

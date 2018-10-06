@@ -21,7 +21,6 @@ class ObservableNever<T> : Operator<T, T> {
         )
     }
 
-    override fun expression(): String {
-        return "never"
-    }
+
+    override val expression: String = "never"
 }

@@ -21,7 +21,5 @@ class ObservableJust<T>(private vararg val values: T) : Operator<T, T> {
         )
     }
 
-    override fun expression(): String {
-        return "just(${values.joinToString(", ")})"
-    }
+    override val expression: String = "just(${values.joinToString(", ")})"
 }

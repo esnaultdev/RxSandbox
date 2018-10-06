@@ -21,7 +21,5 @@ class ObservableEmpty<T> : Operator<T, T> {
         )
     }
 
-    override fun expression(): String {
-        return "empty"
-    }
+    override val expression: String = "empty"
 }

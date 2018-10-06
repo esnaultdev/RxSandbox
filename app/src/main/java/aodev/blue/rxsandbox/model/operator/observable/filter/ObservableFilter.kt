@@ -22,7 +22,5 @@ class ObservableFilter<T>(private val predicate: Predicate<T>) : Operator<T, T> 
         )
     }
 
-    override fun expression(): String {
-        return "filter { ${predicate.expression()} }"
-    }
+    override val expression: String = "filter { ${predicate.expression} }"
 }

@@ -30,7 +30,5 @@ class ObservableTake<T>(private val count: Int) : Operator<T, T> {
         }
     }
 
-    override fun expression(): String {
-        return "take($count)"
-    }
+    override val expression: String = "take($count)"
 }

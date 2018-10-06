@@ -32,7 +32,5 @@ class ObservableAny<T>(private val predicate: Predicate<T>) : Operator<T, Boolea
         }
     }
 
-    override fun expression(): String {
-        return "any { ${predicate.expression()} }"
-    }
+    override val expression: String = "any { ${predicate.expression} }"
 }

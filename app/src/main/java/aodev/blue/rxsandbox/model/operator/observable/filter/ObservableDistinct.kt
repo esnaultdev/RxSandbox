@@ -23,7 +23,5 @@ class ObservableDistinct<T> : Operator<T, T> {
         )
     }
 
-    override fun expression(): String {
-        return "distinct"
-    }
+    override val expression: String = "distinct"
 }

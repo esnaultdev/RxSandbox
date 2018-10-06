@@ -26,7 +26,5 @@ class ObservableRange<T>(private val from: Int, private val to: Int) : Operator<
         )
     }
 
-    override fun expression(): String {
-        return "range($from, $to)"
-    }
+    override val expression: String = "range($from, $to)"
 }

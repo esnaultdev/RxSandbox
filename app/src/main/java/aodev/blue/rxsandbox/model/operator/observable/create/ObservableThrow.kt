@@ -21,7 +21,5 @@ class ObservableThrow<T> : Operator<T, T> {
         )
     }
 
-    override fun expression(): String {
-        return "throw"
-    }
+    override val expression: String = "throw"
 }

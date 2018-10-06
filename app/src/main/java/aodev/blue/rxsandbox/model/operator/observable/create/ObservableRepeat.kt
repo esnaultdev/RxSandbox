@@ -45,7 +45,5 @@ class ObservableRepeat<T> : Operator<T, T> {
         }
     }
 
-    override fun expression(): String {
-        return "repeat"
-    }
+    override val expression: String = "repeat"
 }

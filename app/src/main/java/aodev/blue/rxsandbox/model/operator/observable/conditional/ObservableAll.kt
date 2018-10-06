@@ -32,7 +32,5 @@ class ObservableAll<T>(private val predicate: Predicate<T>) : Operator<T, Boolea
         }
     }
 
-    override fun expression(): String {
-        return "all { ${predicate.expression()} }"
-    }
+    override val expression: String = "all { ${predicate.expression} }"
 }

@@ -32,7 +32,5 @@ class ObservableFirst<T> : Operator<T, T> {
         }
     }
 
-    override fun expression(): String {
-        return "first"
-    }
+    override val expression: String = "first"
 }

@@ -43,7 +43,5 @@ class CompletableDelay<T>(private val delay: Float) : Operator<T, T> {
         return CompletableT(delayedResult)
     }
 
-    override fun expression(): String {
-        return "delay(${"%.1f".format(delay)})"
-    }
+    override val expression = "delay(${"%.1f".format(delay)})"
 }

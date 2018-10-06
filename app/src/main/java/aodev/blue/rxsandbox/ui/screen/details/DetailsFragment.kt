@@ -91,7 +91,7 @@ class DetailsFragment : Fragment() {
 
     private fun setupViews(view: View, sample: OperatorSample) {
         val operatorView: OperatorView = view.findViewById(R.id.details_operator)
-        operatorView.text = sample.operator.expression()
+        operatorView.text = sample.operator.expression
 
         rootContainer = view.findViewById(R.id.details_root)
         constraintSet = ConstraintSet()

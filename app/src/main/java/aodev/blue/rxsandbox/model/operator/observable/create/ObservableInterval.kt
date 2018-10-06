@@ -29,7 +29,5 @@ class ObservableInterval<T>(private val interval: Float) : Operator<T, Int> {
         )
     }
 
-    override fun expression(): String {
-        return "interval(${"%.1f".format(interval)})"
-    }
+    override val expression: String = "interval(${"%.1f".format(interval)})"
 }

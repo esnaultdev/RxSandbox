@@ -7,5 +7,5 @@ interface Operator<in T, out R>  {
 
     fun apply(input: List<Timeline<T>>): Timeline<R>?
 
-    fun expression(): String
+    val expression: String
 }

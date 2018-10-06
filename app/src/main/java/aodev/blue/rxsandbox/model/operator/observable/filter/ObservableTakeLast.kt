@@ -32,7 +32,5 @@ class ObservableTakeLast<T>(private val count: Int) : Operator<T, T> {
         }
     }
 
-    override fun expression(): String {
-        return "takeLast($count)"
-    }
+    override val expression: String = "takeLast($count)"
 }

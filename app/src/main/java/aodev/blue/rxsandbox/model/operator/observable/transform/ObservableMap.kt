@@ -22,7 +22,5 @@ class ObservableMap<T, out R>(private val mapping: Mapping<T, R>) : Operator<T, 
         )
     }
 
-    override fun expression(): String {
-        return "map { ${mapping.expression()} }"
-    }
+    override val expression: String = "map { ${mapping.expression} }"
 }
