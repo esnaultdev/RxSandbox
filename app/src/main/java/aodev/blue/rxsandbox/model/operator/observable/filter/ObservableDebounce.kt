@@ -8,7 +8,7 @@ import aodev.blue.rxsandbox.model.operator.Operator
 import aodev.blue.rxsandbox.utils.clamp
 
 
-class ObservableDebounce<T>(private val duration: Float) : Operator<T, T> {
+class ObservableDebounce<T : Any>(private val duration: Float) : Operator<T, T> {
 
     // TODO Verify the behavior of the debounce with an error
 

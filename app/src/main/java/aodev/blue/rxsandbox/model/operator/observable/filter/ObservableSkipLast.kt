@@ -7,7 +7,7 @@ import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableSkipLast<T>(private val count: Int) : Operator<T, T> {
+class ObservableSkipLast<T : Any>(private val count: Int) : Operator<T, T> {
 
     init {
         require(count >= 0)

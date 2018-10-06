@@ -7,7 +7,7 @@ import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableRange<T>(private val from: Int, private val to: Int) : Operator<T, Int> {
+class ObservableRange<T : Any>(private val from: Int, private val to: Int) : Operator<T, Int> {
 
     init {
         require(from >= 0)

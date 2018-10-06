@@ -7,7 +7,7 @@ import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableInterval<T>(private val interval: Float) : Operator<T, Int> {
+class ObservableInterval<T : Any>(private val interval: Float) : Operator<T, Int> {
 
     init {
         require(interval > 0)

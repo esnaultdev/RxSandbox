@@ -8,7 +8,7 @@ import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableElementAt<T>(private val index: Int) : Operator<T, T> {
+class ObservableElementAt<T : Any>(private val index: Int) : Operator<T, T> {
 
     init {
         require(index >= 0)

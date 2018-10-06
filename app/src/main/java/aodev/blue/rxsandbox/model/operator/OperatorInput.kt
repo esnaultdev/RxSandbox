@@ -10,13 +10,16 @@ import aodev.blue.rxsandbox.model.Timeline
 object Input {
 
     object None {
-        inline fun <T, R> from(input: List<Timeline<T>>, block: () -> Timeline<R>): Timeline<R>? {
+        inline fun <T : Any, R : Any> from(
+                input: List<Timeline<T>>,
+                block: () -> Timeline<R>
+        ): Timeline<R>? {
             return if (input.isEmpty()) block() else null
         }
     }
 
     object Observable {
-        inline fun <T, R> from(
+        inline fun <T : Any, R : Any> from(
                 input: List<Timeline<T>>,
                 block: (observable: ObservableT<T>) -> Timeline<R>
         ): Timeline<R>? {
@@ -34,7 +37,7 @@ object Input {
     }
 
     object Single {
-        inline fun <T, R> from(
+        inline fun <T : Any, R : Any> from(
                 input: List<Timeline<T>>,
                 block: (single: SingleT<T>) -> Timeline<R>
         ): Timeline<R>? {
@@ -52,7 +55,7 @@ object Input {
     }
 
     object Maybe {
-        inline fun <T, R> from(
+        inline fun <T : Any, R : Any> from(
                 input: List<Timeline<T>>,
                 block: (maybe: MaybeT<T>) -> Timeline<R>
         ): Timeline<R>? {
@@ -70,7 +73,7 @@ object Input {
     }
 
     object Completable {
-        inline fun <T, R> from(
+        inline fun <T : Any, R : Any> from(
                 input: List<Timeline<T>>,
                 block: (completable: CompletableT) -> Timeline<R>
         ): Timeline<R>? {

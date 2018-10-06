@@ -8,7 +8,7 @@ import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableIgnoreElements<T> : Operator<T, T> {
+class ObservableIgnoreElements<T : Any> : Operator<T, T> {
 
     override fun apply(input: List<Timeline<T>>): Timeline<T>? {
         return Input.Observable.from(input) {

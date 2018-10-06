@@ -7,7 +7,7 @@ import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class MaybeDelay<T>(private val delay: Float) : Operator<T, T> {
+class MaybeDelay<T : Any>(private val delay: Float) : Operator<T, T> {
 
     init {
         require(delay >= 0)

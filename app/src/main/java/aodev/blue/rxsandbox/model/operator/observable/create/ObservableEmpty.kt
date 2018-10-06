@@ -7,7 +7,7 @@ import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableEmpty<T> : Operator<T, T> {
+class ObservableEmpty<T : Any> : Operator<T, T> {
 
     override fun apply(input: List<Timeline<T>>): Timeline<T>? {
         return Input.None.from(input) {

@@ -7,7 +7,7 @@ import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableRepeat<T> : Operator<T, T> {
+class ObservableRepeat<T : Any> : Operator<T, T> {
 
     override fun apply(input: List<Timeline<T>>): Timeline<T>? {
         return Input.Observable.from(input) {

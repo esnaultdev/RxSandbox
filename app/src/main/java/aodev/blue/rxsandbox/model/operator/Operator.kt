@@ -3,7 +3,7 @@ package aodev.blue.rxsandbox.model.operator
 import aodev.blue.rxsandbox.model.Timeline
 
 
-interface Operator<in T, out R>  {
+interface Operator<in T : Any, out R : Any>  {
 
     fun apply(input: List<Timeline<T>>): Timeline<R>?
 

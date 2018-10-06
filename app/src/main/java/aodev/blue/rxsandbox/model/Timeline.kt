@@ -6,10 +6,10 @@ package aodev.blue.rxsandbox.model
  * Note that the timeline types are suffixed with T for Timeline
  * to avoid confusion and clashes with the ReactiveX types.
  */
-sealed class Timeline<out T>
+sealed class Timeline<out T : Any>
 
 
-data class ObservableT<out T>(
+data class ObservableT<out T : Any>(
         val events: List<Event<T>>,
         val termination: Termination
 ) : Timeline<T>() {
@@ -42,7 +42,7 @@ data class ObservableT<out T>(
 }
 
 
-data class SingleT<out T>(
+data class SingleT<out T : Any>(
         val result: Result<T>
 ) : Timeline<T>() {
 
@@ -54,7 +54,7 @@ data class SingleT<out T>(
 }
 
 
-data class MaybeT<out T>(
+data class MaybeT<out T : Any>(
         val result: Result<T>
 ) : Timeline<T>() {
 

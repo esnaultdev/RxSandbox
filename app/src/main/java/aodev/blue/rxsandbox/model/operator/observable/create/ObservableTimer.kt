@@ -7,7 +7,7 @@ import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableTimer<T>(private val delay: Float) : Operator<T, Int> {
+class ObservableTimer<T : Any>(private val delay: Float) : Operator<T, Int> {
 
     init {
         require(delay >= 0)
