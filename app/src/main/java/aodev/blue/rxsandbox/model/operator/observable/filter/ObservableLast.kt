@@ -21,7 +21,7 @@ class ObservableLast<T> : Operator<T, T> {
             is ObservableT.Termination.Complete -> {
                 if (input.events.isNotEmpty()) {
                     val event = input.events.last()
-                    SingleT(SingleT.Result.Success(event.time, event.value))
+                    SingleT(SingleT.Result.Success(input.termination.time, event.value))
                 } else {
                     SingleT(SingleT.Result.Error(input.termination.time))
                 }
