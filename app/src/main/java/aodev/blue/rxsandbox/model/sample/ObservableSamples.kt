@@ -25,6 +25,7 @@ import aodev.blue.rxsandbox.model.operator.observable.transform.ObservableMap
 import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableDelay
 import aodev.blue.rxsandbox.model.operation.mapping.MultiplyMapping
 import aodev.blue.rxsandbox.model.operation.predicate.EvenPredicate
+import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableElementAt
 
 
 fun getObservableSample(operatorName: String): OperatorSample? {
@@ -169,7 +170,7 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                                     termination = ObservableT.Termination.Complete(10f)
                             )
                     ),
-                    operator = ObservableDistinctUntilChanged()
+                    operator = ObservableElementAt(2)
             )
         }
         "filter" -> {
