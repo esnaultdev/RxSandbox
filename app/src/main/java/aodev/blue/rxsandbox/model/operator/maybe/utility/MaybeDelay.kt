@@ -53,4 +53,6 @@ class MaybeDelay<T>(private val delay: Float) : Operator<T, T> {
     }
 
     override val expression: String = "delay(${"%.1f".format(delay)})"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}delay.html"
 }

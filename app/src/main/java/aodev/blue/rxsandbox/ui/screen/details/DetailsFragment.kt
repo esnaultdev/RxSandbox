@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
@@ -26,6 +27,7 @@ import aodev.blue.rxsandbox.ui.widget.timeline.CompletableTimelineView
 import aodev.blue.rxsandbox.ui.widget.timeline.MaybeTimelineView
 import aodev.blue.rxsandbox.ui.widget.timeline.ObservableTimelineView
 import aodev.blue.rxsandbox.ui.widget.timeline.SingleTimelineView
+import aodev.blue.rxsandbox.utils.openInBrowser
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Observable
@@ -95,6 +97,7 @@ class DetailsFragment : Fragment() {
 
         rootContainer = view.findViewById(R.id.details_root)
         constraintSet = ConstraintSet()
+        constraintSet.clone(rootContainer)
 
         if (sample.input.isNotEmpty()) {
             // Currently just display the first timeline for simplicity
@@ -117,7 +120,6 @@ class DetailsFragment : Fragment() {
                 connect(timelineView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
                 connect(timelineView.id, ConstraintSet.BOTTOM, R.id.details_operator, ConstraintSet.TOP)
             }
-            constraintSet.applyTo(rootContainer)
 
             val inputObservables = listOf(timelineObservable)
 
@@ -144,6 +146,16 @@ class DetailsFragment : Fragment() {
                     )
                     .addTo(disposables)
         }
+
+        val documentationUrl = sample.operator.docUrl
+        if (documentationUrl != null) {
+            constraintSet.setVisibility(R.id.details_see_documentation, View.VISIBLE)
+            view.findViewById<Button>(R.id.details_see_documentation).setOnClickListener {
+                requireActivity().openInBrowser(documentationUrl)
+            }
+        }
+
+        constraintSet.applyTo(rootContainer)
     }
 
     private fun handleResultTimelineChanged(timeline: Timeline<Int>) {

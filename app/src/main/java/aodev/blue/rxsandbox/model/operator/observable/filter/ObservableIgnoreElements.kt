@@ -1,6 +1,7 @@
 package aodev.blue.rxsandbox.model.operator.observable.filter
 
 import aodev.blue.rxsandbox.model.CompletableT
+import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.operator.Input
@@ -26,4 +27,6 @@ class ObservableIgnoreElements<T> : Operator<T, T> {
     }
 
     override val expression: String = "ignoreElements"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}ignoreelements.html"
 }

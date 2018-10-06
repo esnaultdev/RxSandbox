@@ -14,4 +14,7 @@
     <string name="operators_list_screen_title_maybe">Maybe operators</string>
     <string name="operators_list_screen_title_completable">Completable operators</string>
 
+    <!-- Details -->
+    <string name="details_see_documentation">See documentation</string>
+
 </resources>

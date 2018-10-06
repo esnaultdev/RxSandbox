@@ -30,4 +30,6 @@ class ObservableInterval<T>(private val interval: Float) : Operator<T, Int> {
     }
 
     override val expression: String = "interval(${"%.1f".format(interval)})"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}interval.html"
 }

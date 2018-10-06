@@ -1,5 +1,6 @@
 package aodev.blue.rxsandbox.model.operator.observable.filter
 
+import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.Timeline
@@ -37,4 +38,6 @@ class ObservableElementAt<T>(private val index: Int) : Operator<T, T> {
     }
 
     override val expression: String = "elementAt($index)"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}elementat.html"
 }

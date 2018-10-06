@@ -1,5 +1,6 @@
 package aodev.blue.rxsandbox.model.operator.observable.filter
 
+import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.operator.Input
@@ -24,4 +25,6 @@ class ObservableDistinct<T> : Operator<T, T> {
     }
 
     override val expression: String = "distinct"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}distinct.html"
 }

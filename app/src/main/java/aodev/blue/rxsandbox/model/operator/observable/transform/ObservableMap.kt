@@ -1,5 +1,6 @@
 package aodev.blue.rxsandbox.model.operator.observable.transform
 
+import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.operator.Operator
@@ -23,4 +24,6 @@ class ObservableMap<T, out R>(private val mapping: Mapping<T, R>) : Operator<T, 
     }
 
     override val expression: String = "map { ${mapping.expression} }"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}map.html"
 }

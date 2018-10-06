@@ -44,4 +44,6 @@ class CompletableDelay<T>(private val delay: Float) : Operator<T, T> {
     }
 
     override val expression = "delay(${"%.1f".format(delay)})"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}delay.html"
 }

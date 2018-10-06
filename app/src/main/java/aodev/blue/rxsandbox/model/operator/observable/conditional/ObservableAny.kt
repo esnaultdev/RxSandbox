@@ -33,4 +33,6 @@ class ObservableAny<T>(private val predicate: Predicate<T>) : Operator<T, Boolea
     }
 
     override val expression: String = "any { ${predicate.expression} }"
+
+    override val docUrl: String? = null
 }

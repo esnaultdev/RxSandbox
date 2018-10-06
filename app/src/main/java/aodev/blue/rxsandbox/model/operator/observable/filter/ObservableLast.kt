@@ -1,5 +1,6 @@
 package aodev.blue.rxsandbox.model.operator.observable.filter
 
+import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.Timeline
@@ -33,4 +34,6 @@ class ObservableLast<T> : Operator<T, T> {
     }
 
     override val expression: String = "last"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}last.html"
 }

@@ -31,4 +31,6 @@ class ObservableTimer<T>(private val delay: Float) : Operator<T, Int> {
     }
 
     override val expression: String = "timer(${"%.1f".format(delay)})"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}timer.html"
 }

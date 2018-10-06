@@ -1,5 +1,6 @@
 package aodev.blue.rxsandbox.model.operator.observable.conditional
 
+import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.Timeline
@@ -33,4 +34,6 @@ class ObservableAll<T>(private val predicate: Predicate<T>) : Operator<T, Boolea
     }
 
     override val expression: String = "all { ${predicate.expression} }"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}all.html"
 }

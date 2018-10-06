@@ -46,4 +46,6 @@ class ObservableRepeat<T> : Operator<T, T> {
     }
 
     override val expression: String = "repeat"
+
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}repeat.html"
 }
