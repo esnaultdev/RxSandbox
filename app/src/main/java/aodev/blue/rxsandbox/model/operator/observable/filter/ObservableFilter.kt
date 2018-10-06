@@ -3,12 +3,12 @@ package aodev.blue.rxsandbox.model.operator.observable.filter
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.functions.Predicate
 import aodev.blue.rxsandbox.model.operator.Operator
-import aodev.blue.rxsandbox.model.operation.predicate.Predicate
 import aodev.blue.rxsandbox.model.operator.Input
 
 
-class ObservableFilter<T>(private val predicate: Predicate<T>) : Operator<T, T> {
+class ObservableFilter<T : Any>(private val predicate: Predicate<T>) : Operator<T, T> {
 
     override fun apply(input: List<Timeline<T>>): Timeline<T>? {
         return Input.Observable.from(input) {
@@ -18,7 +18,7 @@ class ObservableFilter<T>(private val predicate: Predicate<T>) : Operator<T, T> 
 
     fun apply(input: ObservableT<T>): ObservableT<T> {
         return ObservableT(
-                input.events.filter { predicate.check(it.value) },
+                input.events.filter { predicate.test(it.value) },
                 input.termination
         )
     }

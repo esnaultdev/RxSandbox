@@ -2,6 +2,7 @@ package aodev.blue.rxsandbox.model.sample
 
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.ObservableT.Companion.eventsOf
+import aodev.blue.rxsandbox.model.functions.functionOf
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableEmpty
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableInterval
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableJust
@@ -23,9 +24,11 @@ import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableTake
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableTakeLast
 import aodev.blue.rxsandbox.model.operator.observable.transform.ObservableMap
 import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableDelay
-import aodev.blue.rxsandbox.model.operation.mapping.MultiplyMapping
-import aodev.blue.rxsandbox.model.operation.predicate.EvenPredicate
+import aodev.blue.rxsandbox.model.functions.predicateOf
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableElementAt
+
+
+private val evenPredicate = predicateOf<Int>("x -> x % 2 == 0") { it % 2 == 0 }
 
 
 fun getObservableSample(operatorName: String): OperatorSample? {
@@ -102,7 +105,9 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                                     termination = ObservableT.Termination.Complete(10f)
                             )
                     ),
-                    operator = ObservableMap(MultiplyMapping(2))
+                    operator = ObservableMap(
+                            functionOf("x -> x * 2") { x -> x *2 }
+                    )
             )
         }
 
@@ -187,7 +192,7 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                                     termination = ObservableT.Termination.Complete(10f)
                             )
                     ),
-                    operator = ObservableFilter(EvenPredicate())
+                    operator = ObservableFilter(evenPredicate)
             )
         }
         "first" -> {
@@ -342,7 +347,7 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                                     termination = ObservableT.Termination.Complete(10f)
                             )
                     ),
-                    operator = ObservableAll(EvenPredicate())
+                    operator = ObservableAll(evenPredicate)
             )
         }
         "any" -> {
@@ -359,7 +364,7 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                                     termination = ObservableT.Termination.Complete(10f)
                             )
                     ),
-                    operator = ObservableAny(EvenPredicate())
+                    operator = ObservableAny(evenPredicate)
             )
         }
         */
