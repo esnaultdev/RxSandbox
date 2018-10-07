@@ -52,9 +52,10 @@ class DetailsFragment : Fragment() {
     }
 
     // UI
-    private var resultView: View? = null
     private lateinit var rootContainer: ConstraintLayout
     private lateinit var constraintSet: ConstraintSet
+    private var resultView: View? = null
+    private var operatorView: OperatorView? = null
 
     // Rx
     private val disposables = CompositeDisposable()
@@ -92,12 +93,24 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setupViews(view: View, sample: OperatorSample) {
-        val operatorView: OperatorView = view.findViewById(R.id.details_operator)
-        operatorView.text = sample.operator.expression
-
-        rootContainer = view.findViewById(R.id.details_root)
+        rootContainer = view.findViewById(R.id.details_content)
         constraintSet = ConstraintSet()
         constraintSet.clone(rootContainer)
+
+        val operatorView = OperatorView(requireContext()).apply {
+            text = sample.operator.expression
+            id = View.generateViewId()
+        }
+        this.operatorView = operatorView
+
+        rootContainer.addView(operatorView)
+
+        constraintSet.run {
+            constrainWidth(operatorView.id, ConstraintSet.MATCH_CONSTRAINT)
+            constrainHeight(operatorView.id, ConstraintSet.WRAP_CONTENT)
+            connect(operatorView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+            connect(operatorView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        }
 
         if (sample.input.isNotEmpty()) {
             // Currently just display the first timeline for simplicity
@@ -106,19 +119,15 @@ class DetailsFragment : Fragment() {
             val (timelineView, timelineObservable) = createViewForTimeline(view.context, timeline, false)
             timelineView.id = View.generateViewId()
 
-            rootContainer.addView(
-                    timelineView,
-                    ViewGroup.LayoutParams(
-                            ConstraintSet.MATCH_CONSTRAINT,
-                            ConstraintSet.WRAP_CONTENT
-                    )
-            )
-            constraintSet.clone(rootContainer)
+            rootContainer.addView(timelineView)
 
             constraintSet.run {
+                constrainWidth(timelineView.id, ConstraintSet.MATCH_CONSTRAINT)
+                constrainHeight(timelineView.id, ConstraintSet.WRAP_CONTENT)
                 connect(timelineView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
                 connect(timelineView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-                connect(timelineView.id, ConstraintSet.BOTTOM, R.id.details_operator, ConstraintSet.TOP)
+                connect(operatorView.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+                connect(operatorView.id, ConstraintSet.TOP, timelineView.id, ConstraintSet.BOTTOM)
             }
 
             val inputObservables = listOf(timelineObservable)
@@ -137,6 +146,8 @@ class DetailsFragment : Fragment() {
                     )
                     .addTo(disposables)
         } else {
+            constraintSet.connect(operatorView.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+
             Single.fromCallable { requireNotNull(sample.operator.apply(emptyList())) } // TODO Handle this gracefully
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -165,19 +176,15 @@ class DetailsFragment : Fragment() {
             timelineView.id = View.generateViewId()
             resultView = timelineView
 
-            rootContainer.addView(
-                    timelineView,
-                    ViewGroup.LayoutParams(
-                            ConstraintSet.MATCH_CONSTRAINT,
-                            ConstraintSet.WRAP_CONTENT
-                    )
-            )
-            constraintSet.clone(rootContainer)
+            rootContainer.addView(timelineView)
 
             constraintSet.apply {
+                constrainWidth(timelineView.id, ConstraintSet.MATCH_CONSTRAINT)
+                constrainHeight(timelineView.id, ConstraintSet.WRAP_CONTENT)
                 connect(timelineView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
                 connect(timelineView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-                connect(timelineView.id, ConstraintSet.TOP, R.id.details_operator, ConstraintSet.BOTTOM)
+                val topConstraintId = operatorView?.id ?: ConstraintSet.PARENT_ID
+                connect(timelineView.id, ConstraintSet.TOP, topConstraintId, ConstraintSet.BOTTOM)
 
                 applyTo(rootContainer)
             }
