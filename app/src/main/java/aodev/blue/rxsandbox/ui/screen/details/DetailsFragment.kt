@@ -113,24 +113,35 @@ class DetailsFragment : Fragment() {
         }
 
         if (sample.input.isNotEmpty()) {
-            // Currently just display the first timeline for simplicity
-            val timeline: Timeline<Int> = sample.input.first()
+            var topConstraint = ConstraintSet.PARENT_ID
+            val inputObservables = sample.input.mapIndexed { index, timeline ->
+                val (timelineView, timelineObservable) = createViewForTimeline(view.context, timeline, false)
+                timelineView.id = View.generateViewId()
 
-            val (timelineView, timelineObservable) = createViewForTimeline(view.context, timeline, false)
-            timelineView.id = View.generateViewId()
+                rootContainer.addView(timelineView)
 
-            rootContainer.addView(timelineView)
+                val isFirstTimeline = index == 0
+                val isLastTimeline = index == sample.input.lastIndex
+                constraintSet.run {
+                    constrainWidth(timelineView.id, ConstraintSet.MATCH_CONSTRAINT)
+                    constrainHeight(timelineView.id, ConstraintSet.WRAP_CONTENT)
+                    connect(timelineView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+                    connect(timelineView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
 
-            constraintSet.run {
-                constrainWidth(timelineView.id, ConstraintSet.MATCH_CONSTRAINT)
-                constrainHeight(timelineView.id, ConstraintSet.WRAP_CONTENT)
-                connect(timelineView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-                connect(timelineView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-                connect(operatorView.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-                connect(operatorView.id, ConstraintSet.TOP, timelineView.id, ConstraintSet.BOTTOM)
+                    if (isFirstTimeline) {
+                        connect(timelineView.id, ConstraintSet.TOP, topConstraint, ConstraintSet.TOP)
+                    } else {
+                        connect(timelineView.id, ConstraintSet.TOP, topConstraint, ConstraintSet.BOTTOM)
+                    }
+
+                    if (isLastTimeline) {
+                        connect(operatorView.id, ConstraintSet.TOP, timelineView.id, ConstraintSet.BOTTOM)
+                    }
+                }
+                topConstraint = timelineView.id
+
+                timelineObservable
             }
-
-            val inputObservables = listOf(timelineObservable)
 
             val inputFlowables = inputObservables.map { it.toFlowable(BackpressureStrategy.LATEST) }
             Flowable.combineLatest(inputFlowables) { inputsArray ->
