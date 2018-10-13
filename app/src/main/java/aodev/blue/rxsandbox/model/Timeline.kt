@@ -41,6 +41,13 @@ data class ObservableT<out T : Any>(
     }
 }
 
+val ObservableT.Termination.time: Float?
+    get() = when (this) {
+        is ObservableT.Termination.None -> null
+        is ObservableT.Termination.Complete -> this.time
+        is ObservableT.Termination.Error -> this.time
+    }
+
 
 data class SingleT<out T : Any>(
         val result: Result<T>

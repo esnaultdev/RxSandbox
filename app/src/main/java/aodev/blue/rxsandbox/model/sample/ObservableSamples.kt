@@ -25,6 +25,7 @@ import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableTakeLast
 import aodev.blue.rxsandbox.model.operator.observable.transform.ObservableMap
 import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableDelay
 import aodev.blue.rxsandbox.model.functions.predicateOf
+import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableCombineLatest
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableElementAt
 
 
@@ -312,6 +313,32 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                             )
                     ),
                     operator = ObservableTakeLast(2)
+            )
+        }
+        // Combine
+        "combineLatest" -> {
+            OperatorSample(
+                    input = listOf(
+                            ObservableT(
+                                    events = eventsOf(
+                                            0f to 1,
+                                            4f to 2,
+                                            6f to 3
+                                    ),
+                                    termination = ObservableT.Termination.Complete(10f)
+                            ),
+                            ObservableT(
+                                    events = eventsOf(
+                                            1f to 10,
+                                            3f to 20,
+                                            8f to 30
+                                    ),
+                                    termination = ObservableT.Termination.Complete(10f)
+                            )
+                    ),
+                    operator = ObservableCombineLatest(
+                            functionOf("x, y -> x + y") { list -> list.sum() }
+                    )
             )
         }
         // Utility

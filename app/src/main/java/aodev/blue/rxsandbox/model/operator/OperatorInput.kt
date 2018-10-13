@@ -36,6 +36,24 @@ object Input {
         }
     }
 
+    /** At least two observables */
+    object Observables {
+        inline fun <T : Any, R : Any> from(
+                input: List<Timeline<T>>,
+                block: (observables: List<ObservableT<T>>) -> Timeline<R>
+        ): Timeline<R>? {
+            return if (input.size < 2) {
+                null
+            } else {
+                if (input.all { it is ObservableT }) {
+                    block(input.map { it as ObservableT<T> })
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
     object Single {
         inline fun <T : Any, R : Any> from(
                 input: List<Timeline<T>>,
