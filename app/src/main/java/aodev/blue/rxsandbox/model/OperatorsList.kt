@@ -48,7 +48,8 @@ val observableOperators = listOf(
         OperatorCategory(
                 name = "utility",
                 operatorNames = listOf(
-                        "delay"
+                        "delay",
+                        "timeout"
                 )
         )
         /*

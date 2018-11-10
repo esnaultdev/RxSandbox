@@ -29,6 +29,7 @@ import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableCombineL
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableMerge
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableStartWith
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableElementAt
+import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableTimeout
 
 
 private val evenPredicate = predicateOf<Int>("x -> x % 2 == 0") { it % 2 == 0 }
@@ -395,6 +396,21 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                             )
                     ),
                     operator = ObservableDelay(2f)
+            )
+        }
+        "timeout" -> {
+            OperatorSample(
+                    input = listOf(
+                            ObservableT(
+                                    events = eventsOf(
+                                            0f to 1,
+                                            2f to 2,
+                                            6f to 3
+                                    ),
+                                    termination = ObservableT.Termination.Complete(8f)
+                            )
+                    ),
+                    operator = ObservableTimeout(3f)
             )
         }
         // Conditional

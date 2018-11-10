@@ -85,7 +85,7 @@ Observable utility operators
 - CANT subscribe
 - CANT subscribeOn
 - CANT timeInterval
-- TODO timeout
+- DONE timeout
 - CANT timestamp
 - CANT using
 
