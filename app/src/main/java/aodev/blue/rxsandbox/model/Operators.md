@@ -61,7 +61,7 @@ Combining observables
 - CANT and/then/when
 - DONE combineLatest
 - CANT join
-- TODO merge
+- DONE merge
 - TODO startWith
 - CANT switch
 - TODO zip

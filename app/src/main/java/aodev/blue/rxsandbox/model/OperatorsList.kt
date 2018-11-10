@@ -40,7 +40,8 @@ val observableOperators = listOf(
         OperatorCategory(
                 name = "combine",
                 operatorNames = listOf(
-                        "combineLatest"
+                        "combineLatest",
+                        "merge"
                 )
         ),
         OperatorCategory(

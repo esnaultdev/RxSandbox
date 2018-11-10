@@ -26,6 +26,7 @@ import aodev.blue.rxsandbox.model.operator.observable.transform.ObservableMap
 import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableDelay
 import aodev.blue.rxsandbox.model.functions.predicateOf
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableCombineLatest
+import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableMerge
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableElementAt
 
 
@@ -339,6 +340,29 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                     operator = ObservableCombineLatest(
                             functionOf("x, y -> x + y") { list -> list.sum() }
                     )
+            )
+        }
+        "merge" -> {
+            OperatorSample(
+                    input = listOf(
+                            ObservableT(
+                                    events = eventsOf(
+                                            0f to 1,
+                                            4f to 2,
+                                            6f to 3
+                                    ),
+                                    termination = ObservableT.Termination.Complete(10f)
+                            ),
+                            ObservableT(
+                                    events = eventsOf(
+                                            1f to 4,
+                                            3f to 5,
+                                            8f to 6
+                                    ),
+                                    termination = ObservableT.Termination.Complete(10f)
+                            )
+                    ),
+                    operator = ObservableMerge()
             )
         }
         // Utility
