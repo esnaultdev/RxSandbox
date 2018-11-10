@@ -62,7 +62,7 @@ Combining observables
 - DONE combineLatest
 - CANT join
 - DONE merge
-- TODO startWith
+- DONE startWith
 - CANT switch
 - TODO zip
 

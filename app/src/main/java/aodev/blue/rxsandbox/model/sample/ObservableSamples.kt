@@ -27,6 +27,7 @@ import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableDelay
 import aodev.blue.rxsandbox.model.functions.predicateOf
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableCombineLatest
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableMerge
+import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableStartWith
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableElementAt
 
 
@@ -363,6 +364,21 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                             )
                     ),
                     operator = ObservableMerge()
+            )
+        }
+        "startWith" -> {
+            OperatorSample(
+                    input = listOf(
+                            ObservableT(
+                                    events = eventsOf(
+                                            3f to 1,
+                                            5f to 2,
+                                            7f to 3
+                                    ),
+                                    termination = ObservableT.Termination.Complete(10f)
+                            )
+                    ),
+                    operator = ObservableStartWith(0)
             )
         }
         // Utility
