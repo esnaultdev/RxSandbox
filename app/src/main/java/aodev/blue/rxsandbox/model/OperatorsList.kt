@@ -51,16 +51,15 @@ val observableOperators = listOf(
                         "delay",
                         "timeout"
                 )
-        )
-        /*
+        ),
         OperatorCategory(
                 name = "conditional",
                 operatorNames = listOf(
-                        "all",
-                        "any"
+                        // "all",
+                        "amb"
+                        // "any"
                 )
         )
-        */
 )
 
 val singleOperators = listOf(

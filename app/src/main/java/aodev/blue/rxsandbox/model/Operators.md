@@ -94,7 +94,7 @@ Conditional and Boolean operators
 ---------------------------------
 
 - DONE all
-- TODO amb
+- DONE amb
 - DONE any
 - TODO contains
 - PART defaultIfEmpty

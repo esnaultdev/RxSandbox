@@ -28,6 +28,7 @@ import aodev.blue.rxsandbox.model.functions.predicateOf
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableCombineLatest
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableMerge
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableStartWith
+import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAmb
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableElementAt
 import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableTimeout
 
@@ -414,6 +415,29 @@ fun getObservableSample(operatorName: String): OperatorSample? {
             )
         }
         // Conditional
+        "amb" -> {
+            OperatorSample(
+                    input = listOf(
+                            ObservableT(
+                                    events = eventsOf(
+                                            2f to 1,
+                                            5f to 2,
+                                            7f to 3
+                                    ),
+                                    termination = ObservableT.Termination.Complete(10f)
+                            ),
+                            ObservableT(
+                                    events = eventsOf(
+                                            1f to 1,
+                                            3f to 2,
+                                            7f to 3
+                                    ),
+                                    termination = ObservableT.Termination.Complete(8f)
+                            )
+                    ),
+                    operator = ObservableAmb()
+            )
+        }
         /*
         // TODO Make these samples available when booleans are supported for display
         "all" -> {
