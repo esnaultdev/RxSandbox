@@ -6,6 +6,8 @@ import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
+// FIXME Limit the max events produced by the repeat to avoid a laggy UI
+private const val EVENT_LIMIT = 100
 
 class ObservableRepeat<T : Any> : Operator<T, T> {
 
@@ -24,8 +26,10 @@ class ObservableRepeat<T : Any> : Operator<T, T> {
                     ObservableT(emptyList(), ObservableT.Termination.None)
                 } else {
                     val repeatTime = input.termination.time
-                    val repeatCount = (Config.timelineDuration / repeatTime).toInt()
-                    val events = (0..repeatCount).map { repeatIndex ->
+                    val theoreticalRepeatCount = (Config.timelineDuration / repeatTime).toInt()
+                    val pragmaticRepeatCount = minOf(theoreticalRepeatCount, EVENT_LIMIT)
+
+                    val events = (0..pragmaticRepeatCount).map { repeatIndex ->
                         input.events.mapNotNull { event ->
                             val newTime = event.time + repeatIndex * repeatTime
                             if (newTime <= Config.timelineDuration) {
