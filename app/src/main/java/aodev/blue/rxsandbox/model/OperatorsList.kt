@@ -17,7 +17,8 @@ val observableOperators = listOf(
         OperatorCategory(
                 name = "transform",
                 operatorNames = listOf(
-                        "map"
+                        "map",
+                        "scan"
                 )
         ),
         OperatorCategory(

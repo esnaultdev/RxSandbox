@@ -33,7 +33,7 @@ Transforming observables
 - CANT flatmap
 - CANT groupBy
 - DONE map
-- TODO scan
+- DONE scan
 - CANT window
 
 

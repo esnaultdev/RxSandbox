@@ -30,6 +30,7 @@ import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableMerge
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableStartWith
 import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAmb
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableElementAt
+import aodev.blue.rxsandbox.model.operator.observable.transform.ObservableScan
 import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableTimeout
 
 
@@ -112,6 +113,26 @@ fun getObservableSample(operatorName: String): OperatorSample? {
                     ),
                     operator = ObservableMap(
                             functionOf("x -> x * 2") { x -> x *2 }
+                    )
+            )
+        }
+        "scan" -> {
+            OperatorSample(
+                    input = listOf(
+                            ObservableT(
+                                    events = eventsOf(
+                                            2f to 1,
+                                            4f to 2,
+                                            6f to 3,
+                                            8f to 4,
+                                            10f to 5
+                                    ),
+                                    termination = ObservableT.Termination.Complete(10f)
+                            )
+                    ),
+                    operator = ObservableScan(
+                            0,
+                            functionOf("acc, x -> acc + x") { acc, x -> acc + x }
                     )
             )
         }
