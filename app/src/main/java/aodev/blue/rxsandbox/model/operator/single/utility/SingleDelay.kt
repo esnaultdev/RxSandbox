@@ -2,21 +2,13 @@ package aodev.blue.rxsandbox.model.operator.single.utility
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.SingleT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class SingleDelay<T : Any>(private val delay: Float) : Operator<T, T> {
+class SingleDelay<T : Any>(private val delay: Float) : Operator {
 
     init {
         require(delay >= 0)
-    }
-
-    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
-        return Input.Single.from(input) {
-            apply(it)
-        }
     }
 
     fun apply(input: SingleT<T>): SingleT<T> {

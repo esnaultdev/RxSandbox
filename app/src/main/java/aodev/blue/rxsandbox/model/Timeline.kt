@@ -21,9 +21,9 @@ data class ObservableT<out T : Any>(
     }
 
     init {
-        val eventsSorted = events.zip(events.drop(1)).all { (event, nextEvent) ->
-            event.time <= nextEvent.time
-        }
+        val eventsSorted = events.asSequence()
+                .zipWithNext()
+                .all { (event, nextEvent) -> event.time <= nextEvent.time }
         require(eventsSorted) { "Observable events not sorted" }
     }
 
