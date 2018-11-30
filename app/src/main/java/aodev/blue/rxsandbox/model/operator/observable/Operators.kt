@@ -3,6 +3,7 @@
 package aodev.blue.rxsandbox.model.operator.observable
 
 import aodev.blue.rxsandbox.model.CompletableX
+import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.ObservableX
 import aodev.blue.rxsandbox.model.SingleX
 import aodev.blue.rxsandbox.model.functions.Function
@@ -20,7 +21,7 @@ import aodev.blue.rxsandbox.model.operator.observable.create.ObservableJust
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableNever
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableRange
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableRepeat
-import aodev.blue.rxsandbox.model.operator.observable.create.ObservableThrow
+import aodev.blue.rxsandbox.model.operator.observable.create.ObservableError
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableTimer
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableDebounce
 import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableDistinct
@@ -39,6 +40,19 @@ import aodev.blue.rxsandbox.model.operator.observable.transform.ObservableScan
 import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableDelay
 import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableTimeout
 
+
+// region Input
+
+fun <T : Any> ObservableX.Companion.inputOf(
+        events: List<Pair<Float, T>>,
+        termination: ObservableT.Termination
+): ObservableX<T> {
+    return ObservableX.Input(
+            ObservableT(events.map { ObservableT.Event(it.first, it.second) }, termination)
+    )
+}
+
+// endregion
 
 // region Combine
 
@@ -127,8 +141,8 @@ fun <T: Any> ObservableX<T>.repeat(): ObservableX<T> {
     }
 }
 
-fun <T: Any> ObservableX.Companion.`throw`(): ObservableX<T> {
-    val operator = ObservableThrow<T>()
+fun <T: Any> ObservableX.Companion.error(): ObservableX<T> {
+    val operator = ObservableError<T>()
     return ObservableX.Result(operator, emptyList(), operator::apply)
 }
 

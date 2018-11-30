@@ -1,499 +1,350 @@
 package aodev.blue.rxsandbox.model.sample
 
+import aodev.blue.rxsandbox.model.AsyncTree
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.ObservableT.Companion.eventsOf
+import aodev.blue.rxsandbox.model.ObservableX
 import aodev.blue.rxsandbox.model.functions.functionOf
-import aodev.blue.rxsandbox.model.operator.observable.create.ObservableEmpty
-import aodev.blue.rxsandbox.model.operator.observable.create.ObservableInterval
-import aodev.blue.rxsandbox.model.operator.observable.create.ObservableJust
-import aodev.blue.rxsandbox.model.operator.observable.create.ObservableNever
-import aodev.blue.rxsandbox.model.operator.observable.create.ObservableRange
-import aodev.blue.rxsandbox.model.operator.observable.create.ObservableRepeat
-import aodev.blue.rxsandbox.model.operator.observable.create.ObservableThrow
-import aodev.blue.rxsandbox.model.operator.observable.create.ObservableTimer
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableDebounce
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableDistinct
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableDistinctUntilChanged
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableFilter
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableFirst
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableIgnoreElements
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableLast
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableSkip
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableSkipLast
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableTake
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableTakeLast
-import aodev.blue.rxsandbox.model.operator.observable.transform.ObservableMap
-import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableDelay
 import aodev.blue.rxsandbox.model.functions.predicateOf
-import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableCombineLatest
-import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableMerge
-import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableStartWith
-import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAmb
-import aodev.blue.rxsandbox.model.operator.observable.filter.ObservableElementAt
-import aodev.blue.rxsandbox.model.operator.observable.transform.ObservableScan
-import aodev.blue.rxsandbox.model.operator.observable.utility.ObservableTimeout
+import aodev.blue.rxsandbox.model.operator.observable.empty
+import aodev.blue.rxsandbox.model.operator.observable.*
 
 
 private val evenPredicate = predicateOf<Int>("x -> x % 2 == 0") { it % 2 == 0 }
 
 
-fun getObservableSample(operatorName: String): OperatorSample? {
+fun getObservableSample(operatorName: String): AsyncTree<Int>? {
     return when (operatorName) {
         // Create
-        "empty" -> {
-            OperatorSample(
-                    input = emptyList(),
-                    operator = ObservableEmpty()
-            )
-        }
-        "interval" -> {
-            OperatorSample(
-                    input = emptyList(),
-                    operator = ObservableInterval(2f)
-            )
-        }
-        "just" -> {
-            OperatorSample(
-                    input = emptyList(),
-                    operator = ObservableJust(1, 2, 3, 4, 5)
-            )
-        }
-        "never" -> {
-            OperatorSample(
-                    input = emptyList(),
-                    operator = ObservableNever()
-            )
-        }
-        "range" -> {
-            OperatorSample(
-                    input = emptyList(),
-                    operator = ObservableRange(1, 5)
-            )
-        }
+        "empty" -> ObservableX.empty()
+        "interval" -> ObservableX.interval(2f)
+        "just" -> ObservableX.just(1)
+        "never" -> ObservableX.never()
+        "range" -> ObservableX.range(1, 5)
         "repeat" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1
-                                    ),
-                                    termination = ObservableT.Termination.Complete(2f)
-                            )
-                    ),
-                    operator = ObservableRepeat<Int>()
+            ObservableX.inputOf(
+                    listOf(0f to 1),
+                    ObservableT.Termination.Complete(2f)
             )
+                    .repeat()
         }
-        "throw" -> {
-            OperatorSample(
-                    input = emptyList(),
-                    operator = ObservableThrow()
-            )
-        }
-        "timer" -> {
-            OperatorSample(
-                    input = emptyList(),
-                    operator = ObservableTimer(5f)
-            )
-        }
+        "throw" -> ObservableX.error()
+        "timer" -> ObservableX.timer(5f)
 
         // Transform
         "map" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                           0f to 1,
+                           2f to 2,
+                           4f to 3,
+                           6f to 4,
+                           8f to 5
                     ),
-                    operator = ObservableMap(
-                            functionOf("x -> x * 2") { x -> x *2 }
-                    )
+                    ObservableT.Termination.Complete(10f)
             )
+                    .map(functionOf("x -> x * 2") { x -> x *2 })
         }
         "scan" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            2f to 1,
-                                            4f to 2,
-                                            6f to 3,
-                                            8f to 4,
-                                            10f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            2f to 1,
+                            4f to 2,
+                            6f to 3,
+                            8f to 4,
+                            10f to 5
                     ),
-                    operator = ObservableScan(
+                    ObservableT.Termination.Complete(10f)
+            )
+                    .scan(
                             0,
                             functionOf("acc, x -> acc + x") { acc, x -> acc + x }
                     )
-            )
         }
 
         // Filter
         "debounce" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            4f to 2,
-                                            6f to 3
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            4f to 2,
+                            6f to 3
                     ),
-                    operator = ObservableDebounce(3f)
+                    ObservableT.Termination.Complete(10f)
             )
+                    .debounce(3f)
         }
         "distinct" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 2,
-                                            6f to 3,
-                                            8f to 1
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 2,
+                            6f to 3,
+                            8f to 1
                     ),
-                    operator = ObservableDistinct()
+                    ObservableT.Termination.Complete(10f)
             )
+                    .distinct()
         }
         "distinctUntilChanged" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 2,
-                                            6f to 3,
-                                            8f to 1
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 2,
+                            6f to 3,
+                            8f to 1
                     ),
-                    operator = ObservableDistinctUntilChanged()
+                    ObservableT.Termination.Complete(10f)
             )
+                    .distinctUntilChanged()
         }
         "elementAt" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 2,
-                                            6f to 3,
-                                            8f to 1
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 2,
+                            6f to 3,
+                            8f to 1
                     ),
-                    operator = ObservableElementAt(2)
+                    ObservableT.Termination.Complete(10f)
             )
+                    .elementAt(2)
         }
         "filter" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableFilter(evenPredicate)
+                    ObservableT.Termination.Complete(10f)
             )
+                    .filter(evenPredicate)
         }
         "first" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableFirst()
+                    ObservableT.Termination.Complete(10f)
             )
+                    .first()
         }
         "ignoreElements" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableIgnoreElements()
+                    ObservableT.Termination.Complete(10f)
             )
+                    .ignoreElements()
         }
         "last" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableLast()
+                    ObservableT.Termination.Complete(10f)
             )
+                    .last()
         }
         "skip" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableSkip(2)
+                    termination = ObservableT.Termination.Complete(10f)
             )
+                    .skip(2)
         }
         "skipLast" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableSkipLast(2)
+                    ObservableT.Termination.Complete(10f)
             )
+                    .skipLast(2)
         }
         "take" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableTake(2)
+                    ObservableT.Termination.Complete(10f)
             )
+                    .take(2)
         }
         "takeLast" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableTakeLast(2)
+                    ObservableT.Termination.Complete(10f)
             )
+                    .takeLast(2)
         }
+
         // Combine
         "combineLatest" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            4f to 2,
-                                            6f to 3
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            ),
-                            ObservableT(
-                                    events = eventsOf(
-                                            1f to 10,
-                                            3f to 20,
-                                            8f to 30
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            val observable1 = ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            4f to 2,
+                            6f to 3
                     ),
-                    operator = ObservableCombineLatest(
-                            functionOf("x, y -> x + y") { list -> list.sum() }
-                    )
+                    ObservableT.Termination.Complete(8f)
+            )
+            val observable2 = ObservableX.inputOf(
+                    listOf(
+                            1f to 10,
+                            3f to 20,
+                            8f to 30
+                    ),
+                    ObservableT.Termination.Complete(10f)
+            )
+
+            ObservableX.combineLatest(
+                    listOf(observable1, observable2),
+                    functionOf("x, y -> x + y") { list -> list.sum() }
             )
         }
         "merge" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            4f to 2,
-                                            6f to 3
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            ),
-                            ObservableT(
-                                    events = eventsOf(
-                                            1f to 4,
-                                            3f to 5,
-                                            8f to 6
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            val observable1 = ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            4f to 2,
+                            6f to 3
                     ),
-                    operator = ObservableMerge()
+                    ObservableT.Termination.Complete(8f)
             )
+            val observable2 = ObservableX.inputOf(
+                    listOf(
+                            1f to 10,
+                            3f to 20,
+                            8f to 30
+                    ),
+                    ObservableT.Termination.Complete(10f)
+            )
+
+            ObservableX.merge(listOf(observable1, observable2))
         }
         "startWith" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            3f to 1,
-                                            5f to 2,
-                                            7f to 3
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            3f to 1,
+                            5f to 2,
+                            7f to 3
                     ),
-                    operator = ObservableStartWith(0)
+                    ObservableT.Termination.Complete(10f)
             )
+                    .startWith(0)
         }
+
         // Utility
         "delay" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3
-                                    ),
-                                    termination = ObservableT.Termination.Complete(6f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3
                     ),
-                    operator = ObservableDelay(2f)
+                    ObservableT.Termination.Complete(6f)
             )
+                    .delay(2f)
         }
         "timeout" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            6f to 3
-                                    ),
-                                    termination = ObservableT.Termination.Complete(8f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            6f to 3
                     ),
-                    operator = ObservableTimeout(3f)
+                    ObservableT.Termination.Complete(8f)
             )
+                    .timeout(3f)
         }
+
         // Conditional
         "amb" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            2f to 1,
-                                            5f to 2,
-                                            7f to 3
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            ),
-                            ObservableT(
-                                    events = eventsOf(
-                                            1f to 1,
-                                            3f to 2,
-                                            7f to 3
-                                    ),
-                                    termination = ObservableT.Termination.Complete(8f)
-                            )
+            val observable1 = ObservableX.inputOf(
+                    listOf(
+                            2f to 1,
+                            5f to 2,
+                            7f to 3
                     ),
-                    operator = ObservableAmb()
+                    ObservableT.Termination.Complete(10f)
             )
+            val observable2 = ObservableX.inputOf(
+                    listOf(
+                            1f to 1,
+                            3f to 2,
+                            7f to 3
+                    ),
+                    ObservableT.Termination.Complete(8f)
+            )
+
+            ObservableX.amb(listOf(observable1, observable2))
         }
-        /*
         // TODO Make these samples available when booleans are supported for display
+        /*
         "all" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableAll(evenPredicate)
+                    ObservableT.Termination.Complete(10f)
             )
+                    .all(evenPredicate)
         }
         "any" -> {
-            OperatorSample(
-                    input = listOf(
-                            ObservableT(
-                                    events = eventsOf(
-                                            0f to 1,
-                                            2f to 2,
-                                            4f to 3,
-                                            6f to 4,
-                                            8f to 5
-                                    ),
-                                    termination = ObservableT.Termination.Complete(10f)
-                            )
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
                     ),
-                    operator = ObservableAny(evenPredicate)
+                    ObservableT.Termination.Complete(10f)
             )
+                    .any(evenPredicate)
         }
         */
         else -> null

@@ -65,6 +65,18 @@ val observableOperators = listOf(
 
 val singleOperators = listOf(
         OperatorCategory(
+                name = "create",
+                operatorNames = listOf(
+                        "just"
+                )
+        ),
+        OperatorCategory(
+                name = "transform",
+                operatorNames = listOf(
+                        "map"
+                )
+        ),
+        OperatorCategory(
                 name = "utility",
                 operatorNames = listOf(
                         "delay"

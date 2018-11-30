@@ -2,9 +2,18 @@
 
 package aodev.blue.rxsandbox.model.operator.completable
 
+import aodev.blue.rxsandbox.model.CompletableT
 import aodev.blue.rxsandbox.model.CompletableX
 import aodev.blue.rxsandbox.model.operator.completable.utility.CompletableDelay
 
+
+// region Input
+
+fun CompletableX.Companion.inputOf(
+        result: CompletableT.Result
+): CompletableX = CompletableX.Input(CompletableT(result))
+
+// endregion
 
 // region Utility
 

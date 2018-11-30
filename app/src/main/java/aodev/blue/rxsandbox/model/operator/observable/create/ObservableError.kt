@@ -5,7 +5,7 @@ import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableThrow<T : Any> : Operator {
+class ObservableError<T : Any> : Operator {
 
     fun apply(): ObservableT<T> {
         return ObservableT(
@@ -14,7 +14,7 @@ class ObservableThrow<T : Any> : Operator {
         )
     }
 
-    override val expression: String = "throw"
+    override val expression: String = "error"
 
     override val docUrl: String? = "${Config.operatorDocUrlPrefix}empty-never-throw.html"
 }

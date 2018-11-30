@@ -2,12 +2,21 @@
 
 package aodev.blue.rxsandbox.model.operator.single
 
+import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.SingleX
 import aodev.blue.rxsandbox.model.functions.Function
 import aodev.blue.rxsandbox.model.operator.single.create.SingleJust
 import aodev.blue.rxsandbox.model.operator.single.transform.SingleMap
 import aodev.blue.rxsandbox.model.operator.single.utility.SingleDelay
 
+
+// region Input
+
+fun <T : Any> SingleX.Companion.inputOf(
+        result: SingleT.Result<T>
+): SingleX<T> = SingleX.Input(SingleT(result))
+
+// endregion
 
 // region Create
 
