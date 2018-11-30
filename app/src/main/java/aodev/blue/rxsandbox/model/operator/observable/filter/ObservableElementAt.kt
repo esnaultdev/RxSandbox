@@ -13,18 +13,18 @@ class ObservableElementAt<T : Any>(private val index: Int) : Operator {
     }
 
     fun apply(input: ObservableT<T>): SingleT<T> {
-        return when (input.termination) {
-            is ObservableT.Termination.None -> SingleT(SingleT.Result.None())
-            is ObservableT.Termination.Complete -> {
-                if (input.events.size > index) {
-                    val event = input.events[index]
-                    SingleT(SingleT.Result.Success(event.time, event.value))
-                } else {
+        return if (input.events.size > index) {
+            val event = input.events[index]
+            SingleT(SingleT.Result.Success(event.time, event.value))
+        } else {
+            when (input.termination) {
+                is ObservableT.Termination.None -> SingleT(SingleT.Result.None())
+                is ObservableT.Termination.Complete -> {
                     SingleT(SingleT.Result.Error(input.termination.time))
                 }
-            }
-            is ObservableT.Termination.Error -> {
-                SingleT(SingleT.Result.Error(input.termination.time))
+                is ObservableT.Termination.Error -> {
+                    SingleT(SingleT.Result.Error(input.termination.time))
+                }
             }
         }
     }
