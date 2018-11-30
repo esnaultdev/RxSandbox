@@ -2,21 +2,13 @@ package aodev.blue.rxsandbox.model.operator.observable.create
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableTimer<T : Any>(private val delay: Float) : Operator<T, Int> {
+class ObservableTimer(private val delay: Float) : Operator {
 
     init {
         require(delay >= 0)
-    }
-
-    override fun apply(input: List<Timeline<T>>): Timeline<Int>? {
-        return Input.None.from(input) {
-            apply()
-        }
     }
 
     fun apply(): ObservableT<Int> {

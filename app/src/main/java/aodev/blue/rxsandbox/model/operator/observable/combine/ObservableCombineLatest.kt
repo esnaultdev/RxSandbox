@@ -2,9 +2,7 @@ package aodev.blue.rxsandbox.model.operator.observable.combine
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.model.functions.Function
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 import aodev.blue.rxsandbox.model.time
 import aodev.blue.rxsandbox.utils.alter
@@ -12,13 +10,7 @@ import aodev.blue.rxsandbox.utils.alter
 
 class ObservableCombineLatest<T : Any, R : Any>(
         private val combiner: Function<List<T>, R>
-) : Operator<T, R> {
-
-    override fun apply(input: List<Timeline<T>>): Timeline<R>? {
-        return Input.Observables.from(input) {
-            apply(it)
-        }
-    }
+) : Operator {
 
     fun apply(input: List<ObservableT<T>>): ObservableT<R> {
         return if (input.isEmpty()) {

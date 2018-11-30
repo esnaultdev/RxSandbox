@@ -2,21 +2,13 @@ package aodev.blue.rxsandbox.model.operator.maybe.utility
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.MaybeT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class MaybeDelay<T : Any>(private val delay: Float) : Operator<T, T> {
+class MaybeDelay<T : Any>(private val delay: Float) : Operator {
 
     init {
         require(delay >= 0)
-    }
-
-    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
-        return Input.Maybe.from(input) {
-            apply(it)
-        }
     }
 
     fun apply(input: MaybeT<T>): MaybeT<T> {

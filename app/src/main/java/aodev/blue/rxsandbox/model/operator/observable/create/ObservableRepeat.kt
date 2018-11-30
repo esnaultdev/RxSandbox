@@ -2,20 +2,13 @@ package aodev.blue.rxsandbox.model.operator.observable.create
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
-// FIXME Limit the max events produced by the repeat to avoid a laggy UI
+// FIXME This limit is used to avoid a laggy UI when too many events gets generated.
+// Find a better way to deal with this case
 private const val EVENT_LIMIT = 100
 
-class ObservableRepeat<T : Any> : Operator<T, T> {
-
-    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
-        return Input.Observable.from(input) {
-            apply(it)
-        }
-    }
+class ObservableRepeat<T : Any> : Operator {
 
     fun apply(input: ObservableT<T>): ObservableT<T> {
         return when (input.termination) {

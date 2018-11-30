@@ -2,18 +2,10 @@ package aodev.blue.rxsandbox.model.operator.observable.create
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableNever<T : Any> : Operator<T, T> {
-
-    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
-        return Input.None.from(input) {
-            apply()
-        }
-    }
+class ObservableNever<T : Any> : Operator {
 
     fun apply(): ObservableT<T> {
         return ObservableT(
@@ -21,7 +13,6 @@ class ObservableNever<T : Any> : Operator<T, T> {
                 ObservableT.Termination.None
         )
     }
-
 
     override val expression: String = "never"
 

@@ -2,22 +2,14 @@ package aodev.blue.rxsandbox.model.operator.observable.create
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableRange<T : Any>(private val from: Int, private val to: Int) : Operator<T, Int> {
+class ObservableRange(private val from: Int, private val to: Int) : Operator {
 
     init {
         require(from >= 0)
         require(to >= 0)
-    }
-
-    override fun apply(input: List<Timeline<T>>): Timeline<Int>? {
-        return Input.None.from(input) {
-            apply()
-        }
     }
 
     fun apply(): ObservableT<Int> {
