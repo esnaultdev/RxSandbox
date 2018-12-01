@@ -14,12 +14,6 @@ data class ObservableT<out T : Any>(
         val termination: Termination
 ) : Timeline<T>() {
 
-    companion object {
-        fun <T> eventsOf(vararg events: Pair<Float, T>): List<Event<T>> {
-            return events.map { Event(it.first, it.second) }
-        }
-    }
-
     init {
         val eventsSorted = events.asSequence()
                 .zipWithNext()
@@ -38,6 +32,8 @@ data class ObservableT<out T : Any>(
         object None : Termination()
         class Complete(val time: Float) : Termination()
         class Error(val time: Float) : Termination()
+
+
     }
 }
 
