@@ -31,7 +31,8 @@ class AsyncTreeView : ConstraintLayout {
         it.clone(this)
     }
 
-    var asyncTree: AsyncTree<*>? by Delegates.observable<AsyncTree<*>?>(null) { _, _, _ ->
+    var asyncTree: AsyncTree<Int>? by Delegates.observable<AsyncTree<Int>?>(null) {
+        _, _, _ ->
         updateViews()
     }
 
@@ -44,8 +45,21 @@ class AsyncTreeView : ConstraintLayout {
         }
     }
 
-    private fun updateViews(asyncTree: AsyncTree<*>) {
-        // TODO display the whole tree
+    private fun updateViews(asyncTree: AsyncTree<Int>) {
+        val rootTimeline = asyncTree.timeline()
+        val (timelineView, _) = createViewForTimeline(context, rootTimeline, true)
+        timelineView.id = View.generateViewId()
+
+        addView(timelineView)
+        constraintSet.run {
+            constrainWidth(timelineView.id, ConstraintSet.MATCH_CONSTRAINT)
+            constrainHeight(timelineView.id, ConstraintSet.WRAP_CONTENT)
+            connect(timelineView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+            connect(timelineView.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+            connect(timelineView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+        }
+
+        constraintSet.applyTo(this)
     }
 
     private fun createViewForTimeline(
