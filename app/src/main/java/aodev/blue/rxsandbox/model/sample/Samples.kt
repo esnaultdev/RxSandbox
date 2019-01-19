@@ -1,10 +1,10 @@
 package aodev.blue.rxsandbox.model.sample
 
-import aodev.blue.rxsandbox.model.AsyncTree
+import aodev.blue.rxsandbox.model.ReactiveTypeX
 import aodev.blue.rxsandbox.model.TimelineType
 
 
-fun getSample(timelineType: TimelineType, operatorName: String): AsyncTree<Int>? {
+fun getSample(timelineType: TimelineType, operatorName: String): ReactiveTypeX<*, *>? {
     return when(timelineType) {
         TimelineType.OBSERVABLE -> getObservableSample(operatorName)
         TimelineType.SINGLE -> getSingleSample(operatorName)

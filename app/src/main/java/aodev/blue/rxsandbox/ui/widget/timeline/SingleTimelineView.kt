@@ -13,9 +13,6 @@ import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ErrorEventDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.TimelineLineDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ValueEventDrawer
 import aodev.blue.rxsandbox.utils.exhaustive
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.Subject
 
 
 class SingleTimelineView : View {
@@ -35,7 +32,7 @@ class SingleTimelineView : View {
     private var _timeline: SingleT<Int> = initialTimeline
         set(value) {
             field = value
-            timelineSubject.onNext(value)
+            onUpdate(value)
             invalidate()
         }
 
@@ -52,9 +49,7 @@ class SingleTimelineView : View {
         }
         get() = _timeline
 
-    private val timelineSubject: Subject<SingleT<Int>> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineObservable: Observable<SingleT<Int>>
-        get() = timelineSubject.hide()
+    var onUpdate: (SingleT<Int>) -> Unit = {}
 
     var readOnly: Boolean = false
 

@@ -17,9 +17,6 @@ import aodev.blue.rxsandbox.ui.widget.timeline.drawer.TimelineLineDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ValueEventDrawer
 import aodev.blue.rxsandbox.utils.clamp
 import aodev.blue.rxsandbox.utils.exhaustive
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.Subject
 
 
 class ObservableTimelineView : View {
@@ -42,7 +39,7 @@ class ObservableTimelineView : View {
     private var _timeline: ObservableT<Int> = initialTimeline
         set(value) {
             field = value
-            timelineSubject.onNext(value)
+            onUpdate(value)
             invalidate()
         }
 
@@ -59,9 +56,7 @@ class ObservableTimelineView : View {
         }
         get() = _timeline
 
-    private val timelineSubject: Subject<ObservableT<Int>> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineObservable: Observable<ObservableT<Int>>
-        get() = timelineSubject.hide()
+    var onUpdate: (ObservableT<Int>) -> Unit = {}
 
     var readOnly: Boolean = false
 

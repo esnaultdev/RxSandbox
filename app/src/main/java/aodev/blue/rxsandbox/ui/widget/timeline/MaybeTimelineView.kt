@@ -14,9 +14,6 @@ import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ErrorEventDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.TimelineLineDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ValueEventDrawer
 import aodev.blue.rxsandbox.utils.exhaustive
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.Subject
 
 
 class MaybeTimelineView : View {
@@ -36,7 +33,7 @@ class MaybeTimelineView : View {
     private var _timeline: MaybeT<Int> = initialTimeline
         set(value) {
             field = value
-            timelineSubject.onNext(value)
+            onUpdate(value)
             invalidate()
         }
 
@@ -53,9 +50,7 @@ class MaybeTimelineView : View {
         }
         get() = _timeline
 
-    private val timelineSubject: Subject<MaybeT<Int>> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineObservable: Observable<MaybeT<Int>>
-        get() = timelineSubject.hide()
+    var onUpdate: (MaybeT<Int>) -> Unit = {}
 
     var readOnly: Boolean = false
 

@@ -1,13 +1,13 @@
 package aodev.blue.rxsandbox.model.sample
 
-import aodev.blue.rxsandbox.model.AsyncTree
+import aodev.blue.rxsandbox.model.ReactiveTypeX
 import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.SingleX
 import aodev.blue.rxsandbox.model.functions.functionOf
 import aodev.blue.rxsandbox.model.operator.single.*
 
 
-fun getSingleSample(operatorName: String): AsyncTree<Int>? {
+fun getSingleSample(operatorName: String): ReactiveTypeX<*, *>? {
     return when (operatorName) {
         // Create
         "just" -> SingleX.just(5)
@@ -15,7 +15,7 @@ fun getSingleSample(operatorName: String): AsyncTree<Int>? {
         // Transform
         "map" -> {
             SingleX.inputOf(SingleT.Result.Success(5f, 4))
-                    .map(functionOf("x -> x * 2") { x -> x * 2 })
+                    .map<Int, Int>(functionOf("x -> x * 2") { x -> x * 2 })
         }
 
         // Utility

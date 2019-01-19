@@ -3,6 +3,7 @@
 package aodev.blue.rxsandbox.model.operator.observable
 
 import aodev.blue.rxsandbox.model.CompletableX
+import aodev.blue.rxsandbox.model.InnerReactiveTypeX
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.ObservableX
 import aodev.blue.rxsandbox.model.SingleX
@@ -47,9 +48,9 @@ fun <T : Any> ObservableX.Companion.inputOf(
         events: List<Pair<Float, T>>,
         termination: ObservableT.Termination
 ): ObservableX<T> {
-    return ObservableX.Input(
-            ObservableT(events.map { ObservableT.Event(it.first, it.second) }, termination)
-    )
+    val observableT = ObservableT(events.map { ObservableT.Event(it.first, it.second) }, termination)
+    val innerX = InnerReactiveTypeX.Input(observableT)
+    return ObservableX(innerX)
 }
 
 // endregion
@@ -61,23 +62,26 @@ fun <T : Any, R : Any> ObservableX.Companion.combineLatest(
         combiner: Function<List<T>, R>
 ): ObservableX<R> {
     val operator = ObservableCombineLatest(combiner)
-    return ObservableX.Result(operator, input) {
-        operator.apply(input.map { it.observableT() })
+    val innerX = InnerReactiveTypeX.Result(operator, input) {
+        operator.apply(input.map { it.innerX.timeline() })
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX.Companion.merge(input: List<ObservableX<T>>): ObservableX<T> {
     val operator = ObservableMerge<T>()
-    return ObservableX.Result(operator, input) {
-        operator.apply(input.map { it.observableT() })
+    val innerX = InnerReactiveTypeX.Result(operator, input) {
+        operator.apply(input.map { it.innerX.timeline() })
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.startWith(value: T): ObservableX<T> {
     val operator = ObservableStartWith(value)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 // endregion
@@ -86,23 +90,26 @@ fun <T : Any> ObservableX<T>.startWith(value: T): ObservableX<T> {
 
 fun <T : Any> ObservableX<T>.all(predicate: Predicate<T>): SingleX<Boolean> {
     val operator = ObservableAll(predicate)
-    return SingleX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return SingleX(innerX)
 }
 
 fun <T : Any> ObservableX.Companion.amb(input: List<ObservableX<T>>): ObservableX<T> {
     val operator = ObservableAmb<T>()
-    return ObservableX.Result(operator, input) {
-        operator.apply(input.map { it.observableT() })
+    val innerX = InnerReactiveTypeX.Result(operator, input) {
+        operator.apply(input.map { it.innerX.timeline() })
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.any(predicate: Predicate<T>): SingleX<Boolean> {
     val operator = ObservableAny(predicate)
-    return SingleX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return SingleX(innerX)
 }
 
 // endregion
@@ -111,44 +118,52 @@ fun <T : Any> ObservableX<T>.any(predicate: Predicate<T>): SingleX<Boolean> {
 
 fun <T : Any> ObservableX.Companion.empty(): ObservableX<T> {
     val operator = ObservableEmpty<T>()
-    return ObservableX.Result(operator, emptyList(), operator::apply)
+    val innerX = InnerReactiveTypeX.Result(operator, emptyList(), operator::apply)
+    return ObservableX(innerX)
 }
 
 fun ObservableX.Companion.interval(interval: Float): ObservableX<Int> {
     val operator = ObservableInterval(interval)
-    return ObservableX.Result(operator, emptyList(), operator::apply)
+    val innerX = InnerReactiveTypeX.Result(operator, emptyList(), operator::apply)
+    return ObservableX(innerX)
 }
 
 fun <T: Any> ObservableX.Companion.just(vararg values: T): ObservableX<T> {
     val operator = ObservableJust(*values)
-    return ObservableX.Result(operator, emptyList(), operator::apply)
+    val innerX = InnerReactiveTypeX.Result(operator, emptyList(), operator::apply)
+    return ObservableX(innerX)
 }
 
 fun <T: Any> ObservableX.Companion.never(): ObservableX<T> {
     val operator = ObservableNever<T>()
-    return ObservableX.Result(operator, emptyList(), operator::apply)
+    val innerX = InnerReactiveTypeX.Result(operator, emptyList(), operator::apply)
+    return ObservableX(innerX)
 }
 
 fun ObservableX.Companion.range(from: Int, to: Int): ObservableX<Int> {
     val operator = ObservableRange(from, to)
-    return ObservableX.Result(operator, emptyList(), operator::apply)
+    val innerX = InnerReactiveTypeX.Result(operator, emptyList(), operator::apply)
+    return ObservableX(innerX)
 }
 
 fun <T: Any> ObservableX<T>.repeat(): ObservableX<T> {
     val operator = ObservableRepeat<T>()
-    return ObservableX.Result(operator, emptyList()) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T: Any> ObservableX.Companion.error(): ObservableX<T> {
     val operator = ObservableError<T>()
-    return ObservableX.Result(operator, emptyList(), operator::apply)
+    val innerX = InnerReactiveTypeX.Result(operator, emptyList(), operator::apply)
+    return ObservableX(innerX)
 }
 
 fun ObservableX.Companion.timer(delay: Float): ObservableX<Int> {
     val operator = ObservableTimer(delay)
-    return ObservableX.Result(operator, emptyList(), operator::apply)
+    val innerX = InnerReactiveTypeX.Result(operator, emptyList(), operator::apply)
+    return ObservableX(innerX)
 }
 
 // endregion
@@ -157,86 +172,98 @@ fun ObservableX.Companion.timer(delay: Float): ObservableX<Int> {
 
 fun <T : Any> ObservableX<T>.debounce(duration: Float): ObservableX<T> {
     val operator = ObservableDebounce<T>(duration)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.distinct(): ObservableX<T> {
     val operator = ObservableDistinct<T>()
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.distinctUntilChanged(): ObservableX<T> {
     val operator = ObservableDistinctUntilChanged<T>()
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.elementAt(index: Int): SingleX<T> {
     val operator = ObservableElementAt<T>(index)
-    return SingleX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return SingleX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.filter(predicate: Predicate<T>): ObservableX<T> {
     val operator = ObservableFilter(predicate)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.first(): SingleX<T> {
     val operator = ObservableFirst<T>()
-    return SingleX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return SingleX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.ignoreElements(): CompletableX {
     val operator = ObservableIgnoreElements<T>()
-    return CompletableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return CompletableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.last(): SingleX<T> {
     val operator = ObservableLast<T>()
-    return SingleX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return SingleX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.skip(count: Int): ObservableX<T> {
     val operator = ObservableSkip<T>(count)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.skipLast(count: Int): ObservableX<T> {
     val operator = ObservableSkipLast<T>(count)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.take(count: Int): ObservableX<T> {
     val operator = ObservableTake<T>(count)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.takeLast(count: Int): ObservableX<T> {
     val operator = ObservableTakeLast<T>(count)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 // endregion
@@ -245,9 +272,10 @@ fun <T : Any> ObservableX<T>.takeLast(count: Int): ObservableX<T> {
 
 fun <T : Any, R : Any> ObservableX<T>.map(combiner: Function<T, R>): ObservableX<R> {
     val operator = ObservableMap(combiner)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any, R : Any> ObservableX<T>.scan(
@@ -255,9 +283,10 @@ fun <T : Any, R : Any> ObservableX<T>.scan(
         operation: Function2<R, T, R>
 ): ObservableX<R> {
     val operator = ObservableScan(initialValue, operation)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 // endregion
@@ -266,16 +295,18 @@ fun <T : Any, R : Any> ObservableX<T>.scan(
 
 fun <T : Any> ObservableX<T>.delay(delay: Float): ObservableX<T> {
     val operator = ObservableDelay<T>(delay)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 fun <T : Any> ObservableX<T>.timeout(timeout: Float): ObservableX<T> {
     val operator = ObservableTimeout<T>(timeout)
-    return ObservableX.Result(operator, listOf(this)) {
-        operator.apply(observableT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return ObservableX(innerX)
 }
 
 // endregion

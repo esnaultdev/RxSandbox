@@ -2,6 +2,7 @@
 
 package aodev.blue.rxsandbox.model.operator.single
 
+import aodev.blue.rxsandbox.model.InnerReactiveTypeX
 import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.SingleX
 import aodev.blue.rxsandbox.model.functions.Function
@@ -14,7 +15,10 @@ import aodev.blue.rxsandbox.model.operator.single.utility.SingleDelay
 
 fun <T : Any> SingleX.Companion.inputOf(
         result: SingleT.Result<T>
-): SingleX<T> = SingleX.Input(SingleT(result))
+): SingleX<T> {
+    val innerX = InnerReactiveTypeX.Input(SingleT(result))
+    return SingleX(innerX)
+}
 
 // endregion
 
@@ -22,7 +26,8 @@ fun <T : Any> SingleX.Companion.inputOf(
 
 fun <T : Any> SingleX.Companion.just(element: T): SingleX<T> {
     val operator = SingleJust(element)
-    return SingleX.Result(operator, emptyList(), operator::apply)
+    val innerX = InnerReactiveTypeX.Result(operator, emptyList(), operator::apply)
+    return SingleX(innerX)
 }
 
 // endregion
@@ -31,9 +36,10 @@ fun <T : Any> SingleX.Companion.just(element: T): SingleX<T> {
 
 fun <T : Any, R : Any> SingleX<T>.map(mapping: Function<T, R>): SingleX<R> {
     val operator = SingleMap(mapping)
-    return SingleX.Result(operator, listOf(this)) {
-        operator.apply(singleT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return SingleX(innerX)
 }
 
 // endregion
@@ -42,9 +48,10 @@ fun <T : Any, R : Any> SingleX<T>.map(mapping: Function<T, R>): SingleX<R> {
 
 fun <T : Any> SingleX<T>.delay(delay: Float): SingleX<T> {
     val operator = SingleDelay<T>(delay)
-    return SingleX.Result(operator, listOf(this)) {
-        operator.apply(singleT())
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
     }
+    return SingleX(innerX)
 }
 
 // endregion

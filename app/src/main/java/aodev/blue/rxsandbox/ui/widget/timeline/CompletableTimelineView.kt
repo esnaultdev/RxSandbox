@@ -13,9 +13,6 @@ import aodev.blue.rxsandbox.ui.widget.timeline.drawer.CompleteEventDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.ErrorEventDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.TimelineLineDrawer
 import aodev.blue.rxsandbox.utils.exhaustive
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.Subject
 
 
 class CompletableTimelineView : View {
@@ -35,7 +32,7 @@ class CompletableTimelineView : View {
     private var _timeline: CompletableT = initialTimeline
         set(value) {
             field = value
-            timelineSubject.onNext(value)
+            onUpdate(value)
             invalidate()
         }
 
@@ -52,9 +49,7 @@ class CompletableTimelineView : View {
         }
         get() = _timeline
 
-    private val timelineSubject: Subject<CompletableT> = BehaviorSubject.createDefault(initialTimeline)
-    val timelineObservable: Observable<CompletableT>
-        get() = timelineSubject.hide()
+    var onUpdate: (CompletableT) -> Unit = {}
 
     var readOnly: Boolean = false
 

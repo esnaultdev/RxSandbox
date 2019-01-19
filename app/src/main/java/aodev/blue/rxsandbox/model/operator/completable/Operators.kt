@@ -4,6 +4,7 @@ package aodev.blue.rxsandbox.model.operator.completable
 
 import aodev.blue.rxsandbox.model.CompletableT
 import aodev.blue.rxsandbox.model.CompletableX
+import aodev.blue.rxsandbox.model.InnerReactiveTypeX
 import aodev.blue.rxsandbox.model.operator.completable.utility.CompletableDelay
 
 
@@ -11,7 +12,7 @@ import aodev.blue.rxsandbox.model.operator.completable.utility.CompletableDelay
 
 fun CompletableX.Companion.inputOf(
         result: CompletableT.Result
-): CompletableX = CompletableX.Input(CompletableT(result))
+): CompletableX = CompletableX(InnerReactiveTypeX.Input(CompletableT(result)))
 
 // endregion
 
@@ -19,9 +20,11 @@ fun CompletableX.Companion.inputOf(
 
 fun CompletableX.delay(delay: Float): CompletableX {
     val operator = CompletableDelay(delay)
-    return CompletableX.Result(operator, listOf(this)) {
-        operator.apply(completableT())
-    }
+    return CompletableX(
+            InnerReactiveTypeX.Result(operator, listOf(this)) {
+                operator.apply(innerX.timeline())
+            }
+    )
 }
 
 // endregion

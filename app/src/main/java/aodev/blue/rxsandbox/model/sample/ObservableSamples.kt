@@ -1,8 +1,8 @@
 package aodev.blue.rxsandbox.model.sample
 
-import aodev.blue.rxsandbox.model.AsyncTree
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.ObservableX
+import aodev.blue.rxsandbox.model.ReactiveTypeX
 import aodev.blue.rxsandbox.model.functions.functionOf
 import aodev.blue.rxsandbox.model.functions.predicateOf
 import aodev.blue.rxsandbox.model.operator.observable.empty
@@ -12,13 +12,13 @@ import aodev.blue.rxsandbox.model.operator.observable.*
 private val evenPredicate = predicateOf<Int>("x -> x % 2 == 0") { it % 2 == 0 }
 
 
-fun getObservableSample(operatorName: String): AsyncTree<Int>? {
+fun getObservableSample(operatorName: String): ReactiveTypeX<*, *>? {
     return when (operatorName) {
         // Create
-        "empty" -> ObservableX.empty()
+        "empty" -> ObservableX.empty<Int>()
         "interval" -> ObservableX.interval(2f)
         "just" -> ObservableX.just(1)
-        "never" -> ObservableX.never()
+        "never" -> ObservableX.never<Int>()
         "range" -> ObservableX.range(1, 5)
         "repeat" -> {
             ObservableX.inputOf(
@@ -27,7 +27,7 @@ fun getObservableSample(operatorName: String): AsyncTree<Int>? {
             )
                     .repeat()
         }
-        "throw" -> ObservableX.error()
+        "throw" -> ObservableX.error<Int>()
         "timer" -> ObservableX.timer(5f)
 
         // Transform
@@ -42,7 +42,7 @@ fun getObservableSample(operatorName: String): AsyncTree<Int>? {
                     ),
                     ObservableT.Termination.Complete(10f)
             )
-                    .map(functionOf("x -> x * 2") { x -> x *2 })
+                    .map<Int, Int>(functionOf("x -> x * 2") { x -> x *2 })
         }
         "scan" -> {
             ObservableX.inputOf(
@@ -238,7 +238,7 @@ fun getObservableSample(operatorName: String): AsyncTree<Int>? {
 
             ObservableX.combineLatest(
                     listOf(observable1, observable2),
-                    functionOf("x, y -> x + y") { list -> list.sum() }
+                    functionOf<List<Int>, Int>("x, y -> x + y") { list -> list.sum() }
             )
         }
         "merge" -> {
@@ -318,8 +318,6 @@ fun getObservableSample(operatorName: String): AsyncTree<Int>? {
 
             ObservableX.amb(listOf(observable1, observable2))
         }
-        // TODO Make these samples available when booleans are supported for display
-        /*
         "all" -> {
             ObservableX.inputOf(
                     listOf(
@@ -346,7 +344,6 @@ fun getObservableSample(operatorName: String): AsyncTree<Int>? {
             )
                     .any(evenPredicate)
         }
-        */
         else -> null
     }
 }

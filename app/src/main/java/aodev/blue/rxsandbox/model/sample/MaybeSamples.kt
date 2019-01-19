@@ -1,12 +1,12 @@
 package aodev.blue.rxsandbox.model.sample
 
-import aodev.blue.rxsandbox.model.AsyncTree
 import aodev.blue.rxsandbox.model.MaybeT
 import aodev.blue.rxsandbox.model.MaybeX
+import aodev.blue.rxsandbox.model.ReactiveTypeX
 import aodev.blue.rxsandbox.model.operator.maybe.*
 
 
-fun getMaybeSample(operatorName: String): AsyncTree<Int>? {
+fun getMaybeSample(operatorName: String): ReactiveTypeX<*, *>? {
     return when (operatorName) {
         // Utility
         "delay" -> {
