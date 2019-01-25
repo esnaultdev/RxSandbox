@@ -9,7 +9,7 @@ import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.TimelineType
 import aodev.blue.rxsandbox.model.sample.getSample
 import aodev.blue.rxsandbox.ui.screen.NavigationLabelListener
-import aodev.blue.rxsandbox.ui.widget.asynctree.AsyncTreeView
+import aodev.blue.rxsandbox.ui.widget.asynctree.SingleColumnTreeView
 
 
 class DetailsFragment : Fragment() {
@@ -24,7 +24,7 @@ class DetailsFragment : Fragment() {
     }
 
     // UI
-    private lateinit var asyncTreeView: AsyncTreeView
+    private lateinit var asyncTreeView: SingleColumnTreeView
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -44,7 +44,7 @@ class DetailsFragment : Fragment() {
         val sample = getSample(timelineType, operatorName)
 
         if (sample != null) {
-            asyncTreeView.asyncTree = sample
+            asyncTreeView.reactiveTypeX = sample
         } else {
             TODO("Properly handle a missing operator")
         }
