@@ -11,10 +11,12 @@ import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.ReactiveTypeX
 import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.ui.widget.timeline.CompletableTimelineView
 import aodev.blue.rxsandbox.ui.widget.timeline.MaybeTimelineView
 import aodev.blue.rxsandbox.ui.widget.timeline.ObservableTimelineView
 import aodev.blue.rxsandbox.ui.widget.timeline.SingleTimelineView
 import kotlin.properties.Delegates
+import kotlin.reflect.KClass
 
 
 class SingleColumnTreeView : ConstraintLayout {
@@ -44,65 +46,145 @@ class SingleColumnTreeView : ConstraintLayout {
         }
     }
 
-    private fun updateViews(viewModel: SingleColumnViewModel) {
-        var previousViewId: Int? = null
+    private fun updateViews(viewModel: ViewModel) {
+        val viewIds = IntArray(viewModel.elements.size)
 
-        for (element in viewModel.elements) {
+        viewModel.elements.forEachIndexed { index, element ->
             val currentView = when (element) {
-                is SingleColumnViewModel.Element.Operator -> {
+                is ViewModel.Element.Operator -> {
                     OperatorView(context).apply {
                         text = element.name
                     }
                 }
-                is SingleColumnViewModel.Element.TimelineElement<*> -> {
-                    when (lastTimeline) {
-                        is ObservableT -> ObservableTimelineView(context)
-                        is SingleT -> SingleTimelineView(context)
-                        is MaybeT -> MaybeTimelineView(context)
-                        is CompletableT -> MaybeTimelineView(context)
-                    }
-                }
+                is ViewModel.Element.TimelineE<*, *> -> bindElementToView(element)
             }
 
             currentView.id = View.generateViewId()
             addView(currentView)
+            viewIds[index] = currentView.id
 
             constraintSet.run {
                 constrainWidth(currentView.id, ConstraintSet.MATCH_CONSTRAINT)
                 constrainHeight(currentView.id, ConstraintSet.WRAP_CONTENT)
                 connect(currentView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
                 connect(currentView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-
-                val previousId = previousViewId
-                if (previousId == null) {
-                    connect(currentView.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-                } else {
-                    connect(currentView.id, ConstraintSet.BOTTOM, previousId, ConstraintSet.TOP)
-                }
             }
-            previousViewId = currentView.id
         }
 
-        previousViewId?.let { previousId ->
-            constraintSet.connect(previousId, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+        if (viewModel.elements.isNotEmpty()) {
+            constraintSet.createVerticalChain(
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.TOP,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.BOTTOM,
+                    viewIds,
+                    FloatArray(viewModel.elements.size) { 1f },
+                    ConstraintSet.CHAIN_PACKED
+            )
         }
 
         constraintSet.applyTo(this)
     }
-}
 
-private fun toViewModel(reactiveTypeX: ReactiveTypeX<*, *>): SingleColumnViewModel {
-    // TODO
-}
+    private fun bindElementToView(element: ViewModel.Element.TimelineE<*, *>): View {
+        return when (element) {
+            is ViewModel.Element.TimelineE.Observable<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                val timelineE = element as? ViewModel.Element.TimelineE<Int, ObservableT<Int>>
 
-class SingleColumnViewModel(val elements: List<Element>) {
+                ObservableTimelineView(context).apply {
+                    readOnly = element.inner.isInput
 
-    sealed class Element {
-        class TimelineElement<TI : Timeline<*>>(
-                val isInput: Boolean,
-                val onUpdate: (TI) -> Unit,
-                val invalidate: () -> Unit
-        ) : Element()
-        class Operator(val name: String) : Element()
+                    onUpdate = timelineE?.inner?.onUpdate ?: {}
+                    timelineE?.inner?.update = { timeline -> this.timeline = timeline}
+                }
+            }
+            is ViewModel.Element.TimelineE.Single<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                val timelineE = element as? ViewModel.Element.TimelineE<Int, SingleT<Int>>
+
+                SingleTimelineView(context).apply {
+                    readOnly = element.inner.isInput
+
+                    onUpdate = timelineE?.inner?.onUpdate ?: {}
+                    timelineE?.inner?.update = { timeline -> this.timeline = timeline}
+                }
+            }
+            is ViewModel.Element.TimelineE.Maybe<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                val timelineE = element as? ViewModel.Element.TimelineE<Int, MaybeT<Int>>
+
+                MaybeTimelineView(context).apply {
+                    readOnly = element.inner.isInput
+
+                    onUpdate = timelineE?.inner?.onUpdate ?: {}
+                    timelineE?.inner?.update = { timeline -> this.timeline = timeline}
+                }
+            }
+            is ViewModel.Element.TimelineE.Completable -> {
+                @Suppress("UNCHECKED_CAST")
+                val timelineE = element as ViewModel.Element.TimelineE<Int, CompletableT>
+
+                CompletableTimelineView(context).apply {
+                    readOnly = element.inner.isInput
+
+                    onUpdate = timelineE.inner.onUpdate
+                    timelineE.inner.update = { timeline -> this.timeline = timeline}
+                }
+            }
+        }
+    }
+
+    private fun toViewModel(reactiveTypeX: ReactiveTypeX<*, *>): ViewModel {
+        return ViewModel(
+                listOf(
+                        ViewModel.Element.TimelineE.Single(
+                                ViewModel.Element.TimelineE.Inner(true, {}), Int::class
+                        ),
+                        ViewModel.Element.Operator("map"),
+                        ViewModel.Element.TimelineE.Single(
+                                ViewModel.Element.TimelineE.Inner(false, {}), Int::class
+                        ),
+                        ViewModel.Element.Operator("map"),
+                        ViewModel.Element.TimelineE.Single(
+                                ViewModel.Element.TimelineE.Inner(false, {}), Int::class
+                        )
+                )
+        )
+    }
+
+    class ViewModel(val elements: List<Element>) {
+
+        sealed class Element {
+            sealed class TimelineE<T: Any, TL : Timeline<T>>(
+                    val inner: Inner<T, TL>, val type: KClass<T>
+            ) : Element() {
+
+                class Inner<out T : Any, TL : Timeline<T>>(
+                        val isInput: Boolean,
+                        val onUpdate: (TL) -> Unit
+                ) {
+                    var update: (TL) -> Unit = {}
+                }
+
+                class Observable<T: Any>(
+                        inner: Inner<T, ObservableT<T>>, type: KClass<T>
+                ) : TimelineE<T, ObservableT<T>>(inner, type)
+
+                class Single<T: Any>(
+                        inner: Inner<T, SingleT<T>>, type: KClass<T>
+                ) : TimelineE<T, SingleT<T>>(inner, type)
+
+                class Maybe<T: Any>(
+                        inner: Inner<T, MaybeT<T>>, type: KClass<T>
+                ) : TimelineE<T, MaybeT<T>>(inner, type)
+
+                class Completable(
+                        inner: Inner<Nothing, CompletableT>
+                ) : TimelineE<Nothing, CompletableT>(inner, Nothing::class)
+            }
+
+            class Operator(val name: String) : Element()
+        }
     }
 }
