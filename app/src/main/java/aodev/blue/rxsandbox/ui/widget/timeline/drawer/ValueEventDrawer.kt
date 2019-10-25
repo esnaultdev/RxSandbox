@@ -45,11 +45,13 @@ class ValueEventDrawer(context: Context) {
      * @param y The y position of the center of the error event
      * @param value The value of the event to draw
      */
-    fun draw(canvas: Canvas, x: Float, y: Float, value: Int) {
+    fun draw(canvas: Canvas, x: Float, y: Float, value: Any) {
         canvas.drawCircle(x, y, eventSize / 2, eventFillPaint)
         canvas.drawCircle(x, y, eventSize / 2, strokePaint)
 
-        val eventText = value.toString()
+        // TODO Handle multiple display types
+        val intValue = value as? Int ?: return
+        val eventText = intValue.toString()
         eventTextPaint.getTextBounds(eventText, 0, eventText.length, textBoundsRect)
         val textX = x - textBoundsRect.width().toFloat() / 2 - textBoundsRect.left
         val textY = y + textBoundsRect.height().toFloat() / 2 - textBoundsRect.bottom

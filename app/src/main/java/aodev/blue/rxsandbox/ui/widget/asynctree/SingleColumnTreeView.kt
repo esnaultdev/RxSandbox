@@ -11,10 +11,7 @@ import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.ReactiveTypeX
 import aodev.blue.rxsandbox.model.SingleT
 import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.ui.widget.timeline.CompletableTimelineView
-import aodev.blue.rxsandbox.ui.widget.timeline.MaybeTimelineView
-import aodev.blue.rxsandbox.ui.widget.timeline.ObservableTimelineView
-import aodev.blue.rxsandbox.ui.widget.timeline.SingleTimelineView
+import aodev.blue.rxsandbox.ui.widget.timeline.TimelineView
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
@@ -87,51 +84,11 @@ class SingleColumnTreeView : ConstraintLayout {
     }
 
     private fun bindElementToView(element: ViewModel.Element.TimelineE<*, *>): View {
-        return when (element) {
-            is ViewModel.Element.TimelineE.Observable<*> -> {
-                @Suppress("UNCHECKED_CAST")
-                val timelineE = element as? ViewModel.Element.TimelineE<Int, ObservableT<Int>>
+        return TimelineView(context).apply {
+            readOnly = element.inner.isInput
 
-                ObservableTimelineView(context).apply {
-                    readOnly = element.inner.isInput
-
-                    onUpdate = timelineE?.inner?.onUpdate ?: {}
-                    timelineE?.inner?.update = { timeline -> this.timeline = timeline}
-                }
-            }
-            is ViewModel.Element.TimelineE.Single<*> -> {
-                @Suppress("UNCHECKED_CAST")
-                val timelineE = element as? ViewModel.Element.TimelineE<Int, SingleT<Int>>
-
-                SingleTimelineView(context).apply {
-                    readOnly = element.inner.isInput
-
-                    onUpdate = timelineE?.inner?.onUpdate ?: {}
-                    timelineE?.inner?.update = { timeline -> this.timeline = timeline}
-                }
-            }
-            is ViewModel.Element.TimelineE.Maybe<*> -> {
-                @Suppress("UNCHECKED_CAST")
-                val timelineE = element as? ViewModel.Element.TimelineE<Int, MaybeT<Int>>
-
-                MaybeTimelineView(context).apply {
-                    readOnly = element.inner.isInput
-
-                    onUpdate = timelineE?.inner?.onUpdate ?: {}
-                    timelineE?.inner?.update = { timeline -> this.timeline = timeline}
-                }
-            }
-            is ViewModel.Element.TimelineE.Completable -> {
-                @Suppress("UNCHECKED_CAST")
-                val timelineE = element as ViewModel.Element.TimelineE<Int, CompletableT>
-
-                CompletableTimelineView(context).apply {
-                    readOnly = element.inner.isInput
-
-                    onUpdate = timelineE.inner.onUpdate
-                    timelineE.inner.update = { timeline -> this.timeline = timeline}
-                }
-            }
+            // onUpdate = element.inner.onUpdate
+            element.inner.update = { timeline -> this.timeline = timeline}
         }
     }
 
@@ -161,8 +118,8 @@ class SingleColumnTreeView : ConstraintLayout {
             ) : Element() {
 
                 class Inner<out T : Any, TL : Timeline<T>>(
-                        val isInput: Boolean,
-                        val onUpdate: (TL) -> Unit
+                        val isInput: Boolean
+                        // val onUpdate: (TL) -> Unit
                 ) {
                     var update: (TL) -> Unit = {}
                 }

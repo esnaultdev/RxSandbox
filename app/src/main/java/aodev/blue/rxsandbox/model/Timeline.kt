@@ -6,13 +6,17 @@ package aodev.blue.rxsandbox.model
  * Note that the timeline types are suffixed with T for Timeline
  * to avoid confusion and clashes with the ReactiveX types.
  */
-sealed class Timeline<out T : Any>
+sealed class Timeline<out T : Any> {
+    abstract val type: TimelineType
+}
 
 
 data class ObservableT<out T : Any>(
         val events: List<Event<T>>,
         val termination: Termination
 ) : Timeline<T>() {
+
+    override val type = TimelineType.OBSERVABLE
 
     init {
         val eventsSorted = events.asSequence()
@@ -29,11 +33,13 @@ data class ObservableT<out T : Any>(
     }
 
     sealed class Termination {
-        object None : Termination()
-        class Complete(val time: Float) : Termination()
-        class Error(val time: Float) : Termination()
+        abstract val time: Float?
 
-
+        object None : Termination() {
+            override val time: Float? = null
+        }
+        class Complete(override val time: Float) : Termination()
+        class Error(override val time: Float) : Termination()
     }
 }
 
@@ -49,10 +55,16 @@ data class SingleT<out T : Any>(
         val result: Result<T>
 ) : Timeline<T>() {
 
+    override val type = TimelineType.SINGLE
+
     sealed class Result<out T> {
-        class None<T> : Result<T>()
-        class Success<T>(val time: Float, val value: T) : Result<T>()
-        class Error<T>(val time: Float) : Result<T>()
+        abstract val time: Float?
+
+        class None<T> : Result<T>() {
+            override val time: Float? = null
+        }
+        class Success<T>(override val time: Float, val value: T) : Result<T>()
+        class Error<T>(override val time: Float) : Result<T>()
     }
 }
 
@@ -61,11 +73,17 @@ data class MaybeT<out T : Any>(
         val result: Result<T>
 ) : Timeline<T>() {
 
+    override val type = TimelineType.MAYBE
+
     sealed class Result<out T> {
-        class None<T> : Result<T>()
-        class Complete<T>(val time: Float) : Result<T>()
-        class Success<T>(val time: Float, val value: T) : Result<T>()
-        class Error<T>(val time: Float) : Result<T>()
+        abstract val time: Float?
+
+        class None<T> : Result<T>() {
+            override val time: Float? = null
+        }
+        class Complete<T>(override val time: Float) : Result<T>()
+        class Success<T>(override val time: Float, val value: T) : Result<T>()
+        class Error<T>(override val time: Float) : Result<T>()
     }
 }
 
@@ -74,9 +92,15 @@ data class CompletableT(
         val result: Result
 ) : Timeline<Nothing>() {
 
+    override val type = TimelineType.COMPLETABLE
+
     sealed class Result {
-        object None : Result()
-        class Complete(val time: Float) : Result()
-        class Error(val time: Float) : Result()
+        abstract val time: Float?
+
+        object None : Result() {
+            override val time: Float? = null
+        }
+        class Complete(override val time: Float) : Result()
+        class Error(override val time: Float) : Result()
     }
 }

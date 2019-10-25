@@ -12,7 +12,7 @@ class TimePositionMapper(
     var isLtr: Boolean = true
     var width: Int = 0
 
-    val availableWidth: Float
+    private val availableWidth: Float
         get() = width - 2 * padding - innerPaddingStart - innerPaddingEnd
 
     fun position(time: Float): Float {
