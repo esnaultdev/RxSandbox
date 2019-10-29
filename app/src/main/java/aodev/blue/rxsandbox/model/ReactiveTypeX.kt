@@ -16,7 +16,7 @@ sealed class InnerReactiveTypeX<out T : Any, out TL : Timeline<T>>(
 ) {
 
     class Input<out T: Any, TL : Timeline<T>>(
-            val input: TL
+            var input: TL
     ) : InnerReactiveTypeX<T, TL>(emptyList())
 
     class Result<out T: Any, TL : Timeline<T>>(

@@ -5,15 +5,9 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import aodev.blue.rxsandbox.model.CompletableT
-import aodev.blue.rxsandbox.model.MaybeT
-import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.ReactiveTypeX
-import aodev.blue.rxsandbox.model.SingleT
-import aodev.blue.rxsandbox.model.Timeline
+import aodev.blue.rxsandbox.model.*
 import aodev.blue.rxsandbox.ui.widget.timeline.TimelineView
 import kotlin.properties.Delegates
-import kotlin.reflect.KClass
 
 
 class SingleColumnTreeView : ConstraintLayout {
@@ -34,12 +28,16 @@ class SingleColumnTreeView : ConstraintLayout {
         }
     }
 
+    private var viewState: ViewState? = null
+
     private fun updateViews() {
         val reactiveTypeX = reactiveTypeX
         removeAllViews()
         if (reactiveTypeX != null) {
-            val viewModel = toViewModel(reactiveTypeX)
-            updateViews(viewModel)
+            updateViewState(reactiveTypeX)
+            // TODO build and show the view model
+        } else {
+            // TODO clean the state and the updates
         }
     }
 
@@ -53,7 +51,7 @@ class SingleColumnTreeView : ConstraintLayout {
                         text = element.name
                     }
                 }
-                is ViewModel.Element.TimelineE<*, *> -> bindElementToView(element)
+                is ViewModel.Element.TimelineE -> bindElementToView(element)
             }
 
             currentView.id = View.generateViewId()
@@ -83,65 +81,100 @@ class SingleColumnTreeView : ConstraintLayout {
         constraintSet.applyTo(this)
     }
 
-    private fun bindElementToView(element: ViewModel.Element.TimelineE<*, *>): View {
+    private fun bindElementToView(element: ViewModel.Element.TimelineE): View {
         return TimelineView(context).apply {
-            readOnly = element.inner.isInput
+            readOnly = element.onUpdate == null
 
-            // onUpdate = element.inner.onUpdate
-            element.inner.update = { timeline -> this.timeline = timeline}
+            onUpdate = { timeline -> timeline?.let { element.onUpdate?.invoke(it) } }
+            element.update = { timeline -> this.timeline = timeline}
         }
     }
 
-    private fun toViewModel(reactiveTypeX: ReactiveTypeX<*, *>): ViewModel {
-        return ViewModel(
-                listOf(
-                        ViewModel.Element.TimelineE.Single(
-                                ViewModel.Element.TimelineE.Inner(true, {}), Int::class
-                        ),
-                        ViewModel.Element.Operator("map"),
-                        ViewModel.Element.TimelineE.Single(
-                                ViewModel.Element.TimelineE.Inner(false, {}), Int::class
-                        ),
-                        ViewModel.Element.Operator("map"),
-                        ViewModel.Element.TimelineE.Single(
-                                ViewModel.Element.TimelineE.Inner(false, {}), Int::class
-                        )
-                )
-        )
+    private fun updateViewState(reactiveTypeX: ReactiveTypeX<*, *>) {
+        viewState = ViewState(buildElement(reactiveTypeX, true))
+    }
+
+    // static
+    private fun <T : Any, TL : Timeline<T>> buildElement(
+            reactiveTypeX: ReactiveTypeX<T, TL>,
+            selected: Boolean
+    ): ViewState.Element<*, *> {
+        val element = ViewState.Element(reactiveTypeX)
+
+        val innerX = reactiveTypeX.innerX
+        if (selected && innerX is InnerReactiveTypeX.Result<T, TL>) {
+            buildPrevious(innerX, element)
+        }
+
+        return element
+    }
+
+    // static
+    private fun <T : Any, TL : Timeline<T>> buildPrevious(
+            innerX: InnerReactiveTypeX.Result<T, TL>,
+            element: ViewState.Element<*, *>
+    ) {
+        if (innerX.previous.isEmpty()) return
+
+        innerX.previous.forEachIndexed { index, typeX ->
+            val selected = element.selectedPreviousIndex == index
+            val previousElement = buildElement(typeX, selected)
+
+            previousElement.next = element
+            element.previous[index] = previousElement
+        }
     }
 
     class ViewModel(val elements: List<Element>) {
 
         sealed class Element {
-            sealed class TimelineE<T: Any, TL : Timeline<T>>(
-                    val inner: Inner<T, TL>, val type: KClass<T>
+            class TimelineE(
+                    // If null the timeline is not used as an input
+                    val onUpdate: ((Timeline<Any>) -> Unit)?
             ) : Element() {
-
-                class Inner<out T : Any, TL : Timeline<T>>(
-                        val isInput: Boolean
-                        // val onUpdate: (TL) -> Unit
-                ) {
-                    var update: (TL) -> Unit = {}
-                }
-
-                class Observable<T: Any>(
-                        inner: Inner<T, ObservableT<T>>, type: KClass<T>
-                ) : TimelineE<T, ObservableT<T>>(inner, type)
-
-                class Single<T: Any>(
-                        inner: Inner<T, SingleT<T>>, type: KClass<T>
-                ) : TimelineE<T, SingleT<T>>(inner, type)
-
-                class Maybe<T: Any>(
-                        inner: Inner<T, MaybeT<T>>, type: KClass<T>
-                ) : TimelineE<T, MaybeT<T>>(inner, type)
-
-                class Completable(
-                        inner: Inner<Nothing, CompletableT>
-                ) : TimelineE<Nothing, CompletableT>(inner, Nothing::class)
+                var update: (Timeline<Any>) -> Unit = {}
             }
 
-            class Operator(val name: String) : Element()
+            class Operator(
+                    val name: String,
+                    val docUrl: String?
+            ) : Element()
+        }
+    }
+
+    class ViewState(val bottomElement: Element<*, *>) {
+
+        class Element<out T : Any, out TL : Timeline<T>>(
+                val reactiveTypeX: ReactiveTypeX<T, TL>
+        ) {
+            /**
+             * The next element.
+             */
+            var next: Element<*, *>? = null
+
+            /**
+             * The list of previous elements.
+             * We only build the previous elements when needed.
+             */
+            var previous: MutableList<Element<*, *>?> = when (val innerX = reactiveTypeX.innerX) {
+                is InnerReactiveTypeX.Input<*, *> -> mutableListOf()
+                is InnerReactiveTypeX.Result<*, *> -> MutableList(innerX.previous.size) { null }
+            }
+
+            /**
+             * The index of the selected [previous] element.
+             */
+            var selectedPreviousIndex: Int = 0
+
+            /**
+             * Invalidate this element and all the elements depending on it.
+             */
+            fun invalidate() {
+                if (reactiveTypeX is InnerReactiveTypeX.Result<*, *>) {
+                    reactiveTypeX.invalidate()
+                }
+                next?.invalidate()
+            }
         }
     }
 }
