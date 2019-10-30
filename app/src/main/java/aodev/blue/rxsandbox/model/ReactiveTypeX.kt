@@ -31,6 +31,9 @@ sealed class InnerReactiveTypeX<out T : Any, out TL : Timeline<T>>(
             cached = null
         }
 
+        val isCached: Boolean
+            get() = cached != null
+
         fun result(): TL = cached ?: apply().also { this.cached = it }
     }
 

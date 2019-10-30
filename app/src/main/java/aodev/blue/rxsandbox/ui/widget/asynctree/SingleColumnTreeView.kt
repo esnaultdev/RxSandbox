@@ -7,6 +7,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import aodev.blue.rxsandbox.model.*
 import aodev.blue.rxsandbox.ui.widget.timeline.TimelineView
+import aodev.blue.rxsandbox.utils.linkedListOf
+import java.util.*
 import kotlin.properties.Delegates
 
 
@@ -29,17 +31,23 @@ class SingleColumnTreeView : ConstraintLayout {
     }
 
     private var viewState: ViewState? = null
+    private var viewModel: ViewModel? = null
 
     private fun updateViews() {
         val reactiveTypeX = reactiveTypeX
         removeAllViews()
         if (reactiveTypeX != null) {
             updateViewState(reactiveTypeX)
-            // TODO build and show the view model
+            updateViewModel()
+            viewModel?.let(this::updateViews)
+            computeAndUpdateTimelines(true)
         } else {
             // TODO clean the state and the updates
         }
     }
+
+    /* *****************************************************************************************************************/
+    //region Display **************************************************************************/
 
     private fun updateViews(viewModel: ViewModel) {
         val viewIds = IntArray(viewModel.elements.size)
@@ -83,12 +91,25 @@ class SingleColumnTreeView : ConstraintLayout {
 
     private fun bindElementToView(element: ViewModel.Element.TimelineE): View {
         return TimelineView(context).apply {
-            readOnly = element.onUpdate == null
+            when (element) {
+                is ViewModel.Element.TimelineE.Input -> {
+                    readOnly = false
+                    onUpdate = { timeline -> timeline?.let(element.onUpdate) }
+                }
+                is ViewModel.Element.TimelineE.Result -> {
+                    readOnly = true
+                    onUpdate = {}
+                }
+            }
 
-            onUpdate = { timeline -> timeline?.let { element.onUpdate?.invoke(it) } }
             element.update = { timeline -> this.timeline = timeline}
         }
     }
+
+    //endregion
+
+    /* *****************************************************************************************************************/
+    //region View state **************************************************************************/
 
     private fun updateViewState(reactiveTypeX: ReactiveTypeX<*, *>) {
         viewState = ViewState(buildElement(reactiveTypeX, true))
@@ -125,23 +146,6 @@ class SingleColumnTreeView : ConstraintLayout {
         }
     }
 
-    class ViewModel(val elements: List<Element>) {
-
-        sealed class Element {
-            class TimelineE(
-                    // If null the timeline is not used as an input
-                    val onUpdate: ((Timeline<Any>) -> Unit)?
-            ) : Element() {
-                var update: (Timeline<Any>) -> Unit = {}
-            }
-
-            class Operator(
-                    val name: String,
-                    val docUrl: String?
-            ) : Element()
-        }
-    }
-
     class ViewState(val bottomElement: Element<*, *>) {
 
         class Element<out T : Any, out TL : Timeline<T>>(
@@ -170,11 +174,117 @@ class SingleColumnTreeView : ConstraintLayout {
              * Invalidate this element and all the elements depending on it.
              */
             fun invalidate() {
-                if (reactiveTypeX is InnerReactiveTypeX.Result<*, *>) {
-                    reactiveTypeX.invalidate()
+                val innerX = reactiveTypeX.innerX
+                if (innerX is InnerReactiveTypeX.Result<*, *>) {
+                    innerX.invalidate()
                 }
                 next?.invalidate()
             }
         }
     }
+
+    //endregion
+
+    /* *****************************************************************************************************************/
+    //region View model **************************************************************************/
+
+    private fun updateViewModel() {
+        viewModel = viewState?.let { buildViewModel(it) }
+    }
+
+    // static
+    private fun buildViewModel(viewState: ViewState): ViewModel {
+        // We use a linked list to be able to add elements in the first place in O(1)
+        val viewElements = linkedListOf<ViewModel.Element>()
+        addToViewModelElements(viewState.bottomElement, viewElements)
+        return ViewModel(viewElements)
+    }
+
+    // static
+    /**
+     * Add the elements recursively from the bottom.
+     */
+    private fun <T : Any, TL : Timeline<T>> addToViewModelElements(
+            stateElement: ViewState.Element<T, TL>,
+            viewElements: LinkedList<ViewModel.Element>
+    ) {
+        when (val innerX = stateElement.reactiveTypeX.innerX) {
+            is InnerReactiveTypeX.Input -> {
+                val onUpdate = fun (timeline: Timeline<Any>) {
+                    // Update the typeX timeline
+                    @Suppress("UNCHECKED_CAST") // TODO Make this unchecked cast unnecessary
+                    (timeline as? TL)?.let { innerX.input = it }
+
+                    // Invalidate the elements depending on it
+                    stateElement.next?.invalidate()
+
+                    // Update the timelines
+                    computeAndUpdateTimelines(false)
+                }
+                ViewModel.Element.TimelineE.Input(innerX::input::get, onUpdate).also {
+                    viewElements.add(0, it)
+                }
+            }
+            is InnerReactiveTypeX.Result -> {
+                ViewModel.Element.TimelineE.Result(innerX::result, innerX::isCached::get).also {
+                    viewElements.add(0, it)
+                }
+
+                // FIXME This approach is wrong
+                //  - adding the operator if it's not selected
+                //  - not adding all the previous before the selected one adds its operator
+                //  but I want to see how it behaves already with simple samples
+                ViewModel.Element.Operator(innerX.operator.expression, innerX.operator.docUrl).also {
+                    viewElements.add(0, it)
+                }
+
+                stateElement.previous.reversed()
+                        .filterNotNull()
+                        .forEach { addToViewModelElements(it, viewElements) }
+            }
+        }
+    }
+
+    class ViewModel(val elements: List<Element>) {
+
+        sealed class Element {
+            sealed class TimelineE(val result: () -> Timeline<Any>) : Element() {
+                var update: (Timeline<Any>) -> Unit = {}
+
+                class Input(
+                        result: () -> Timeline<Any>,
+                        val onUpdate: (Timeline<Any>) -> Unit
+                ) : TimelineE(result)
+
+                class Result(
+                        result: () -> Timeline<Any>,
+                        val isCached: () -> Boolean
+                ) : TimelineE(result)
+            }
+
+            class Operator(
+                    val name: String,
+                    val docUrl: String?
+            ) : Element()
+        }
+    }
+
+    //endregion
+
+    /* *****************************************************************************************************************/
+    //region Timeline updates **************************************************************************/
+
+    private fun computeAndUpdateTimelines(initInputs: Boolean) {
+        val viewModel = viewModel ?: return
+
+        viewModel.elements.forEach { element ->
+            if (element is ViewModel.Element.TimelineE.Result && !element.isCached()) {
+                element.update(element.result())
+            } else if (initInputs && element is ViewModel.Element.TimelineE.Input) {
+                element.update(element.result())
+            }
+        }
+    }
+
+    //endregion
 }
