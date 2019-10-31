@@ -10,6 +10,7 @@ import aodev.blue.rxsandbox.ui.widget.timeline.TimelineView
 import aodev.blue.rxsandbox.utils.linkedListOf
 import java.util.*
 import kotlin.properties.Delegates
+import kotlinx.coroutines.*
 
 
 class SingleColumnTreeView : ConstraintLayout {
@@ -32,17 +33,22 @@ class SingleColumnTreeView : ConstraintLayout {
 
     private var viewState: ViewState? = null
     private var viewModel: ViewModel? = null
+        set(value) {
+            updater.viewModel = value
+            field = value
+        }
+    private val updater = Updater()
 
     private fun updateViews() {
         val reactiveTypeX = reactiveTypeX
+
         removeAllViews()
+        viewModel = null
+
         if (reactiveTypeX != null) {
             updateViewState(reactiveTypeX)
             updateViewModel()
             viewModel?.let(this::updateViews)
-            computeAndUpdateTimelines(true)
-        } else {
-            // TODO clean the state and the updates
         }
     }
 
@@ -219,7 +225,7 @@ class SingleColumnTreeView : ConstraintLayout {
                     stateElement.next?.invalidate()
 
                     // Update the timelines
-                    computeAndUpdateTimelines(false)
+                    updater.updateTimelines(false)
                 }
                 ViewModel.Element.TimelineE.Input(innerX::input::get, onUpdate).also {
                     viewElements.add(0, it)
@@ -274,15 +280,48 @@ class SingleColumnTreeView : ConstraintLayout {
     /* *****************************************************************************************************************/
     //region Timeline updates **************************************************************************/
 
-    private fun computeAndUpdateTimelines(initInputs: Boolean) {
-        val viewModel = viewModel ?: return
+    private class Updater {
 
-        viewModel.elements.forEach { element ->
-            if (element is ViewModel.Element.TimelineE.Result && !element.isCached()) {
-                element.update(element.result())
-            } else if (initInputs && element is ViewModel.Element.TimelineE.Input) {
-                element.update(element.result())
+        var viewModel: ViewModel? = null
+            set(value) {
+                field = value
+                cancel()
+                updateTimelines(true)
             }
+
+        private var job: Job? = null
+
+        fun updateTimelines(initInputs: Boolean) {
+            job?.cancel()
+
+            val viewModel = viewModel ?: return
+            job = GlobalScope.launch {
+                updateTimelinesAsync(viewModel, initInputs)
+            }
+        }
+
+        private fun CoroutineScope.updateTimelinesAsync(
+                viewModel: ViewModel,
+                initInputs: Boolean
+        ) {
+            viewModel.elements.forEach { element ->
+                if (element is ViewModel.Element.TimelineE.Result && !element.isCached()) {
+                    val result = element.result()
+                    launch(Dispatchers.Main) {
+                        element.update(result)
+                    }
+                } else if (initInputs && element is ViewModel.Element.TimelineE.Input) {
+                    val result = element.result()
+                    launch(Dispatchers.Main) {
+                        element.update(result)
+                    }
+                }
+            }
+        }
+
+        private fun cancel() {
+            job?.cancel()
+            job = null
         }
     }
 

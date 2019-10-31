@@ -2,11 +2,7 @@
 
 package aodev.blue.rxsandbox.model.operator.observable
 
-import aodev.blue.rxsandbox.model.CompletableX
-import aodev.blue.rxsandbox.model.InnerReactiveTypeX
-import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.ObservableX
-import aodev.blue.rxsandbox.model.SingleX
+import aodev.blue.rxsandbox.model.*
 import aodev.blue.rxsandbox.model.functions.Function
 import aodev.blue.rxsandbox.model.functions.Function2
 import aodev.blue.rxsandbox.model.functions.Predicate
@@ -220,7 +216,7 @@ fun <T : Any> ObservableX<T>.first(): SingleX<T> {
 
 fun <T : Any> ObservableX<T>.ignoreElements(): CompletableX {
     val operator = ObservableIgnoreElements<T>()
-    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+    val innerX = InnerReactiveTypeX.Result<Nothing, CompletableT>(operator, listOf(this)) {
         operator.apply(innerX.timeline())
     }
     return CompletableX(innerX)
