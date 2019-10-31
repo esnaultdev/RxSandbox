@@ -28,6 +28,11 @@ class GestureHandler(
     private val isMoving: Boolean
         get() = movingEventIndex != EventIndex.NONE
     /**
+     * The difference between the pointer x position and the event center.
+     * This is used so that the event doesn't jump to the pointer x value at the first move event.
+     */
+    private var movingEventDiffX: Float = 0f
+    /**
      * A mutable list of the observable events, kept up-to-date while
      */
     private var observableEvents: MutableList<ObservableT.Event<Any>>? = null
@@ -79,6 +84,7 @@ class GestureHandler(
         if (eventIndex != EventIndex.NONE) {
             activePointerId = ev.getPointerId(0)
             movingEventIndex = eventIndex
+            movingEventDiffX = x - getEventX(eventIndex)
 
             val timeline = timelineProp.get()
             if (timeline is ObservableT) {
@@ -93,7 +99,7 @@ class GestureHandler(
         if (isMoving) {
             val pointerIndex = ev.findPointerIndex(activePointerId)
 
-            val x = ev.getX(pointerIndex)
+            val x = ev.getX(pointerIndex) - movingEventDiffX
 
             val newTime = timePositionMapper.time(x).clamp(0f, Config.timelineDuration.toFloat())
 
@@ -186,6 +192,31 @@ class GestureHandler(
         val eventPosition = timePositionMapper.position(eventTime)
         val halfTargetSize = touchTargetSize / 2
         return x >= eventPosition - halfTargetSize && x <= eventPosition + halfTargetSize
+    }
+
+    //endregion
+
+    /* *****************************************************************************************************************/
+    //region Event X position **************************************************************************/
+
+    private fun getEventX(eventIndex: Int): Float {
+        return when (val timeline = timelineProp.get()) {
+            null -> 0f
+            else -> when (timeline) {
+                is ObservableT -> getEventTimeObservable(timeline, eventIndex)
+                is SingleT -> timeline.result.time ?: 0f
+                is MaybeT -> timeline.result.time ?: 0f
+                is CompletableT -> timeline.result.time ?: 0f
+            }.let(timePositionMapper::position)
+        }
+    }
+
+    private fun getEventTimeObservable(timeline: ObservableT<Any>, eventIndex: Int): Float {
+        return if (eventIndex == EventIndex.TERMINATION) {
+            timeline.termination.time ?: 0f
+        } else {
+            timeline.events.getOrNull(eventIndex)?.time ?: 0f
+        }
     }
 
     //endregion
