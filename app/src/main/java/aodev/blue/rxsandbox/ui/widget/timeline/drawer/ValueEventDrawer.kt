@@ -49,13 +49,20 @@ class ValueEventDrawer(context: Context) {
         canvas.drawCircle(x, y, eventSize / 2, eventFillPaint)
         canvas.drawCircle(x, y, eventSize / 2, strokePaint)
 
-        // TODO Handle multiple display types
-        val intValue = value as? Int ?: return
-        val eventText = intValue.toString()
+        val eventText = toDisplayValue(value)?.take(4) ?: return
         eventTextPaint.getTextBounds(eventText, 0, eventText.length, textBoundsRect)
         val textX = x - textBoundsRect.width().toFloat() / 2 - textBoundsRect.left
         val textY = y + textBoundsRect.height().toFloat() / 2 - textBoundsRect.bottom
 
         canvas.drawText(eventText, textX, textY, eventTextPaint)
+    }
+
+    private fun toDisplayValue(value: Any): String? {
+        return when (value) {
+            is Int -> value.toString()
+            is String -> value
+            is Boolean -> if (value) "T" else "F"
+            else -> null
+        }
     }
 }

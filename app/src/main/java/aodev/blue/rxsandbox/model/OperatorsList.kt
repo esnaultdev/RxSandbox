@@ -56,9 +56,9 @@ val observableOperators = listOf(
         OperatorCategory(
                 name = "conditional",
                 operatorNames = listOf(
-                        // "all",
-                        "amb"
-                        // "any"
+                        "all",
+                        "amb",
+                        "any"
                 )
         )
 )
