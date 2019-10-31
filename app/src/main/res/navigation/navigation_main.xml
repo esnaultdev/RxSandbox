@@ -22,7 +22,8 @@
         tools:layout="@layout/fragment_list">
 
         <argument
-            android:name="timeline_type"/>
+            android:name="timeline_type"
+            app:argType="integer"/>
 
         <action
             android:id="@+id/action_see_details"
@@ -36,10 +37,12 @@
         tools:layout="@layout/fragment_details">
 
         <argument
-            android:name="timeline_type"/>
+            android:name="timeline_type"
+            app:argType="integer"/>
 
         <argument
-            android:name="operator_name"/>
+            android:name="operator_name"
+            app:argType="string"/>
 
     </fragment>
 

@@ -2,24 +2,16 @@ package aodev.blue.rxsandbox.model.operator.observable.filter
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableSkipLast<T : Any>(private val count: Int) : Operator<T, T> {
+class ObservableSkipLast<T : Any>(private val count: Int) : Operator {
 
     init {
         require(count >= 0)
     }
 
     // TODO verify the behavior of the skipLast with an error
-
-    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
-        return Input.Observable.from(input) {
-            apply(it)
-        }
-    }
 
     fun apply(input: ObservableT<T>): ObservableT<T> {
         return when (input.termination) {

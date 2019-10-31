@@ -7,16 +7,14 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
 import aodev.blue.rxsandbox.R
+import aodev.blue.rxsandbox.model.TimelineType
 import aodev.blue.rxsandbox.ui.utils.extension.getColorCompat
 
 
 /**
  * Draw a timeline line with its arrow and the type text.
  */
-class TimelineLineDrawer(
-        context: Context,
-        private val typeText: String
-) {
+class TimelineLineDrawer(context: Context) {
 
     var isLtr: Boolean = true
 
@@ -115,9 +113,9 @@ class TimelineLineDrawer(
 
     //region Drawing
 
-    fun draw(canvas: Canvas) {
+    fun draw(canvas: Canvas, type: TimelineType?) {
         drawLine(canvas)
-        drawTypeText(canvas)
+        type?.let { drawTypeText(canvas, it) }
     }
 
     private fun drawLine(canvas: Canvas) {
@@ -125,8 +123,8 @@ class TimelineLineDrawer(
         canvas.drawPath(linePath, strokePaint)
     }
 
-    private fun drawTypeText(canvas: Canvas) {
-        val text = typeText
+    private fun drawTypeText(canvas: Canvas, type: TimelineType) {
+        val text = type.text
 
         typeTextPaint.getTextBounds(text, 0, text.length, textBoundsRect)
 
@@ -139,6 +137,14 @@ class TimelineLineDrawer(
 
         canvas.drawText(text, textX, textY, typeTextPaint)
     }
+
+    private val TimelineType.text
+        get() = when (this) {
+            TimelineType.OBSERVABLE -> "observable"
+            TimelineType.SINGLE -> "single"
+            TimelineType.MAYBE -> "maybe"
+            TimelineType.COMPLETABLE -> "completable"
+        }
 
     //endregion
 }

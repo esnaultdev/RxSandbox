@@ -2,18 +2,10 @@ package aodev.blue.rxsandbox.model.operator.observable.filter
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableDistinctUntilChanged<T : Any> : Operator<T, T> {
-
-    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
-        return Input.Observable.from(input) {
-            apply(it)
-        }
-    }
+class ObservableDistinctUntilChanged<T : Any> : Operator {
 
     fun apply(input: ObservableT<T>): ObservableT<T> {
         val events = when (input.events.size) {

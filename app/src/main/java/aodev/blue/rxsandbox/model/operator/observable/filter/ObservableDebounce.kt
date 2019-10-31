@@ -2,24 +2,16 @@ package aodev.blue.rxsandbox.model.operator.observable.filter
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 import aodev.blue.rxsandbox.utils.clamp
 
 
-class ObservableDebounce<T : Any>(private val duration: Float) : Operator<T, T> {
+class ObservableDebounce<T : Any>(private val duration: Float) : Operator {
 
     // TODO Verify the behavior of the debounce with an error
 
     init {
         require(duration >= 0)
-    }
-
-    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
-        return Input.Observable.from(input) {
-            apply(it)
-        }
     }
 
     fun apply(input: ObservableT<T>): ObservableT<T> {

@@ -2,18 +2,10 @@ package aodev.blue.rxsandbox.model.operator.observable.combine
 
 import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
-import aodev.blue.rxsandbox.model.Timeline
-import aodev.blue.rxsandbox.model.operator.Input
 import aodev.blue.rxsandbox.model.operator.Operator
 import aodev.blue.rxsandbox.model.time
 
-class ObservableMerge<T : Any> : Operator<T, T> {
-
-    override fun apply(input: List<Timeline<T>>): Timeline<T>? {
-        return Input.Observables.from(input) {
-            apply(it)
-        }
-    }
+class ObservableMerge<T : Any> : Operator {
 
     fun apply(input: List<ObservableT<T>>): ObservableT<T> {
         return if (input.isEmpty()) {
