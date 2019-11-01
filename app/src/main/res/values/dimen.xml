@@ -4,11 +4,12 @@
     <!-- Timeline -->
     <dimen name="timeline_stroke_width">2dp</dimen>
     <!-- Operator -->
-    <dimen name="operator_name_padding">16dp</dimen>
-    <dimen name="timeline_padding">16dp</dimen>
+    <dimen name="operator_padding">12dp</dimen>
+    <dimen name="operator_name_text_size">16sp</dimen>
+    <dimen name="timeline_padding">12dp</dimen>
     <dimen name="timeline_padding_inner_start">32dp</dimen>
     <dimen name="timeline_padding_inner_end">48dp</dimen>
-    <dimen name="timeline_type_text_size">13sp</dimen>
+    <dimen name="timeline_type_text_size">12sp</dimen>
     <dimen name="timeline_type_text_padding">4dp</dimen>
     <dimen name="timeline_event_size">36dp</dimen>
     <dimen name="timeline_event_text_size">16sp</dimen>
