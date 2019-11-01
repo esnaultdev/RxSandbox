@@ -60,6 +60,12 @@ val observableOperators = listOf(
                         "amb",
                         "any"
                 )
+        ),
+        OperatorCategory(
+                name = "custom",
+                operatorNames = listOf(
+                        "mapMerge"
+                )
         )
 )
 

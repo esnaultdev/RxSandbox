@@ -344,6 +344,29 @@ fun getObservableSample(operatorName: String): ReactiveTypeX<*, *>? {
             )
                     .any(evenPredicate)
         }
+        // Custom
+        "mapMerge" -> {
+            val observable1 = ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            4f to 2,
+                            6f to 3
+                    ),
+                    ObservableT.Termination.Complete(8f)
+            ).map<Int, Int>(functionOf("x -> x * 2") { x -> x * 2 })
+
+            val observable2 = ObservableX.inputOf(
+                    listOf(
+                            1f to 10,
+                            3f to 20,
+                            8f to 30
+                    ),
+                    ObservableT.Termination.Complete(10f)
+            ).map<Int, Int>(functionOf("x -> x * 2") { x -> x * 2 })
+
+            ObservableX.merge(listOf(observable1, observable2))
+                    .map<Int, Int>(functionOf("x -> x / 2") { x -> x / 2 })
+        }
         else -> null
     }
 }
