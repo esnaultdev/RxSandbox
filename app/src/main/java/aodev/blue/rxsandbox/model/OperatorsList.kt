@@ -2,6 +2,12 @@ package aodev.blue.rxsandbox.model
 
 val observableOperators = listOf(
         OperatorCategory(
+                name = "custom",
+                operatorNames = listOf(
+                        "mapMerge"
+                )
+        ),
+        OperatorCategory(
                 name = "create",
                 operatorNames = listOf(
                         "empty",
@@ -59,12 +65,6 @@ val observableOperators = listOf(
                         "all",
                         "amb",
                         "any"
-                )
-        ),
-        OperatorCategory(
-                name = "custom",
-                operatorNames = listOf(
-                        "mapMerge"
                 )
         )
 )
