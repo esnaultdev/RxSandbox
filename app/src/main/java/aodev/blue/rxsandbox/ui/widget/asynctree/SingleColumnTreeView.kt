@@ -203,15 +203,16 @@ class SingleColumnTreeView : ConstraintLayout {
     private fun buildViewModel(viewState: ViewState): ViewModel {
         // We use a linked list to be able to add elements in the first place in O(1)
         val viewElements = linkedListOf<ViewModel.Element>()
-        addToViewModelElements(viewState.bottomElement, viewElements)
+        addTimelineToVMElements(viewState.bottomElement, viewElements)
+        addUpstreamToVMElements(viewState.bottomElement, viewElements)
         return ViewModel(viewElements)
     }
 
     // static
     /**
-     * Add the elements recursively from the bottom.
+     * Add the timeline of an element to the [ViewModel] elements.
      */
-    private fun <T : Any, TL : Timeline<T>> addToViewModelElements(
+    private fun <T : Any, TL : Timeline<T>> addTimelineToVMElements(
             stateElement: ViewState.Element<T, TL>,
             viewElements: LinkedList<ViewModel.Element>
     ) {
@@ -236,20 +237,35 @@ class SingleColumnTreeView : ConstraintLayout {
                 ViewModel.Element.TimelineE.Result(innerX::result, innerX::isCached::get).also {
                     viewElements.add(0, it)
                 }
-
-                // FIXME This approach is wrong
-                //  - adding the operator if it's not selected
-                //  - not adding all the previous before the selected one adds its operator
-                //  but I want to see how it behaves already with simple samples
-                ViewModel.Element.Operator(innerX.operator.expression, innerX.operator.docUrl).also {
-                    viewElements.add(0, it)
-                }
-
-                stateElement.previous.reversed()
-                        .filterNotNull()
-                        .forEach { addToViewModelElements(it, viewElements) }
             }
         }
+    }
+
+    // static
+    /**
+     * Add the upstream of an element to the [ViewModel] elements.
+     * The upstream is composed of the operator, the previous timelines and the upstream of the
+     * selected element, recursively.
+     */
+    private fun <T : Any, TL: Timeline<T>> addUpstreamToVMElements(
+            stateElement: ViewState.Element<T, TL>,
+            viewElements: LinkedList<ViewModel.Element>
+    ) {
+        val innerX = stateElement.reactiveTypeX.innerX as? InnerReactiveTypeX.Result<T, TL> ?: return
+
+        // Add the operator
+        ViewModel.Element.Operator(innerX.operator.expression, innerX.operator.docUrl).also {
+            viewElements.add(0, it)
+        }
+
+        // Add each previous as a timeline
+        stateElement.previous.reversed()
+                .filterNotNull()
+                .forEach { addTimelineToVMElements(it, viewElements) }
+
+        // Add the upstream of the selected previous
+        stateElement.previous.getOrNull(stateElement.selectedPreviousIndex)
+                ?.let { this.addUpstreamToVMElements(it, viewElements) }
     }
 
     class ViewModel(val elements: List<Element>) {
