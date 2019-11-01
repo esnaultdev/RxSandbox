@@ -11,6 +11,7 @@ import aodev.blue.rxsandbox.utils.linkedListOf
 import java.util.*
 import kotlin.properties.Delegates
 import kotlinx.coroutines.*
+import kotlin.reflect.KMutableProperty0
 
 
 class SingleColumnTreeView : ConstraintLayout {
@@ -178,13 +179,21 @@ class SingleColumnTreeView : ConstraintLayout {
             var selectedPreviousIndex: Int = 0
 
             /**
+             * True if the last computed timeline has been shown.
+             */
+            var shown: Boolean = false
+
+            /**
              * Invalidate this element and all the elements depending on it.
              */
             fun invalidate() {
+                shown = false
+
                 val innerX = reactiveTypeX.innerX
                 if (innerX is InnerReactiveTypeX.Result<*, *>) {
                     innerX.invalidate()
                 }
+
                 next?.invalidate()
             }
         }
@@ -227,14 +236,21 @@ class SingleColumnTreeView : ConstraintLayout {
                     stateElement.next?.invalidate()
 
                     // Update the timelines
-                    updater.updateTimelines(false)
+                    updater.updateTimelines()
                 }
-                ViewModel.Element.TimelineE.Input(innerX::input::get, onUpdate).also {
+                ViewModel.Element.TimelineE.Input(
+                        result = innerX::input::get,
+                        shown = stateElement::shown,
+                        onUpdate = onUpdate
+                ).also {
                     viewElements.add(0, it)
                 }
             }
             is InnerReactiveTypeX.Result -> {
-                ViewModel.Element.TimelineE.Result(innerX::result, innerX::isCached::get).also {
+                ViewModel.Element.TimelineE.Result(
+                        result = innerX::result,
+                        shown = stateElement::shown
+                ).also {
                     viewElements.add(0, it)
                 }
             }
@@ -271,18 +287,23 @@ class SingleColumnTreeView : ConstraintLayout {
     class ViewModel(val elements: List<Element>) {
 
         sealed class Element {
-            sealed class TimelineE(val result: () -> Timeline<Any>) : Element() {
+            sealed class TimelineE(
+                    val result: () -> Timeline<Any>,
+                    val shown: KMutableProperty0<Boolean>
+            ) : Element() {
+
                 var update: (Timeline<Any>) -> Unit = {}
 
                 class Input(
                         result: () -> Timeline<Any>,
+                        shown: KMutableProperty0<Boolean>,
                         val onUpdate: (Timeline<Any>) -> Unit
-                ) : TimelineE(result)
+                ) : TimelineE(result, shown)
 
                 class Result(
                         result: () -> Timeline<Any>,
-                        val isCached: () -> Boolean
-                ) : TimelineE(result)
+                        shown: KMutableProperty0<Boolean>
+                ) : TimelineE(result, shown)
             }
 
             class Operator(
@@ -303,34 +324,27 @@ class SingleColumnTreeView : ConstraintLayout {
             set(value) {
                 field = value
                 cancel()
-                updateTimelines(true)
+                updateTimelines()
             }
 
         private var job: Job? = null
 
-        fun updateTimelines(initInputs: Boolean) {
+        fun updateTimelines() {
             job?.cancel()
 
             val viewModel = viewModel ?: return
             job = GlobalScope.launch {
-                updateTimelinesAsync(viewModel, initInputs)
+                updateTimelinesAsync(viewModel)
             }
         }
 
-        private fun CoroutineScope.updateTimelinesAsync(
-                viewModel: ViewModel,
-                initInputs: Boolean
-        ) {
+        private fun CoroutineScope.updateTimelinesAsync(viewModel: ViewModel) {
             viewModel.elements.forEach { element ->
-                if (element is ViewModel.Element.TimelineE.Result && !element.isCached()) {
+                if (element is ViewModel.Element.TimelineE && !element.shown.get()) {
                     val result = element.result()
                     launch(Dispatchers.Main) {
                         element.update(result)
-                    }
-                } else if (initInputs && element is ViewModel.Element.TimelineE.Input) {
-                    val result = element.result()
-                    launch(Dispatchers.Main) {
-                        element.update(result)
+                        element.shown.set(true)
                     }
                 }
             }
