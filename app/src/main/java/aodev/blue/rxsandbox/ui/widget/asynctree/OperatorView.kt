@@ -2,12 +2,12 @@ package aodev.blue.rxsandbox.ui.widget.asynctree
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.TypedValue
-import android.view.Gravity
-import android.widget.FrameLayout
+import android.view.LayoutInflater
+import android.widget.ImageView
 import android.widget.TextView
 import aodev.blue.rxsandbox.R
-import aodev.blue.rxsandbox.ui.utils.extension.getColorCompat
+import aodev.blue.rxsandbox.ui.utils.extension.setVisible
+import aodev.blue.rxsandbox.utils.openInBrowser
 import com.google.android.material.card.MaterialCardView
 import kotlin.properties.Delegates
 
@@ -19,29 +19,18 @@ class OperatorView : MaterialCardView {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
             super(context, attrs, defStyleAttr)
 
-    // Resources
-    private val padding = context.resources.getDimension(R.dimen.operator_padding)
-    private val nameTextSize = context.resources.getDimension(R.dimen.operator_name_text_size)
-
     // Sub views
-    private val textView: TextView
+    private val nameView: TextView
+    private val infoView: ImageView
 
     init {
-        textView = TextView(context).apply {
-            gravity = Gravity.CENTER
+        val layoutInflater = LayoutInflater.from(context)
+        layoutInflater.inflate(R.layout.widget_operator, this, true)
 
-            val padding = padding.toInt()
-            setPadding(padding, padding, padding, padding)
+        nameView = findViewById(R.id.operator_name)
+        infoView = findViewById(R.id.operator_info)
 
-            setTextColor(context.getColorCompat(R.color.operator_text_color))
-            setTextSize(TypedValue.COMPLEX_UNIT_PX, nameTextSize)
-        }
-        addView(textView,
-                FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT
-                )
-        )
+        infoView.setOnClickListener { onInfoIconClick() }
 
         if (isInEditMode) {
             text = "map { x -> x * 2 }"
@@ -50,7 +39,18 @@ class OperatorView : MaterialCardView {
 
     var text: String? by Delegates.observable<String?>(null) { _, oldValue, newValue ->
         if (oldValue != newValue) {
-            textView.text = text
+            nameView.text = text
         }
+    }
+
+    var docUrl: String? by Delegates.observable<String?>(null) { _, oldValue, newValue ->
+        if (oldValue != newValue) {
+            infoView.setVisible(newValue != null)
+        }
+    }
+
+    private fun onInfoIconClick() {
+        // TODO use a listener to handle this
+        docUrl?.let(context::openInBrowser)
     }
 }

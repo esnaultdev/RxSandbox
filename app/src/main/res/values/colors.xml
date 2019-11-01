@@ -7,12 +7,23 @@
     <!-- Common colors -->
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="white_50">#80FFFFFF</color>
     <color name="white_background">#FAFAFA</color>
     <color name="black">#000000</color>
+    <color name="black_87">#DE000000</color>
+    <color name="black_54">#8A000000</color>
+    <color name="black_38">#57000000</color>
     <color name="black_15">#26000000</color>
 
     <!-- Material -->
-    <color name="divider">@color/black_15</color>
+    <color name="mt_divider">@color/black_15</color>
+    <color name="mt_icon_light_focused">@color/black_87</color>
+    <color name="mt_icon_light_normal">@color/black_54</color>
+    <color name="mt_icon_light_disabled">@color/black_38</color>
+    <color name="mt_icon_dark_focused">@color/white</color>
+    <color name="mt_icon_dark_normal">@color/white_70</color>
+    <color name="mt_icon_dark_disabled">@color/white_50</color>
 
     <!-- Text colors -->
     <color name="text_primary">#DD000000</color>
@@ -33,6 +44,7 @@
     <color name="stream_type_icon_stroke">@color/white</color>
     <color name="stream_type_icon_fill">@color/black_15</color>
 
+    <!-- Operator -->
     <color name="operator_text_color">@color/text_primary</color>
     <color name="operator_list_category_background">#EEEEEE</color>
     <color name="operator_list_category_text">@color/text_secondary</color>

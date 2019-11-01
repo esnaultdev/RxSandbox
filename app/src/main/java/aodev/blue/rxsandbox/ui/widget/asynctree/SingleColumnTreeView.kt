@@ -63,6 +63,7 @@ class SingleColumnTreeView : ConstraintLayout {
                 is ViewModel.Element.Operator -> {
                     OperatorView(context).apply {
                         text = element.name
+                        docUrl = element.docUrl
                     }
                 }
                 is ViewModel.Element.TimelineE -> bindElementToView(element)
