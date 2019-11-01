@@ -56,20 +56,30 @@ class EventDrawer(
     //region Observable **************************************************************************/
 
     private fun drawObservable(canvas: Canvas, timeline: ObservableT<Any>) {
-        drawTerminationEvent(canvas, timeline.termination)
+        drawTerminationEvent(canvas, timeline)
         drawEvents(canvas, timeline.events)
     }
 
-    private fun drawTerminationEvent(canvas: Canvas, termination: ObservableT.Termination) {
-        when (termination) {
+    private fun drawTerminationEvent(canvas: Canvas, timeline: ObservableT<Any>) {
+        when (val termination = timeline.termination) {
             is ObservableT.Termination.None -> Unit
-            is ObservableT.Termination.Complete -> {
-                val position = timePositionMapper.position(termination.time)
-                completeEventDrawer.draw(canvas, position, centerHeight)
-            }
-            is ObservableT.Termination.Error -> {
-                val position = timePositionMapper.position(termination.time)
-                errorEventDrawer.draw(canvas, position, centerHeight)
+            else -> {
+                // Get the position of the last value event
+                val previousPosition = timeline.events.lastOrNull()
+                        ?.time
+                        ?.let(timePositionMapper::position)
+
+                when (termination) {
+                    is ObservableT.Termination.Complete -> {
+                        val position = timePositionMapper.position(termination.time)
+                        completeEventDrawer.draw(canvas, position, centerHeight, previousPosition)
+                    }
+                    is ObservableT.Termination.Error -> {
+                        val position = timePositionMapper.position(termination.time)
+                        errorEventDrawer.draw(canvas, position, centerHeight, previousPosition)
+                    }
+                    else -> Unit // Already handled, but the compiler still wants it
+                }
             }
         }.exhaustive
     }
@@ -95,7 +105,7 @@ class EventDrawer(
             }
             is SingleT.Result.Error -> {
                 val position = timePositionMapper.position(result.time)
-                errorEventDrawer.draw(canvas, position, centerHeight)
+                errorEventDrawer.draw(canvas, position, centerHeight, null)
             }
         }.exhaustive
     }
@@ -114,11 +124,11 @@ class EventDrawer(
             }
             is MaybeT.Result.Complete -> {
                 val position = timePositionMapper.position(result.time)
-                completeEventDrawer.draw(canvas, position, centerHeight)
+                completeEventDrawer.draw(canvas, position, centerHeight, null)
             }
             is MaybeT.Result.Error -> {
                 val position = timePositionMapper.position(result.time)
-                errorEventDrawer.draw(canvas, position, centerHeight)
+                errorEventDrawer.draw(canvas, position, centerHeight, null)
             }
         }.exhaustive
     }
@@ -133,11 +143,11 @@ class EventDrawer(
             is CompletableT.Result.None -> Unit
             is CompletableT.Result.Complete -> {
                 val position = timePositionMapper.position(result.time)
-                completeEventDrawer.draw(canvas, position, centerHeight)
+                completeEventDrawer.draw(canvas, position, centerHeight, null)
             }
             is CompletableT.Result.Error -> {
                 val position = timePositionMapper.position(result.time)
-                errorEventDrawer.draw(canvas, position, centerHeight)
+                errorEventDrawer.draw(canvas, position, centerHeight, null)
             }
         }.exhaustive
     }
