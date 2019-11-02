@@ -14,20 +14,22 @@ import aodev.blue.rxsandbox.ui.utils.extension.getColorCompat
 /**
  * Draw a timeline line with its arrow and the type text.
  */
-class TimelineLineDrawer(context: Context) {
+class LineDrawer(context: Context) {
 
     var isLtr: Boolean = true
 
     // Resources
-    private val padding = context.resources.getDimension(R.dimen.timeline_padding)
-    private val innerPaddingStart = context.resources.getDimension(R.dimen.timeline_padding_inner_start)
-    private val innerPaddingEnd = context.resources.getDimension(R.dimen.timeline_padding_inner_end)
-    private val strokeWidth = context.resources.getDimension(R.dimen.timeline_stroke_width)
-    private val lineDashSize = context.resources.getDimension(R.dimen.timeline_line_dash_size)
-    private val typeTextSize = context.resources.getDimension(R.dimen.timeline_type_text_size)
-    private val typeTextPadding = context.resources.getDimension(R.dimen.timeline_type_text_padding)
-    private val arrowWidth = context.resources.getDimension(R.dimen.timeline_arrow_width)
-    private val arrowHeight = context.resources.getDimension(R.dimen.timeline_arrow_height)
+    private val resources = context.resources
+    private val paddingStart = resources.getDimension(R.dimen.timeline_padding_start)
+    private val paddingEnd = resources.getDimension(R.dimen.timeline_padding_end)
+    private val innerPaddingStart = resources.getDimension(R.dimen.timeline_padding_inner_start)
+    private val innerPaddingEnd = resources.getDimension(R.dimen.timeline_padding_inner_end)
+    private val strokeWidth = resources.getDimension(R.dimen.timeline_stroke_width)
+    private val lineDashSize = resources.getDimension(R.dimen.timeline_line_dash_size)
+    private val typeTextSize = resources.getDimension(R.dimen.timeline_type_text_size)
+    private val typeTextPadding = resources.getDimension(R.dimen.timeline_type_text_padding)
+    private val arrowWidth = resources.getDimension(R.dimen.timeline_arrow_width)
+    private val arrowHeight = resources.getDimension(R.dimen.timeline_arrow_height)
     private val strokeColor = context.getColorCompat(R.color.timeline_stroke_color)
     private val typeTextColor = context.getColorCompat(R.color.timeline_type_text_color)
 
@@ -35,7 +37,7 @@ class TimelineLineDrawer(context: Context) {
     private val strokePaint = Paint().apply {
         flags = Paint.ANTI_ALIAS_FLAG
         color = strokeColor
-        strokeWidth = this@TimelineLineDrawer.strokeWidth
+        strokeWidth = this@LineDrawer.strokeWidth
         style = Paint.Style.STROKE
     }
     private val arrowPaint = Paint().apply {
@@ -66,13 +68,13 @@ class TimelineLineDrawer(context: Context) {
 
             // Starting from the pointy end
             if (isLtr) {
-                moveTo(width - padding, height.toFloat() / 2)
+                moveTo(width - paddingEnd, height.toFloat() / 2)
                 rLineTo(-arrowWidth, -arrowHeight / 2)
                 rLineTo(0f, arrowHeight)
                 rLineTo(arrowWidth, -arrowHeight / 2)
                 close()
             } else {
-                moveTo(padding, height.toFloat() / 2)
+                moveTo(paddingEnd, height.toFloat() / 2)
                 rLineTo(arrowWidth, -arrowHeight / 2)
                 rLineTo(0f, arrowHeight)
                 rLineTo(-arrowWidth, -arrowHeight / 2)
@@ -83,7 +85,7 @@ class TimelineLineDrawer(context: Context) {
         linePath.run {
             reset()
 
-            val initialX = if (isLtr) padding else width - padding
+            val initialX = if (isLtr) paddingStart else width - paddingStart
             moveTo(initialX, height.toFloat() / 2)
 
             // Start dashed line
@@ -95,7 +97,7 @@ class TimelineLineDrawer(context: Context) {
             }
 
             // Continuous line
-            val lineWidth = width - 2 * padding - innerPaddingStart - innerPaddingEnd
+            val lineWidth = width - paddingStart - paddingEnd - innerPaddingStart - innerPaddingEnd
             val lineDx = if (isLtr) lineWidth else -lineWidth
             rLineTo(lineDx, 0f)
 
@@ -129,9 +131,9 @@ class TimelineLineDrawer(context: Context) {
         typeTextPaint.getTextBounds(text, 0, text.length, textBoundsRect)
 
         val textX = if (isLtr) {
-            canvas.width - typeTextPadding - textBoundsRect.width().toFloat() - textBoundsRect.left
+            canvas.width - paddingEnd - textBoundsRect.width().toFloat() - textBoundsRect.left
         } else {
-            typeTextPadding + textBoundsRect.left
+            paddingEnd + typeTextPadding + textBoundsRect.left
         }
         val textY = canvas.height - typeTextPadding - textBoundsRect.bottom
 

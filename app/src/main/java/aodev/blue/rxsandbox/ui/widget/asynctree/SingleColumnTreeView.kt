@@ -6,6 +6,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import aodev.blue.rxsandbox.model.*
+import aodev.blue.rxsandbox.ui.widget.model.TimelineConnection
 import aodev.blue.rxsandbox.ui.widget.timeline.TimelineView
 import aodev.blue.rxsandbox.utils.linkedListOf
 import java.util.*
@@ -110,6 +111,7 @@ class SingleColumnTreeView : ConstraintLayout {
                 }
             }
 
+            downConnection = element.downConnection
             element.update = { timeline -> this.timeline = timeline}
         }
     }
@@ -212,7 +214,7 @@ class SingleColumnTreeView : ConstraintLayout {
     private fun buildViewModel(viewState: ViewState): ViewModel {
         // We use a linked list to be able to add elements in the first place in O(1)
         val viewElements = linkedListOf<ViewModel.Element>()
-        addTimelineToVMElements(viewState.bottomElement, viewElements)
+        addTimelineToVMElements(viewState.bottomElement, TimelineConnection.NONE, viewElements)
         addUpstreamToVMElements(viewState.bottomElement, viewElements)
         return ViewModel(viewElements)
     }
@@ -223,9 +225,10 @@ class SingleColumnTreeView : ConstraintLayout {
      */
     private fun <T : Any, TL : Timeline<T>> addTimelineToVMElements(
             stateElement: ViewState.Element<T, TL>,
+            downConnection: TimelineConnection,
             viewElements: LinkedList<ViewModel.Element>
     ) {
-        when (val innerX = stateElement.reactiveTypeX.innerX) {
+        val viewElement = when (val innerX = stateElement.reactiveTypeX.innerX) {
             is InnerReactiveTypeX.Input -> {
                 val onUpdate = fun (timeline: Timeline<Any>) {
                     // Update the typeX timeline
@@ -241,20 +244,19 @@ class SingleColumnTreeView : ConstraintLayout {
                 ViewModel.Element.TimelineE.Input(
                         result = innerX::input::get,
                         shown = stateElement::shown,
+                        downConnection = downConnection,
                         onUpdate = onUpdate
-                ).also {
-                    viewElements.add(0, it)
-                }
+                )
             }
             is InnerReactiveTypeX.Result -> {
                 ViewModel.Element.TimelineE.Result(
                         result = innerX::result,
-                        shown = stateElement::shown
-                ).also {
-                    viewElements.add(0, it)
-                }
+                        shown = stateElement::shown,
+                        downConnection = downConnection
+                )
             }
         }
+        viewElements.add(0, viewElement)
     }
 
     // static
@@ -275,9 +277,14 @@ class SingleColumnTreeView : ConstraintLayout {
         }
 
         // Add each previous as a timeline
-        stateElement.previous.reversed()
-                .filterNotNull()
-                .forEach { addTimelineToVMElements(it, viewElements) }
+        val previousElements = stateElement.previous.reversed().filterNotNull()
+        previousElements.forEachIndexed { index, element ->
+                val downConnection = when (index) {
+                    previousElements.lastIndex -> TimelineConnection.TOP
+                    else -> TimelineConnection.MIDDLE
+                }
+                addTimelineToVMElements(element, downConnection, viewElements)
+            }
 
         // Add the upstream of the selected previous
         stateElement.previous.getOrNull(stateElement.selectedPreviousIndex)
@@ -289,7 +296,8 @@ class SingleColumnTreeView : ConstraintLayout {
         sealed class Element {
             sealed class TimelineE(
                     val result: () -> Timeline<Any>,
-                    val shown: KMutableProperty0<Boolean>
+                    val shown: KMutableProperty0<Boolean>,
+                    val downConnection: TimelineConnection
             ) : Element() {
 
                 var update: (Timeline<Any>) -> Unit = {}
@@ -297,13 +305,15 @@ class SingleColumnTreeView : ConstraintLayout {
                 class Input(
                         result: () -> Timeline<Any>,
                         shown: KMutableProperty0<Boolean>,
+                        downConnection: TimelineConnection,
                         val onUpdate: (Timeline<Any>) -> Unit
-                ) : TimelineE(result, shown)
+                ) : TimelineE(result, shown, downConnection)
 
                 class Result(
                         result: () -> Timeline<Any>,
-                        shown: KMutableProperty0<Boolean>
-                ) : TimelineE(result, shown)
+                        shown: KMutableProperty0<Boolean>,
+                        downConnection: TimelineConnection
+                ) : TimelineE(result, shown, downConnection)
             }
 
             class Operator(

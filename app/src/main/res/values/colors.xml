@@ -16,7 +16,19 @@
     <color name="black_38">#57000000</color>
     <color name="black_15">#26000000</color>
 
-    <!-- Material -->
+    <!-- Material colors -->
+    <color name="mt_grey_50">#FAFAFA</color>
+    <color name="mt_grey_100">#F5F5F5</color>
+    <color name="mt_grey_200">#EEEEEE</color>
+    <color name="mt_grey_300">#E0E0E0</color>
+    <color name="mt_grey_400">#BDBDBD</color>
+    <color name="mt_grey_500">#9E9E9E</color>
+    <color name="mt_grey_600">#757575</color>
+    <color name="mt_grey_700">#616161</color>
+    <color name="mt_grey_800">#424242</color>
+    <color name="mt_grey_900">#212121</color>
+
+    <!-- Material components -->
     <color name="mt_divider">@color/black_15</color>
     <color name="mt_icon_light_focused">@color/black_87</color>
     <color name="mt_icon_light_normal">@color/black_54</color>
@@ -39,6 +51,7 @@
     <color name="timeline_type_text_color">@color/text_secondary</color>
     <color name="timeline_event_fill_color">#64B5F6</color>
     <color name="timeline_error_color">#000000</color>
+    <color name="timeline_connection_color">@color/mt_grey_400</color>
 
     <!-- Stream Type icon -->
     <color name="stream_type_icon_stroke">@color/white</color>
