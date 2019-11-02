@@ -9,7 +9,7 @@ import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.TimelineType
 import aodev.blue.rxsandbox.model.sample.getSample
 import aodev.blue.rxsandbox.ui.screen.NavigationLabelListener
-import aodev.blue.rxsandbox.ui.widget.asynctree.SingleColumnTreeView
+import aodev.blue.rxsandbox.ui.widget.treeview.SingleColumnTreeView
 
 
 class DetailsFragment : Fragment() {

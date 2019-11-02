@@ -1,3 +1,10 @@
 package aodev.blue.rxsandbox.ui.widget.model
 
-enum class TimelineSelection { ALONE, SELECTED, NON_SELECTED_UP, NON_SELECTED_BOTTOM, NONE }
+sealed class TimelineSelection {
+    object None : TimelineSelection()
+    object Alone : TimelineSelection()
+    data class Checkbox(
+            val selected: Boolean,
+            val connected: Boolean
+    ) : TimelineSelection()
+}

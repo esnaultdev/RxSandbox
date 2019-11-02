@@ -1,4 +1,4 @@
-package aodev.blue.rxsandbox.ui.widget.asynctree
+package aodev.blue.rxsandbox.ui.widget.treeview
 
 import android.content.Context
 import android.util.AttributeSet

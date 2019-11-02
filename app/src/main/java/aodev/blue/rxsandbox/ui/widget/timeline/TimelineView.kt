@@ -77,7 +77,7 @@ class TimelineView : View {
      * This updates the display of the starting part of the timeline to connect it to the timeline
      * or operator above.
      */
-    var selection: TimelineSelection = TimelineSelection.NONE
+    var selection: TimelineSelection = TimelineSelection.None
         set(value) {
             val oldValue = field
             if (oldValue != value) {

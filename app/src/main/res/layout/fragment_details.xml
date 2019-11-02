@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true">
 
-    <aodev.blue.rxsandbox.ui.widget.asynctree.SingleColumnTreeView
+    <aodev.blue.rxsandbox.ui.widget.treeview.SingleColumnTreeView
         android:id="@+id/async_tree_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

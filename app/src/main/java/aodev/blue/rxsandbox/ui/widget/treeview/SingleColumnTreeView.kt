@@ -1,4 +1,4 @@
-package aodev.blue.rxsandbox.ui.widget.asynctree
+package aodev.blue.rxsandbox.ui.widget.treeview
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import aodev.blue.rxsandbox.model.*
 import aodev.blue.rxsandbox.ui.widget.model.TimelineConnection
+import aodev.blue.rxsandbox.ui.widget.model.TimelineSelection
 import aodev.blue.rxsandbox.ui.widget.timeline.TimelineView
 import aodev.blue.rxsandbox.utils.linkedListOf
 import java.util.*
@@ -100,18 +101,19 @@ class SingleColumnTreeView : ConstraintLayout {
 
     private fun bindElementToView(element: ViewModel.Element.TimelineE): View {
         return TimelineView(context).apply {
-            when (element) {
-                is ViewModel.Element.TimelineE.Input -> {
+            when (val type = element.type) {
+                is ViewModel.Element.TimelineE.Type.Input -> {
                     readOnly = false
-                    onUpdate = { timeline -> timeline?.let(element.onUpdate) }
+                    onUpdate = { timeline -> timeline?.let(type.onUpdate) }
                 }
-                is ViewModel.Element.TimelineE.Result -> {
+                is ViewModel.Element.TimelineE.Type.Result -> {
                     readOnly = true
                     onUpdate = {}
                 }
             }
 
             downConnection = element.downConnection
+            selection = element.selection
             element.update = { timeline -> this.timeline = timeline}
         }
     }
@@ -214,7 +216,8 @@ class SingleColumnTreeView : ConstraintLayout {
     private fun buildViewModel(viewState: ViewState): ViewModel {
         // We use a linked list to be able to add elements in the first place in O(1)
         val viewElements = linkedListOf<ViewModel.Element>()
-        addTimelineToVMElements(viewState.bottomElement, TimelineConnection.NONE, viewElements)
+        // Add the bottom element
+        addTimelineToVMElements(viewState.bottomElement, TimelineSelection.Alone, TimelineConnection.NONE, viewElements)
         addUpstreamToVMElements(viewState.bottomElement, viewElements)
         return ViewModel(viewElements)
     }
@@ -225,6 +228,7 @@ class SingleColumnTreeView : ConstraintLayout {
      */
     private fun <T : Any, TL : Timeline<T>> addTimelineToVMElements(
             stateElement: ViewState.Element<T, TL>,
+            selection: TimelineSelection,
             downConnection: TimelineConnection,
             viewElements: LinkedList<ViewModel.Element>
     ) {
@@ -241,18 +245,21 @@ class SingleColumnTreeView : ConstraintLayout {
                     // Update the timelines
                     updater.updateTimelines()
                 }
-                ViewModel.Element.TimelineE.Input(
+                ViewModel.Element.TimelineE(
                         result = innerX::input::get,
                         shown = stateElement::shown,
                         downConnection = downConnection,
-                        onUpdate = onUpdate
+                        selection = selection,
+                        type = ViewModel.Element.TimelineE.Type.Input(onUpdate)
                 )
             }
             is InnerReactiveTypeX.Result -> {
-                ViewModel.Element.TimelineE.Result(
+                ViewModel.Element.TimelineE(
                         result = innerX::result,
                         shown = stateElement::shown,
-                        downConnection = downConnection
+                        downConnection = downConnection,
+                        selection = selection,
+                        type = ViewModel.Element.TimelineE.Type.Result
                 )
             }
         }
@@ -277,14 +284,39 @@ class SingleColumnTreeView : ConstraintLayout {
         }
 
         // Add each previous as a timeline
-        val previousElements = stateElement.previous.reversed().filterNotNull()
-        previousElements.forEachIndexed { index, element ->
-                val downConnection = when (index) {
-                    previousElements.lastIndex -> TimelineConnection.TOP
-                    else -> TimelineConnection.MIDDLE
+        val selectedIsResult = stateElement.previous.getOrNull(stateElement.selectedPreviousIndex)
+                ?.reactiveTypeX
+                ?.innerX
+                ?.let { it is InnerReactiveTypeX.Result<*, *> }
+                ?: false
+
+        val reversedSelectedIndex = stateElement.previous.lastIndex - stateElement.selectedPreviousIndex
+        val onePrevious = stateElement.previous.size == 1
+
+        // Iterate in reverse order to add the timeline views in the right order
+        stateElement.previous.reversed()
+                .forEachIndexed { index, element ->
+                    if (element == null) return@forEachIndexed
+
+                    val selection = when {
+                        onePrevious && selectedIsResult -> TimelineSelection.Alone
+                        onePrevious && !selectedIsResult -> TimelineSelection.None
+                        else -> {
+                            val selected = index == reversedSelectedIndex
+                            val connected = (selected && selectedIsResult)
+                                    || (!selected && selectedIsResult && index > reversedSelectedIndex)
+                            TimelineSelection.Checkbox(selected, connected)
+                        }
+                    }
+
+                    val downConnection = if (index == stateElement.previous.lastIndex) {
+                        TimelineConnection.TOP
+                    } else {
+                        TimelineConnection.MIDDLE
+                    }
+
+                    addTimelineToVMElements(element, selection, downConnection, viewElements)
                 }
-                addTimelineToVMElements(element, downConnection, viewElements)
-            }
 
         // Add the upstream of the selected previous
         stateElement.previous.getOrNull(stateElement.selectedPreviousIndex)
@@ -294,26 +326,20 @@ class SingleColumnTreeView : ConstraintLayout {
     class ViewModel(val elements: List<Element>) {
 
         sealed class Element {
-            sealed class TimelineE(
+            class TimelineE(
                     val result: () -> Timeline<Any>,
                     val shown: KMutableProperty0<Boolean>,
-                    val downConnection: TimelineConnection
+                    val downConnection: TimelineConnection,
+                    var selection: TimelineSelection,
+                    val type: Type
             ) : Element() {
 
                 var update: (Timeline<Any>) -> Unit = {}
 
-                class Input(
-                        result: () -> Timeline<Any>,
-                        shown: KMutableProperty0<Boolean>,
-                        downConnection: TimelineConnection,
-                        val onUpdate: (Timeline<Any>) -> Unit
-                ) : TimelineE(result, shown, downConnection)
-
-                class Result(
-                        result: () -> Timeline<Any>,
-                        shown: KMutableProperty0<Boolean>,
-                        downConnection: TimelineConnection
-                ) : TimelineE(result, shown, downConnection)
+                sealed class Type {
+                    class Input(val onUpdate: (Timeline<Any>) -> Unit) : Type()
+                    object Result : Type()
+                }
             }
 
             class Operator(
