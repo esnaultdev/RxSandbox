@@ -328,7 +328,7 @@ class GestureHandler(
                     events.removeAt(movingIndex)
                     events.add(index, newEvent)
                     // TODO Move this side effect somewhere testable
-                    movingEventIndex = movingIndex - 1
+                    movingEventIndex = index
                 } else {
                     events[movingIndex] = newEvent
                 }
@@ -342,7 +342,7 @@ class GestureHandler(
                     events.removeAt(movingIndex)
                     events.add(index, newEvent)
                     // TODO Move this side effect somewhere testable
-                    movingEventIndex = movingIndex + 1
+                    movingEventIndex = index
                 } else {
                     events[movingIndex] = newEvent
                 }
