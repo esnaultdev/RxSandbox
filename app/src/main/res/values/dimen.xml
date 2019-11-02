@@ -6,7 +6,7 @@
     <!-- Operator -->
     <dimen name="operator_padding">12dp</dimen>
     <dimen name="operator_name_text_size">16sp</dimen>
-    <dimen name="timeline_padding_start">36dp</dimen>
+    <dimen name="timeline_padding_start">32dp</dimen>
     <dimen name="timeline_padding_end">24dp</dimen>
     <dimen name="timeline_padding_vertical">8dp</dimen>
     <dimen name="timeline_padding_inner_start">24dp</dimen>
@@ -26,5 +26,6 @@
     <dimen name="timeline_arrow_height">16dp</dimen>
     <dimen name="timeline_connection_circle_size">4dp</dimen>
     <dimen name="timeline_connection_stroke_width">2dp</dimen>
+    <dimen name="timeline_selection_checkbox_size">32dp</dimen>
 
 </resources>

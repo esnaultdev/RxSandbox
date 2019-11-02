@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.View
+import android.widget.FrameLayout
 import aodev.blue.rxsandbox.R
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.ui.utils.basicMeasure
@@ -16,7 +16,7 @@ import aodev.blue.rxsandbox.ui.widget.timeline.drawer.EventDrawer
 import aodev.blue.rxsandbox.ui.widget.timeline.drawer.LineDrawer
 
 
-class TimelineView : View {
+class TimelineView : FrameLayout {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -82,6 +82,7 @@ class TimelineView : View {
             val oldValue = field
             if (oldValue != value) {
                 field = value
+                connectionDrawer.selection = selection
                 invalidate()
             }
         }
@@ -126,14 +127,20 @@ class TimelineView : View {
     // Drawing
     private val lineDrawer = LineDrawer(context)
     private val eventDrawer = EventDrawer(context, timePositionMapper)
-    private val connectionDrawer = ConnectionDrawer(context)
+    private val connectionDrawer = ConnectionDrawer(this) { onSelected() }
 
     // Gestures
     private var gestureHandler = GestureHandler(context, timePositionMapper, this::_timeline)
 
+    init {
+        setWillNotDraw(false)
+    }
+
     //region Measurement
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+
         val desiredWidth = (totalPaddingStart + totalPaddingEnd + 3 * touchTargetSize).toInt()
         val desiredHeight = (2 * paddingVertical + touchTargetSize).toInt()
 
