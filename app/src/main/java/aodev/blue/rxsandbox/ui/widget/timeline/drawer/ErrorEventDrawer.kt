@@ -30,15 +30,16 @@ class ErrorEventDrawer(context: Context) {
     /**
      * Draw the error event on the canvas
      * @param canvas The canvas to draw on
+     * @param isLtr The layout direction of the screen
      * @param x The x position of the error event
      * @param y The y position of the center of the error event
      * @param previousX The x position of the center of the previous event, if any
      */
-    fun draw(canvas: Canvas, x: Float, y: Float, previousX: Float?) {
+    fun draw(canvas: Canvas, isLtr: Boolean, x: Float, y: Float, previousX: Float?) {
         val errorSize = if (previousX == null) {
             errorSizeMin
         } else {
-            val diffX = x - previousX
+            val diffX = if (isLtr) x - previousX else previousX - x
             if (diffX  > minEventDiff) {
                 errorSizeMin
             } else {

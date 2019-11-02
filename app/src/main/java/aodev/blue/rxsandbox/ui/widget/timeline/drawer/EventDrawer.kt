@@ -23,13 +23,13 @@ class EventDrawer(
      */
     var centerHeight: Float = 0f
 
-    fun draw(canvas: Canvas, timeline: Timeline<Any>?) {
+    fun draw(canvas: Canvas, isLtr: Boolean, timeline: Timeline<Any>?) {
         when (timeline) {
             null -> Unit
-            is ObservableT -> drawObservable(canvas, timeline)
-            is SingleT -> drawSingle(canvas, timeline)
-            is MaybeT -> drawMaybe(canvas, timeline)
-            is CompletableT -> drawCompletable(canvas, timeline)
+            is ObservableT -> drawObservable(canvas, isLtr, timeline)
+            is SingleT -> drawSingle(canvas, isLtr, timeline)
+            is MaybeT -> drawMaybe(canvas, isLtr, timeline)
+            is CompletableT -> drawCompletable(canvas, isLtr, timeline)
         }.exhaustive
     }
 
@@ -55,12 +55,12 @@ class EventDrawer(
     /* *****************************************************************************************************************/
     //region Observable **************************************************************************/
 
-    private fun drawObservable(canvas: Canvas, timeline: ObservableT<Any>) {
-        drawTerminationEvent(canvas, timeline)
+    private fun drawObservable(canvas: Canvas, isLtr: Boolean, timeline: ObservableT<Any>) {
+        drawTerminationEvent(canvas, isLtr, timeline)
         drawEvents(canvas, timeline.events)
     }
 
-    private fun drawTerminationEvent(canvas: Canvas, timeline: ObservableT<Any>) {
+    private fun drawTerminationEvent(canvas: Canvas, isLtr: Boolean, timeline: ObservableT<Any>) {
         when (val termination = timeline.termination) {
             is ObservableT.Termination.None -> Unit
             else -> {
@@ -72,11 +72,11 @@ class EventDrawer(
                 when (termination) {
                     is ObservableT.Termination.Complete -> {
                         val position = timePositionMapper.position(termination.time)
-                        completeEventDrawer.draw(canvas, position, centerHeight, previousPosition)
+                        completeEventDrawer.draw(canvas, isLtr, position, centerHeight, previousPosition)
                     }
                     is ObservableT.Termination.Error -> {
                         val position = timePositionMapper.position(termination.time)
-                        errorEventDrawer.draw(canvas, position, centerHeight, previousPosition)
+                        errorEventDrawer.draw(canvas, isLtr, position, centerHeight, previousPosition)
                     }
                     else -> Unit // Already handled, but the compiler still wants it
                 }
@@ -96,7 +96,7 @@ class EventDrawer(
     /* *****************************************************************************************************************/
     //region Single **************************************************************************/
 
-    private fun drawSingle(canvas: Canvas, timeline: SingleT<Any>) {
+    private fun drawSingle(canvas: Canvas, isLtr: Boolean, timeline: SingleT<Any>) {
         when (val result = timeline.result) {
             is SingleT.Result.None -> Unit
             is SingleT.Result.Success -> {
@@ -105,7 +105,7 @@ class EventDrawer(
             }
             is SingleT.Result.Error -> {
                 val position = timePositionMapper.position(result.time)
-                errorEventDrawer.draw(canvas, position, centerHeight, null)
+                errorEventDrawer.draw(canvas, isLtr, position, centerHeight, null)
             }
         }.exhaustive
     }
@@ -115,7 +115,7 @@ class EventDrawer(
     /* *****************************************************************************************************************/
     //region Maybe **************************************************************************/
 
-    private fun drawMaybe(canvas: Canvas, timeline: MaybeT<Any>) {
+    private fun drawMaybe(canvas: Canvas, isLtr: Boolean, timeline: MaybeT<Any>) {
         when (val result = timeline.result) {
             is MaybeT.Result.None -> Unit
             is MaybeT.Result.Success -> {
@@ -124,11 +124,11 @@ class EventDrawer(
             }
             is MaybeT.Result.Complete -> {
                 val position = timePositionMapper.position(result.time)
-                completeEventDrawer.draw(canvas, position, centerHeight, null)
+                completeEventDrawer.draw(canvas, isLtr, position, centerHeight, null)
             }
             is MaybeT.Result.Error -> {
                 val position = timePositionMapper.position(result.time)
-                errorEventDrawer.draw(canvas, position, centerHeight, null)
+                errorEventDrawer.draw(canvas, isLtr, position, centerHeight, null)
             }
         }.exhaustive
     }
@@ -136,18 +136,18 @@ class EventDrawer(
     //endregion
 
     /* *****************************************************************************************************************/
-    //region Completable **************************************************************************/
+    //region Completable
 
-    private fun drawCompletable(canvas: Canvas, timeline: CompletableT) {
+    private fun drawCompletable(canvas: Canvas, isLtr: Boolean, timeline: CompletableT) {
         when (val result = timeline.result) {
             is CompletableT.Result.None -> Unit
             is CompletableT.Result.Complete -> {
                 val position = timePositionMapper.position(result.time)
-                completeEventDrawer.draw(canvas, position, centerHeight, null)
+                completeEventDrawer.draw(canvas, isLtr, position, centerHeight, null)
             }
             is CompletableT.Result.Error -> {
                 val position = timePositionMapper.position(result.time)
-                errorEventDrawer.draw(canvas, position, centerHeight, null)
+                errorEventDrawer.draw(canvas, isLtr, position, centerHeight, null)
             }
         }.exhaustive
     }

@@ -166,7 +166,7 @@ class TimelineView : View {
 
         lineDrawer.draw(canvas, timeline?.type)
         connectionDrawer.draw(canvas, downConnection)
-        eventDrawer.draw(canvas, timeline)
+        eventDrawer.draw(canvas, isLtr, timeline)
     }
 
     //endregion

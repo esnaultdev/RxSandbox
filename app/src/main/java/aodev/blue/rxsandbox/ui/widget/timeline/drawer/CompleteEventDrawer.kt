@@ -31,15 +31,16 @@ class CompleteEventDrawer(context: Context) {
     /**
      * Draw the complete event on the canvas
      * @param canvas The canvas to draw on
+     * @param isLtr The layout direction of the screen
      * @param x The x position of the complete event
      * @param y The y position of the center of the complete event
      * @param previousX The x position of the center of the previous event, if any
      */
-    fun draw(canvas: Canvas, x: Float, y: Float, previousX: Float?) {
+    fun draw(canvas: Canvas, isLtr: Boolean, x: Float, y: Float, previousX: Float?) {
         val completeHeight = if (previousX == null) {
             completeHeightMin
         } else {
-            val diffX = x - previousX
+            val diffX = if (isLtr) x - previousX else previousX - x
             if (diffX  > minEventDiff) {
                 completeHeightMin
             } else {
