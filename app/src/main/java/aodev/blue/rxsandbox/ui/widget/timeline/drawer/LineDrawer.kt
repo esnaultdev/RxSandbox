@@ -96,6 +96,14 @@ class LineDrawer(context: Context) {
                 rMoveTo(dashDx, 0f)
             }
 
+            // Compensate for the dashed line that might stop early
+            val actualStartSize = startDashCount * 2 * lineDashSize
+            if (actualStartSize < innerPaddingStart) {
+                val startFinish = innerPaddingStart - actualStartSize
+                val startFinishDx = if (isLtr) startFinish else -startFinish
+                rMoveTo(startFinishDx, 0f)
+            }
+
             // Continuous line
             val lineWidth = width - paddingStart - paddingEnd - innerPaddingStart - innerPaddingEnd
             val lineDx = if (isLtr) lineWidth else -lineWidth

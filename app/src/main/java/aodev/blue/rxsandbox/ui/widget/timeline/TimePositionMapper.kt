@@ -17,17 +17,18 @@ class TimePositionMapper(
     fun position(time: Float): Float {
         val timeFactor = time / Config.timelineDuration
         return if (isLtr) {
-            timeFactor * availableWidth + totalPaddingEnd
+            timeFactor * availableWidth + totalPaddingStart
         } else {
             (1 - timeFactor) * availableWidth + totalPaddingEnd
         }
     }
 
     fun time(position: Float): Float {
-        val factor = (position - totalPaddingStart) / availableWidth
         return if (isLtr) {
+            val factor = (position - totalPaddingStart) / availableWidth
             factor * Config.timelineDuration
         } else {
+            val factor = (position - totalPaddingEnd) / availableWidth
             (1 - factor) * Config.timelineDuration
         }
     }
