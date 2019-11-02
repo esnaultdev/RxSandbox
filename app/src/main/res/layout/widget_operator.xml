@@ -1,41 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:background="?selectableItemBackground">
 
     <TextView
         android:id="@+id/operator_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/operator_padding"
-        android:layout_marginTop="@dimen/operator_padding"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="@dimen/operator_padding"
+        android:layout_margin="@dimen/operator_padding"
         android:gravity="center"
         android:textColor="@color/operator_text_color"
         android:textSize="@dimen/operator_name_text_size"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/operator_info"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginEnd="@dimen/operator_padding"
         tools:text="map { x -> x * 2 }" />
-
-    <ImageView
-        android:id="@+id/operator_info"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="?selectableItemBackground"
-        android:padding="12dp"
-        android:src="@drawable/ic_info_outline"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
