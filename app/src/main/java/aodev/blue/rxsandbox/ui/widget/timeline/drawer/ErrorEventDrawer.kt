@@ -18,7 +18,7 @@ class ErrorEventDrawer(context: Context) {
         val valueEventSize = context.resources.getDimension(R.dimen.timeline_event_size)
         errorSizeMin / 2 + valueEventSize / 2
     }
-    private val errorStrokeWidth = context.resources.getDimension(R.dimen.timeline_error_stroke_width)
+    private val errorStrokeWidth = context.resources.getDimension(R.dimen.timeline_stroke_width)
     private val errorColor = context.getColorCompat(R.color.timeline_error_color)
 
     private val errorPaint = Paint().apply {

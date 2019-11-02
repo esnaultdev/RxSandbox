@@ -20,7 +20,6 @@
     <dimen name="timeline_line_dash_size">4dp</dimen>
     <dimen name="timeline_error_size_min">24dp</dimen>
     <dimen name="timeline_error_size_max">40dp</dimen>
-    <dimen name="timeline_error_stroke_width">3dp</dimen>
     <dimen name="timeline_arrow_width">20dp</dimen>
     <dimen name="timeline_arrow_height">20dp</dimen>
 
