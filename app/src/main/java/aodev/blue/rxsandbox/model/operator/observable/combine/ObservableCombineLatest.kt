@@ -4,7 +4,6 @@ import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.functions.Function
 import aodev.blue.rxsandbox.model.operator.Operator
-import aodev.blue.rxsandbox.model.time
 import aodev.blue.rxsandbox.utils.alter
 
 
@@ -19,15 +18,13 @@ class ObservableCombineLatest<T : Any, R : Any>(
             val terminations = input.map { it.termination }
             val firstError = terminations
                     .filterIsInstance<ObservableT.Termination.Error>()
-                    .sortedBy { it.time }
-                    .firstOrNull()
+                    .minBy { it.time }
 
             val termination = when {
                 firstError != null -> firstError
                 terminations.all { it is ObservableT.Termination.Complete } -> {
                     terminations.map { it as ObservableT.Termination.Complete }
-                            .sortedBy { it.time }
-                            .last()
+                            .maxBy { it.time }!!
                 }
                 else -> ObservableT.Termination.None
             }

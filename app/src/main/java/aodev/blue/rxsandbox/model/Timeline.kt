@@ -16,6 +16,8 @@ data class ObservableT<out T : Any>(
         val termination: Termination
 ) : Timeline<T>() {
 
+    companion object; // Empty companion for extension functions
+
     override val type = TimelineType.OBSERVABLE
 
     init {
@@ -38,8 +40,8 @@ data class ObservableT<out T : Any>(
         object None : Termination() {
             override val time: Float? = null
         }
-        class Complete(override val time: Float) : Termination()
-        class Error(override val time: Float) : Termination()
+        data class Complete(override val time: Float) : Termination()
+        data class Error(override val time: Float) : Termination()
     }
 }
 
@@ -63,8 +65,8 @@ data class SingleT<out T : Any>(
         class None<T> : Result<T>() {
             override val time: Float? = null
         }
-        class Success<T>(override val time: Float, val value: T) : Result<T>()
-        class Error<T>(override val time: Float) : Result<T>()
+        data class Success<T>(override val time: Float, val value: T) : Result<T>()
+        data class Error<T>(override val time: Float) : Result<T>()
     }
 }
 
@@ -81,9 +83,9 @@ data class MaybeT<out T : Any>(
         class None<T> : Result<T>() {
             override val time: Float? = null
         }
-        class Complete<T>(override val time: Float) : Result<T>()
-        class Success<T>(override val time: Float, val value: T) : Result<T>()
-        class Error<T>(override val time: Float) : Result<T>()
+        data class Complete<T>(override val time: Float) : Result<T>()
+        data class Success<T>(override val time: Float, val value: T) : Result<T>()
+        data class Error<T>(override val time: Float) : Result<T>()
     }
 }
 
@@ -100,7 +102,7 @@ data class CompletableT(
         object None : Result() {
             override val time: Float? = null
         }
-        class Complete(override val time: Float) : Result()
-        class Error(override val time: Float) : Result()
+        data class Complete(override val time: Float) : Result()
+        data class Error(override val time: Float) : Result()
     }
 }
