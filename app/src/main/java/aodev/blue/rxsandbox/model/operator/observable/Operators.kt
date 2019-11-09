@@ -9,6 +9,7 @@ import aodev.blue.rxsandbox.model.functions.Predicate
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableCombineLatest
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableMerge
 import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableStartWith
+import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableZip
 import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAll
 import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAmb
 import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAny
@@ -76,6 +77,17 @@ fun <T : Any> ObservableX<T>.startWith(value: T): ObservableX<T> {
     val operator = ObservableStartWith(value)
     val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
         operator.apply(innerX.timeline())
+    }
+    return ObservableX(innerX)
+}
+
+fun <T : Any, R : Any> ObservableX.Companion.zip(
+        input: List<ObservableX<T>>,
+        combiner: Function<List<T>, R>
+): ObservableX<R> {
+    val operator = ObservableZip(combiner)
+    val innerX = InnerReactiveTypeX.Result(operator, input) {
+        operator.apply(input.map { it.innerX.timeline() })
     }
     return ObservableX(innerX)
 }

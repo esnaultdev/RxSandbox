@@ -49,7 +49,8 @@ val observableOperators = listOf(
                 operatorNames = listOf(
                         "combineLatest",
                         "merge",
-                        "startWith"
+                        "startWith",
+                        "zip"
                 )
         ),
         OperatorCategory(

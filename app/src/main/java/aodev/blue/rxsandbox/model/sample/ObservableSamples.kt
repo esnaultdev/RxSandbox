@@ -272,6 +272,29 @@ fun getObservableSample(operatorName: String): ReactiveTypeX<*, *>? {
             )
                     .startWith(0)
         }
+        "zip" -> {
+            val observable1 = ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            4f to 2,
+                            6f to 3
+                    ),
+                    ObservableT.Termination.Complete(8f)
+            )
+            val observable2 = ObservableX.inputOf(
+                    listOf(
+                            1f to 10,
+                            3f to 20,
+                            8f to 30
+                    ),
+                    ObservableT.Termination.Complete(10f)
+            )
+
+            ObservableX.zip(
+                    listOf(observable1, observable2),
+                    functionOf<List<Int>, Int>("x, y -> x + y") { list -> list.sum() }
+            )
+        }
 
         // Utility
         "delay" -> {
