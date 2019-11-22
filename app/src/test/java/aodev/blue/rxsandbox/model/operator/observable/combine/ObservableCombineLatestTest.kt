@@ -169,4 +169,27 @@ class ObservableCombineLatestTest {
         )
         Assert.assertEquals(expected, combined)
     }
+
+    @Test
+    fun combineValuesOnlyOneValueAfterError() {
+        // Given
+        val source1 = ObservableT.inputOf(
+                events = listOf(0f to 1),
+                termination = ObservableT.Termination.Error(5f)
+        )
+        val source2 = ObservableT.inputOf(
+                events = listOf(6f to 2),
+                termination = ObservableT.Termination.Complete(7f)
+        )
+        val inputs = listOf(source1, source2)
+
+        val operator = operator<Int, Int> { it.sum() }
+
+        // When
+        val combined = operator.apply(inputs)
+
+        // Then
+        val expected = ObservableT(emptyList(), ObservableT.Termination.Error(5f))
+        Assert.assertEquals(expected, combined)
+    }
 }
