@@ -13,6 +13,7 @@ import aodev.blue.rxsandbox.model.operator.observable.combine.ObservableZip
 import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAll
 import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAmb
 import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableAny
+import aodev.blue.rxsandbox.model.operator.observable.conditional.ObservableContains
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableEmpty
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableInterval
 import aodev.blue.rxsandbox.model.operator.observable.create.ObservableJust
@@ -114,6 +115,14 @@ fun <T : Any> ObservableX.Companion.amb(input: List<ObservableX<T>>): Observable
 
 fun <T : Any> ObservableX<T>.any(predicate: Predicate<T>): SingleX<Boolean> {
     val operator = ObservableAny(predicate)
+    val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
+        operator.apply(innerX.timeline())
+    }
+    return SingleX(innerX)
+}
+
+fun <T : Any> ObservableX<T>.contains(element: T): SingleX<Boolean> {
+    val operator = ObservableContains(element)
     val innerX = InnerReactiveTypeX.Result(operator, listOf(this)) {
         operator.apply(innerX.timeline())
     }

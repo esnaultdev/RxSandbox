@@ -15,12 +15,12 @@ class ObservableAll<T : Any>(private val predicate: Predicate<T>) : Operator {
         return if (firstNot != null) {
             SingleT(SingleT.Result.Success(firstNot.time, false))
         } else when (input.termination) {
-            ObservableT.Termination.None -> SingleT(SingleT.Result.None())
+            ObservableT.Termination.None -> SingleT<Boolean>(SingleT.Result.None())
             is ObservableT.Termination.Complete -> {
                 SingleT(SingleT.Result.Success(input.termination.time, true))
             }
             is ObservableT.Termination.Error -> {
-                SingleT(SingleT.Result.Error(input.termination.time))
+                SingleT<Boolean>(SingleT.Result.Error(input.termination.time))
             }
         }
     }

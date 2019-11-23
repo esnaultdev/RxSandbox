@@ -65,7 +65,8 @@ val observableOperators = listOf(
                 operatorNames = listOf(
                         "all",
                         "amb",
-                        "any"
+                        "any",
+                        "contains"
                 )
         )
 )

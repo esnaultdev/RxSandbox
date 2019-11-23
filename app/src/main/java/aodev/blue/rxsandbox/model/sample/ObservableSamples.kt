@@ -367,6 +367,19 @@ fun getObservableSample(operatorName: String): ReactiveTypeX<*, *>? {
             )
                     .any(evenPredicate)
         }
+        "contains" -> {
+            ObservableX.inputOf(
+                    listOf(
+                            0f to 1,
+                            2f to 2,
+                            4f to 3,
+                            6f to 4,
+                            8f to 5
+                    ),
+                    ObservableT.Termination.Complete(10f)
+            )
+                    .contains(4)
+        }
         // Custom
         "mapMerge" -> {
             val observable1 = ObservableX.inputOf(

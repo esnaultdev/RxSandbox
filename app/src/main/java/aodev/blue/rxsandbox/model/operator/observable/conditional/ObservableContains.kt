@@ -1,30 +1,31 @@
 package aodev.blue.rxsandbox.model.operator.observable.conditional
 
+import aodev.blue.rxsandbox.model.Config
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.SingleT
-import aodev.blue.rxsandbox.model.functions.Predicate
 import aodev.blue.rxsandbox.model.operator.Operator
 
 
-class ObservableAny<T : Any>(private val predicate: Predicate<T>) : Operator {
+class ObservableContains<T : Any>(private val element: T) : Operator {
 
     fun apply(input: ObservableT<T>): SingleT<Boolean> {
-        val firstGood = input.events.firstOrNull { predicate.test(it.value) }
+        val event = input.events.firstOrNull { it.value == element }
 
-        return if (firstGood != null) {
-            SingleT(SingleT.Result.Success(firstGood.time, true))
+        return if (event != null) {
+            SingleT(SingleT.Result.Success(event.time, true))
         } else when (input.termination) {
             ObservableT.Termination.None -> SingleT<Boolean>(SingleT.Result.None())
             is ObservableT.Termination.Complete -> {
                 SingleT(SingleT.Result.Success(input.termination.time, false))
             }
             is ObservableT.Termination.Error -> {
-                SingleT<Boolean>(SingleT.Result.Error(input.termination.time))
+                SingleT(SingleT.Result.Error<Boolean>(input.termination.time))
             }
         }
     }
 
-    override val expression: String = "any { ${predicate.expression} }"
+    // TODO improve the model and display of the operators to display this element
+    override val expression: String = "contains($element)"
 
-    override val docUrl: String? = null
+    override val docUrl: String? = "${Config.operatorDocUrlPrefix}contains.html"
 }
