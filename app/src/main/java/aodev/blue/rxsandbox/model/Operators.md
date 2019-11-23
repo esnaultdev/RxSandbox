@@ -4,6 +4,7 @@ Observable operators
 Sort the core operators by category then alphabetically.
 
 - TODO: Can be implemented, but not done yet
+- TODO+: Can be implemented, but not the current priority
 - DONE: Implemented
 - CANT: Can't be implemented with the current model
 - PART: Can be partially implemented with the current model
@@ -22,19 +23,19 @@ Creating observables
 - DONE throw
 - DONE range
 - PART repeat
-- CANT start
+- TODO start
 - DONE timer
 
 
 Transforming observables
 ------------------------
 
-- CANT buffer
-- CANT flatmap
-- CANT groupBy
+- TODO buffer
+- TODO flatmap
+- TODO+ groupBy
 - DONE map
 - DONE scan
-- CANT window
+- TODO+ window
 
 
 Filtering observables
@@ -48,7 +49,7 @@ Filtering observables
 - DONE first
 - DONE ignoreElements
 - DONE last
-- CANT sample
+- TODO+ sample
 - DONE skip
 - DONE skipLast
 - DONE take
@@ -63,8 +64,8 @@ Combining observables
 - CANT join
 - DONE merge
 - DONE startWith
-- CANT switch
-- TODO zip
+- TODO+ switch
+- DONE zip
 
 
 Error handling operators
@@ -107,13 +108,13 @@ Conditional and Boolean operators
 Mathematical and Aggregate operators
 ------------------------------------
 
-- TODO average
+- TODO+ average
 - TODO concat
 - TODO count
-- TODO max
-- TODO min
+- TODO+ max
+- TODO+ min
 - TODO reduce
-- TODO sum
+- TODO+ sum
 
 
 Backpressure operators
