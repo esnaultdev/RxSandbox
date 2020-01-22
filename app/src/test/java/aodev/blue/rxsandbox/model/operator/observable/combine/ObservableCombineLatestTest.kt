@@ -23,11 +23,11 @@ class ObservableCombineLatestTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val combined = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
-        Assert.assertEquals(expected, combined)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -38,11 +38,11 @@ class ObservableCombineLatestTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val combined = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
-        Assert.assertEquals(expected, combined)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -57,10 +57,10 @@ class ObservableCombineLatestTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val combined = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
-        Assert.assertEquals(source1, combined)
+        Assert.assertEquals(source1, result)
     }
 
     @Test
@@ -76,10 +76,10 @@ class ObservableCombineLatestTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val combined = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
-        Assert.assertEquals(source2, combined)
+        Assert.assertEquals(source2, result)
     }
 
     @Test
@@ -95,11 +95,11 @@ class ObservableCombineLatestTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val combined = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT<Int>(emptyList(), ObservableT.Termination.Error(8f))
-        Assert.assertEquals(expected, combined)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -112,10 +112,10 @@ class ObservableCombineLatestTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val combined = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
-        Assert.assertEquals(source2, combined)
+        Assert.assertEquals(source2, result)
     }
 
     @Test
@@ -134,14 +134,14 @@ class ObservableCombineLatestTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val combined = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT.inputOf(
                 events = listOf(1f to 3, 2f to 5, 4f to 6, 5f to 7, 7f to 8),
                 termination = ObservableT.Termination.Complete(10f)
         )
-        Assert.assertEquals(expected, combined)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -160,14 +160,14 @@ class ObservableCombineLatestTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val combined = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT.inputOf(
                 events = listOf(1f to 3, 4f to 6),
                 termination = ObservableT.Termination.Error(5f)
         )
-        Assert.assertEquals(expected, combined)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -186,10 +186,10 @@ class ObservableCombineLatestTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val combined = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT(emptyList(), ObservableT.Termination.Error(5f))
-        Assert.assertEquals(expected, combined)
+        Assert.assertEquals(expected, result)
     }
 }

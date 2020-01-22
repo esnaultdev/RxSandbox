@@ -23,11 +23,11 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
-        Assert.assertEquals(expected, zipped)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -38,11 +38,11 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
-        Assert.assertEquals(expected, zipped)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -57,10 +57,10 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
-        Assert.assertEquals(source1, zipped)
+        Assert.assertEquals(source1, result)
     }
 
     @Test
@@ -79,10 +79,10 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
-        Assert.assertEquals(source2, zipped)
+        Assert.assertEquals(source2, result)
     }
 
     @Test
@@ -95,10 +95,10 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
-        Assert.assertEquals(source2, zipped)
+        Assert.assertEquals(source2, result)
     }
 
     @Test
@@ -117,14 +117,14 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT.inputOf(
                 events = listOf(4f to 5),
                 termination = ObservableT.Termination.Error(5f)
         )
-        Assert.assertEquals(expected, zipped)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -143,14 +143,14 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT.inputOf(
                 events = listOf(7f to 9),
                 termination = ObservableT.Termination.None
         )
-        Assert.assertEquals(expected, zipped)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -173,14 +173,14 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT.inputOf(
                 events = listOf(7f to 15, 8f to 19),
                 termination = ObservableT.Termination.Complete(8f)
         )
-        Assert.assertEquals(expected, zipped)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -199,14 +199,14 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT.inputOf(
                 events = listOf(2f to 5, 4f to 6),
                 termination = ObservableT.Termination.Complete(4f)
         )
-        Assert.assertEquals(expected, zipped)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -225,14 +225,14 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT.inputOf(
                 events = listOf(4f to 5),
                 termination = ObservableT.Termination.Complete(5f)
         )
-        Assert.assertEquals(expected, zipped)
+        Assert.assertEquals(expected, result)
     }
 
     @Test
@@ -251,13 +251,13 @@ class ObservableZipTest {
         val operator = operator<Int, Int> { it.sum() }
 
         // When
-        val zipped = operator.apply(inputs)
+        val result = operator.apply(inputs)
 
         // Then
         val expected = ObservableT.inputOf(
                 events = listOf(2f to 5),
                 termination = ObservableT.Termination.Error(5f)
         )
-        Assert.assertEquals(expected, zipped)
+        Assert.assertEquals(expected, result)
     }
 }
