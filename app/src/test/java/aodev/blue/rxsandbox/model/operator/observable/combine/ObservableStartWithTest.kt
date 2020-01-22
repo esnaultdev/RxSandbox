@@ -1,7 +1,9 @@
 package aodev.blue.rxsandbox.model.operator.observable.combine
 
 import aodev.blue.rxsandbox.model.ObservableT
+import aodev.blue.rxsandbox.model.empty
 import aodev.blue.rxsandbox.model.inputOf
+import aodev.blue.rxsandbox.model.never
 import org.junit.Assert
 import org.junit.Test
 
@@ -11,9 +13,9 @@ class ObservableStartWithTest {
     private fun <T : Any> operator(value: T) = ObservableStartWith(value)
 
     @Test
-    fun startWithNever() {
+    fun neverSource() {
         // Given
-        val input = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
+        val input = ObservableT.never<Int>()
 
         val operator = operator(1)
 
@@ -29,9 +31,9 @@ class ObservableStartWithTest {
     }
 
     @Test
-    fun startWithEmpty() {
+    fun emptySource() {
         // Given
-        val input = ObservableT<Int>(emptyList(), ObservableT.Termination.Complete(0f))
+        val input = ObservableT.empty<Int>()
 
         val operator = operator(1)
 
@@ -47,7 +49,7 @@ class ObservableStartWithTest {
     }
 
     @Test
-    fun startWithError() {
+    fun errorSource() {
         // Given
         val input = ObservableT<Int>(emptyList(), ObservableT.Termination.Error(0f))
 
@@ -65,7 +67,7 @@ class ObservableStartWithTest {
     }
 
     @Test
-    fun startWithOtherEvents() {
+    fun otherEvents() {
         // Given
         val input = ObservableT.inputOf(
                 events = listOf(2f to 4, 7f to 8),
@@ -86,7 +88,7 @@ class ObservableStartWithTest {
     }
 
     @Test
-    fun startWithBeforeFirstEvent() {
+    fun beforeFirstEvent() {
         // Given
         val input = ObservableT.inputOf(
                 events = listOf(0f to 5),

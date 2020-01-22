@@ -1,8 +1,10 @@
 package aodev.blue.rxsandbox.model.operator.observable.combine
 
 import aodev.blue.rxsandbox.model.ObservableT
+import aodev.blue.rxsandbox.model.empty
 import aodev.blue.rxsandbox.model.functions.functionOf
 import aodev.blue.rxsandbox.model.inputOf
+import aodev.blue.rxsandbox.model.never
 import org.junit.Assert
 import org.junit.Test
 
@@ -14,10 +16,10 @@ class ObservableCombineLatestTest {
     }
 
     @Test
-    fun combineEmptySources() {
+    fun neverSources() {
         // Given
-        val source1 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
-        val source2 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
+        val source1 = ObservableT.never<Int>()
+        val source2 = ObservableT.never<Int>()
         val inputs = listOf(source1, source2)
 
         val operator = operator<Int, Int> { it.sum() }
@@ -31,7 +33,7 @@ class ObservableCombineLatestTest {
     }
 
     @Test
-    fun combineNoSources() {
+    fun noSources() {
         // Given
         val inputs = emptyList<ObservableT<Int>>()
 
@@ -46,7 +48,7 @@ class ObservableCombineLatestTest {
     }
 
     @Test
-    fun combineOneSource() {
+    fun oneSource() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1, 2f to 3, 7f to 4),
@@ -64,13 +66,13 @@ class ObservableCombineLatestTest {
     }
 
     @Test
-    fun combineMultipleSourcesOneEmpty() {
+    fun multipleSourcesOneEmpty() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1, 2f to 3, 7f to 4),
                 termination = ObservableT.Termination.Error(8f)
         )
-        val source2 = ObservableT<Int>(emptyList(), ObservableT.Termination.Complete(0f))
+        val source2 = ObservableT.empty<Int>()
         val inputs = listOf(source1, source2)
 
         val operator = operator<Int, Int> { it.sum() }
@@ -83,13 +85,13 @@ class ObservableCombineLatestTest {
     }
 
     @Test
-    fun combineMultipleSourcesOneNever() {
+    fun multipleSourcesOneNever() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1, 2f to 3, 7f to 4),
                 termination = ObservableT.Termination.Error(8f)
         )
-        val source2 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
+        val source2 = ObservableT.never<Int>()
         val inputs = listOf(source1, source2)
 
         val operator = operator<Int, Int> { it.sum() }
@@ -103,7 +105,7 @@ class ObservableCombineLatestTest {
     }
 
     @Test
-    fun combineCompleteBeforeError() {
+    fun completeBeforeError() {
         // Given
         val source1 = ObservableT<Int>(emptyList(), ObservableT.Termination.Error(1f))
         val source2 = ObservableT<Int>(emptyList(), ObservableT.Termination.Complete(0f))
@@ -145,7 +147,7 @@ class ObservableCombineLatestTest {
     }
 
     @Test
-    fun combineStopAtError() {
+    fun stopAtError() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1, 4f to 4),
@@ -171,7 +173,7 @@ class ObservableCombineLatestTest {
     }
 
     @Test
-    fun combineValuesOnlyOneValueAfterError() {
+    fun onlyOneValueThenError() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1),

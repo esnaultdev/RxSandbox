@@ -2,7 +2,9 @@ package aodev.blue.rxsandbox.model.operator.observable.conditional
 
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.SingleT
+import aodev.blue.rxsandbox.model.empty
 import aodev.blue.rxsandbox.model.inputOf
+import aodev.blue.rxsandbox.model.never
 import org.junit.Assert
 import org.junit.Test
 
@@ -14,7 +16,7 @@ class ObservableContainsTest {
     @Test
     fun neverSource() {
         // Given
-        val input = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
+        val input = ObservableT.never<Int>()
 
         val operator = operator(5)
 
@@ -29,7 +31,7 @@ class ObservableContainsTest {
     @Test
     fun emptySource() {
         // Given
-        val input = ObservableT<Int>(emptyList(), ObservableT.Termination.Complete(8f))
+        val input = ObservableT.empty<Int>(completeAt = 8f)
 
         val operator = operator(5)
 

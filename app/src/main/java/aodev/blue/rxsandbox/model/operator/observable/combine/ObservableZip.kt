@@ -65,7 +65,7 @@ class ObservableZip<T : Any, R : Any>(
      * Get the completion of the operator result.
      * The zip operator completes when:
      * - All other sources have provided more events than the one that completes (based on the
-     *   completion we now that we can't zip any new events from the other sources)
+     *   completion we know that we can't zip any new events from the other sources)
      *
      *   For example:
      *

@@ -2,6 +2,7 @@ package aodev.blue.rxsandbox.model.operator.observable.conditional
 
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.inputOf
+import aodev.blue.rxsandbox.model.never
 import org.junit.Assert
 import org.junit.Test
 
@@ -13,8 +14,8 @@ class ObservableMergeTest {
     @Test
     fun neverSources() {
         // Given
-        val source1 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
-        val source2 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
+        val source1 = ObservableT.never<Int>()
+        val source2 = ObservableT.never<Int>()
         val inputs = listOf(source1, source2)
 
         // When
@@ -57,7 +58,7 @@ class ObservableMergeTest {
     @Test
     fun oneSourceWithValuesOneNever() {
         // Given
-        val source1 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
+        val source1 = ObservableT.never<Int>()
         val source2 = ObservableT.inputOf(
                 events = listOf(4f to 4, 6f to 6, 8f to 8),
                 termination = ObservableT.Termination.Complete(8f)

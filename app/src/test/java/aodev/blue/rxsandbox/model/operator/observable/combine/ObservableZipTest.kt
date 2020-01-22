@@ -3,6 +3,7 @@ package aodev.blue.rxsandbox.model.operator.observable.combine
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.functions.functionOf
 import aodev.blue.rxsandbox.model.inputOf
+import aodev.blue.rxsandbox.model.never
 import org.junit.Assert
 import org.junit.Test
 
@@ -14,10 +15,10 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipNeverSources() {
+    fun neverSources() {
         // Given
-        val source1 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
-        val source2 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
+        val source1 = ObservableT.never<Int>()
+        val source2 = ObservableT.never<Int>()
         val inputs = listOf(source1, source2)
 
         val operator = operator<Int, Int> { it.sum() }
@@ -31,7 +32,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipNoSources() {
+    fun noSources() {
         // Given
         val inputs = emptyList<ObservableT<Int>>()
 
@@ -46,7 +47,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun mergeOneSource() {
+    fun oneSource() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1, 2f to 3, 7f to 4),
@@ -64,7 +65,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipOneEmptyIgnoreOthers() {
+    fun oneEmptyIgnoreOthers() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1, 2f to 3, 7f to 4),
@@ -86,7 +87,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipEmptySources() {
+    fun emptySources() {
         // Given
         val source1 = ObservableT<Int>(emptyList(), ObservableT.Termination.Complete(4f))
         val source2 = ObservableT<Int>(emptyList(), ObservableT.Termination.Complete(2f))
@@ -102,7 +103,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipStopAtError() {
+    fun stopAtError() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1, 2f to 3),
@@ -128,7 +129,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipNeverComplete() {
+    fun neverComplete() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 2, 4f to 5),
@@ -154,7 +155,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipLastComplete() {
+    fun lastComplete() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 5, 1f to 2, 2f to 4),
@@ -184,7 +185,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipCompleteEarlyAtValue() {
+    fun completeEarlyAtValue() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 2, 2f to 2),
@@ -210,7 +211,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipCompleteEarlyAtComplete() {
+    fun completeEarlyAtComplete() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 2),
@@ -236,7 +237,7 @@ class ObservableZipTest {
     }
 
     @Test
-    fun zipErrorInNonMinimalTimeline() {
+    fun errorInNonMinimalTimeline() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 2, 8f to 4),

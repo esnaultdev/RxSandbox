@@ -2,6 +2,7 @@ package aodev.blue.rxsandbox.model.operator.observable.combine
 
 import aodev.blue.rxsandbox.model.ObservableT
 import aodev.blue.rxsandbox.model.inputOf
+import aodev.blue.rxsandbox.model.never
 import org.junit.Assert
 import org.junit.Test
 
@@ -11,10 +12,10 @@ class ObservableMergeTest {
     private val operator = ObservableMerge<Int>()
 
     @Test
-    fun mergeEmptySources() {
+    fun neverSources() {
         // Given
-        val source1 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
-        val source2 = ObservableT<Int>(emptyList(), ObservableT.Termination.None)
+        val source1 = ObservableT.never<Int>()
+        val source2 = ObservableT.never<Int>()
         val inputs = listOf(source1, source2)
 
         // When
@@ -26,7 +27,7 @@ class ObservableMergeTest {
     }
 
     @Test
-    fun mergeNoSources() {
+    fun noSources() {
         // Given
         val inputs = emptyList<ObservableT<Int>>()
 
@@ -39,7 +40,7 @@ class ObservableMergeTest {
     }
 
     @Test
-    fun mergeOneSource() {
+    fun oneSource() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1, 2f to 3, 7f to 4),
@@ -55,7 +56,7 @@ class ObservableMergeTest {
     }
 
     @Test
-    fun mergeStopAtError() {
+    fun stopAtError() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = listOf(0f to 1, 2f to 3),
@@ -79,7 +80,7 @@ class ObservableMergeTest {
     }
 
     @Test
-    fun mergeNeverComplete() {
+    fun neverComplete() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = emptyList<Pair<Float, Int>>(),
@@ -103,7 +104,7 @@ class ObservableMergeTest {
     }
 
     @Test
-    fun mergeLastComplete() {
+    fun lastComplete() {
         // Given
         val source1 = ObservableT.inputOf(
                 events = emptyList<Pair<Float, Int>>(),
