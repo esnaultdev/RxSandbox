@@ -26,6 +26,7 @@
     <dimen name="timeline_arrow_height">16dp</dimen>
     <dimen name="timeline_connection_circle_size">4dp</dimen>
     <dimen name="timeline_connection_stroke_width">2dp</dimen>
-    <dimen name="timeline_selection_checkbox_size">32dp</dimen>
+    <dimen name="timeline_selection_checkbox_size_total">32dp</dimen>
+    <dimen name="timeline_selection_checkbox_size_actual">20dp</dimen>
 
 </resources>

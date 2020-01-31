@@ -400,7 +400,10 @@ fun getObservableSample(operatorName: String): ReactiveTypeX<*, *>? {
                     ObservableT.Termination.Complete(10f)
             ).map<Int, Int>(functionOf("x -> x * 2") { x -> x * 2 })
 
-            ObservableX.merge(listOf(observable1, observable2))
+            val observable3 = ObservableX.just(5)
+                    .delay(10f)
+
+            ObservableX.merge(listOf(observable1, observable2, observable3))
                     .map<Int, Int>(functionOf("x -> x / 2") { x -> x / 2 })
         }
         else -> null

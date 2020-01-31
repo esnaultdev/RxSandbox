@@ -35,7 +35,8 @@ class ConnectionDrawer(
     private val paddingEnd = resources.getDimension(R.dimen.timeline_padding_end)
     private val connectionCircleSize = resources.getDimension(R.dimen.timeline_connection_circle_size)
     private val connectionStrokeWidth = resources.getDimension(R.dimen.timeline_connection_stroke_width)
-    private val selectionCheckBoxSize = resources.getDimensionPixelSize(R.dimen.timeline_selection_checkbox_size)
+    private val checkBoxSizeTotal = resources.getDimensionPixelSize(R.dimen.timeline_selection_checkbox_size_total)
+    private val checkBoxSizeActual = resources.getDimensionPixelSize(R.dimen.timeline_selection_checkbox_size_actual)
     private val connectionColor = context.getColorCompat(R.color.timeline_connection_color)
 
     // Paints
@@ -86,18 +87,17 @@ class ConnectionDrawer(
         if (selection is TimelineSelection.Checkbox) {
             if (selection.connected) {
                 val middleHeight = canvas.height.toFloat() / 2
-                val bottomY = if (selection.selected) {
-                    middleHeight
-                } else {
-                    canvas.height.toFloat()
-                }
-
                 val x = paddingStart / 2
 
-                canvas.drawLine(x, 0f, x, bottomY, connectionPaint)
+                if (selection.selected) {
+                    canvas.drawLine(x, 0f, x, middleHeight, connectionPaint)
+                } else {
+                    val firstLineBottom = middleHeight - checkBoxSizeActual / 2
+                    val secondLineTop = middleHeight + checkBoxSizeActual / 2
+                    val secondLineBottom = canvas.height.toFloat()
 
-                if (!selection.selected) {
-                    canvas.drawCircle(x, middleHeight, connectionCircleSize, connectionPaint)
+                    canvas.drawLine(x, 0f, x, firstLineBottom, connectionPaint)
+                    canvas.drawLine(x, secondLineTop, x, secondLineBottom, connectionPaint)
                 }
             }
         }
@@ -127,11 +127,11 @@ class ConnectionDrawer(
     private fun createSelectionCheckBox() : RadioButton {
         return RadioButton(context).apply {
             layoutParams = FrameLayout.LayoutParams(
-                    selectionCheckBoxSize,
-                    selectionCheckBoxSize
+                    checkBoxSizeTotal,
+                    checkBoxSizeTotal
             ).apply {
                 gravity = Gravity.CENTER_VERTICAL
-                marginStart = (this@ConnectionDrawer.paddingStart.toInt() - selectionCheckBoxSize) / 2
+                marginStart = (this@ConnectionDrawer.paddingStart.toInt() - checkBoxSizeTotal) / 2
             }
             setOnCheckedChangeListener(this@ConnectionDrawer::onSelectionCheckedChange)
         }
