@@ -8,7 +8,6 @@ import androidx.constraintlayout.widget.ConstraintSet
 import aodev.blue.rxsandbox.model.*
 import aodev.blue.rxsandbox.ui.widget.timeline.TimelineView
 import aodev.blue.rxsandbox.ui.widget.treeview.model.TreeViewModel as ViewModel
-import aodev.blue.rxsandbox.ui.widget.treeview.model.buildViewModel
 import aodev.blue.rxsandbox.ui.widget.treeview.model.TreeViewState as ViewState
 import aodev.blue.rxsandbox.ui.widget.treeview.model.buildViewState
 import kotlin.properties.Delegates
@@ -33,34 +32,25 @@ class SingleColumnTreeView : ConstraintLayout {
     }
 
     private var viewState: ViewState? = null
-    private var viewModel: ViewModel? = null
-        set(value) {
-            updater.viewModel = value
-            field = value
-        }
-    private val updater = TreeUpdater()
+    private val updater = TreeUpdater(this::updateViews)
 
     private fun updateViews() {
         val reactiveTypeX = reactiveTypeX
 
         removeAllViews()
-        viewModel = null
+        updater.viewState = null
 
         if (reactiveTypeX != null) {
             viewState = buildViewState(reactiveTypeX)
-            updateViewModel()
-            viewModel?.let(this::updateViews)
+            updater.viewState = viewState
         }
-    }
-
-    private fun updateViewModel() {
-        viewModel = viewState?.let { buildViewModel(it, updater::updateTimelines) }
     }
 
     /* *****************************************************************************************************************/
     //region Display **************************************************************************/
 
     private fun updateViews(viewModel: ViewModel) {
+        removeAllViews()
         val viewIds = IntArray(viewModel.elements.size)
 
         viewModel.elements.forEachIndexed { index, element ->
@@ -116,6 +106,8 @@ class SingleColumnTreeView : ConstraintLayout {
 
             downConnection = element.downConnection
             selection = element.selection
+            onSelected = element.onSelected
+
             element.update = { timeline -> this.timeline = timeline}
         }
     }

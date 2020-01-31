@@ -4,6 +4,7 @@ import aodev.blue.rxsandbox.model.InnerReactiveTypeX
 import aodev.blue.rxsandbox.model.Timeline
 import aodev.blue.rxsandbox.ui.widget.model.TimelineConnection
 import aodev.blue.rxsandbox.ui.widget.model.TimelineSelection
+import aodev.blue.rxsandbox.ui.widget.treeview.TreeUpdater
 import aodev.blue.rxsandbox.utils.linkedListOf
 import java.util.*
 import kotlin.reflect.KMutableProperty0
@@ -20,6 +21,7 @@ class TreeViewModel(val elements: List<Element>) {
                 val shown: KMutableProperty0<Boolean>,
                 val downConnection: TimelineConnection,
                 var selection: TimelineSelection,
+                val onSelected: () -> Unit,
                 val type: Type
         ) : Element() {
 
@@ -42,19 +44,23 @@ class TreeViewModel(val elements: List<Element>) {
 /**
  * Build a new [TreeViewModel] based on the [TreeViewState].
  */
-fun buildViewModel(viewState: TreeViewState, onUpdateTimelines: () -> Unit): TreeViewModel {
+fun buildViewModel(viewState: TreeViewState, treeUpdater: TreeUpdater): TreeViewModel {
     // We use a linked list to be able to add elements at the first index in O(1)
     val viewElements = linkedListOf<TreeViewModel.Element>()
 
     // Add the bottom element
     addTimelineToVMElements(
             stateElement = viewState.bottomElement,
-            onUpdateTimelines = onUpdateTimelines,
+            treeUpdater = treeUpdater,
+            // The bottom element is always alone
             selection = TimelineSelection.Alone,
+            // Since it's always alone, it's always selected
+            onSelected = {},
+            // Since it's at the bottom, the down connection does not exist
             downConnection = TimelineConnection.NONE,
             viewElements = viewElements
     )
-    addUpstreamToVMElements(viewState.bottomElement, onUpdateTimelines, viewElements)
+    addUpstreamToVMElements(viewState.bottomElement, treeUpdater, viewElements)
 
     return TreeViewModel(viewElements)
 }
@@ -65,8 +71,9 @@ fun buildViewModel(viewState: TreeViewState, onUpdateTimelines: () -> Unit): Tre
  */
 private fun <T : Any, TL : Timeline<T>> addTimelineToVMElements(
         stateElement: TreeViewState.Element<T, TL>,
-        onUpdateTimelines: () -> Unit,
+        treeUpdater: TreeUpdater,
         selection: TimelineSelection,
+        onSelected: () -> Unit,
         downConnection: TimelineConnection,
         viewElements: LinkedList<TreeViewModel.Element>
 ) {
@@ -81,13 +88,14 @@ private fun <T : Any, TL : Timeline<T>> addTimelineToVMElements(
                 stateElement.next?.invalidate()
 
                 // Compute the new results for the dependent timelines
-                onUpdateTimelines()
+                treeUpdater.updateTimelines()
             }
             TreeViewModel.Element.TimelineE(
                     result = innerX::input::get,
                     shown = stateElement::shown,
                     downConnection = downConnection,
                     selection = selection,
+                    onSelected = onSelected,
                     type = TreeViewModel.Element.TimelineE.Type.Input(onUpdate)
             )
         }
@@ -97,6 +105,7 @@ private fun <T : Any, TL : Timeline<T>> addTimelineToVMElements(
                     shown = stateElement::shown,
                     downConnection = downConnection,
                     selection = selection,
+                    onSelected = onSelected,
                     type = TreeViewModel.Element.TimelineE.Type.Result
             )
         }
@@ -112,7 +121,7 @@ private fun <T : Any, TL : Timeline<T>> addTimelineToVMElements(
  */
 private fun <T : Any, TL: Timeline<T>> addUpstreamToVMElements(
         stateElement: TreeViewState.Element<T, TL>,
-        onUpdateTimelines: () -> Unit,
+        treeUpdater: TreeUpdater,
         viewElements: LinkedList<TreeViewModel.Element>
 ) {
     val innerX = stateElement.reactiveTypeX.innerX as? InnerReactiveTypeX.Result<T, TL> ?: return
@@ -154,10 +163,27 @@ private fun <T : Any, TL: Timeline<T>> addUpstreamToVMElements(
                     TimelineConnection.MIDDLE
                 }
 
-                addTimelineToVMElements(element, onUpdateTimelines, selection, downConnection, viewElements)
+                val onSelected = {
+                    // We iterate in reverse order, we need to flip the index
+                    val realIndex = stateElement.previous.lastIndex - index
+                    val updated = stateElement.onSelectPrevious(realIndex)
+
+                    if (updated) {
+                        treeUpdater.updateViewModel()
+                    }
+                }
+
+                addTimelineToVMElements(
+                        stateElement = element,
+                        treeUpdater = treeUpdater,
+                        selection = selection,
+                        onSelected = onSelected,
+                        downConnection = downConnection,
+                        viewElements = viewElements
+                )
             }
 
     // Add the upstream of the selected previous
     stateElement.previous.getOrNull(stateElement.selectedPreviousIndex)
-            ?.let { addUpstreamToVMElements(it, onUpdateTimelines, viewElements) }
+            ?.let { addUpstreamToVMElements(it, treeUpdater, viewElements) }
 }

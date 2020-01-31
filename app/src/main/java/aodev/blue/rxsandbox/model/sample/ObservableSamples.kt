@@ -389,7 +389,7 @@ fun getObservableSample(operatorName: String): ReactiveTypeX<*, *>? {
                             6f to 3
                     ),
                     ObservableT.Termination.Error(8f)
-            ).map<Int, Int>(functionOf("x -> x * 2") { x -> x * 2 })
+            ).map<Int, Int>(functionOf("x -> x * 4") { x -> x * 4 })
 
             val observable2 = ObservableX.inputOf(
                     listOf(

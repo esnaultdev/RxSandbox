@@ -27,11 +27,13 @@ class TreeViewState(val bottomElement: Element<*, *>) {
             is InnerReactiveTypeX.Input<*, *> -> mutableListOf()
             is InnerReactiveTypeX.Result<*, *> -> MutableList(innerX.previous.size) { null }
         }
+            private set
 
         /**
          * The index of the selected [previous] element.
          */
         var selectedPreviousIndex: Int = 0
+            private set
 
         /**
          * True if the last computed timeline has been shown.
@@ -39,7 +41,7 @@ class TreeViewState(val bottomElement: Element<*, *>) {
         var shown: Boolean = false
 
         /**
-         * Invalidate this element and all the elements depending on it.
+         * Invalidate this element's timeline and all the elements depending on it.
          */
         fun invalidate() {
             shown = false
@@ -50,6 +52,26 @@ class TreeViewState(val bottomElement: Element<*, *>) {
             }
 
             next?.invalidate()
+        }
+
+        /**
+         * Update the selected previous.
+         * Return true if the selected previous has indeed been updated.
+         */
+        fun onSelectPrevious(index: Int): Boolean {
+            if (index == selectedPreviousIndex) return false
+            selectedPreviousIndex = index
+
+            // The selection has been updated, we might need to build a new part of the tree
+            val selectedPreviousElement = previous[selectedPreviousIndex]
+                    ?: throw IllegalStateException("The selected previous at index $index was not built")
+
+            val selectedPreviousInnerX = selectedPreviousElement.reactiveTypeX.innerX
+            if (selectedPreviousInnerX is InnerReactiveTypeX.Result<*, *>) {
+                buildPrevious(selectedPreviousInnerX, selectedPreviousElement)
+            }
+
+            return true
         }
     }
 }
@@ -95,6 +117,7 @@ private fun <T : Any, TL : Timeline<T>> buildPrevious(
         element: TreeViewState.Element<*, *>
 ) {
     if (innerX.previous.isEmpty()) return
+    if (element.previous.any { it != null }) return // The previouses have already been built
 
     innerX.previous.forEachIndexed { index, typeX ->
         // Build the previous element
